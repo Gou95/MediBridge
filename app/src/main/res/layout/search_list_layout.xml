@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="20dp"
+        android:layout_marginTop="5dp"
+        >
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginHorizontal="10dp">
+            
+            
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                
+                <ImageView
+                    android:id="@+id/img_logo"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/logo"/>
+
+                <LinearLayout
+                    android:layout_toRightOf="@id/img_logo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginStart="10dp"
+                    >
+                    <TextView
+                        android:id="@+id/txt_medicineName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Paracetamol"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="discriptions"
+                        android:textColor="@color/light_white"
+                        android:textSize="14sp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="\u20b9 0.00"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:layout_marginTop="10dp"/>
+
+
+
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/img_cancle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/remove"
+                    android:layout_alignParentEnd="true"/>
+
+
+
+
+
+
+
+
+            </RelativeLayout>
+
+
+
+
+
+                <AutoCompleteTextView
+                    android:id="@+id/auto_dealerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_background"
+                    android:drawableStart="@drawable/baseline_search"
+                    android:drawablePadding="15sp"
+                    android:hint="search stockist for medicine"
+                    android:paddingVertical="10dp"
+                    android:paddingStart="16dp"
+                    android:textSize="16sp"
+                    android:layout_marginTop="20dp"
+                    />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+               >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quantity:"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/black"/>
+
+                <ImageView
+                    android:id="@+id/img_sub"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/minus"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"/>
+
+                <TextView
+                    android:id="@+id/txt_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="20dp"/>
+
+                <ImageView
+                    android:id="@+id/img_add"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/add"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"/>
+
+            </LinearLayout>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="20dp"
+  >
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Unit:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/black"/>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/edit_background">
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/spinner_unit"/>
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btn_addCart"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                app:cardCornerRadius="25dp"
+                android:layout_marginTop="40dp"
+                app:cardBackgroundColor="@color/green"
+                android:layout_marginBottom="20dp"
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Add To Cart"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+
+            </androidx.cardview.widget.CardView>
+
+
+
+
+
+        </LinearLayout>
+        
+        
+        
+        
+    </androidx.cardview.widget.CardView>
+        
+
+</LinearLayout>

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/img_logo"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/logo"
+                android:layout_centerVertical="true"/>
+
+            <LinearLayout
+                android:layout_toRightOf="@id/img_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="10dp"
+                >
+                <TextView
+                    android:id="@+id/txt_medicine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Paracetamol"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="15sp"/>
+                <TextView
+                    android:id="@+id/txt_stockitName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Stocket name"
+                    android:textColor="@color/green"
+                    android:textSize="14sp"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                   />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="discriptions"
+                    android:textColor="@color/light_white"
+                    android:textSize="14sp"
+                    android:layout_gravity="center"
+                    />
+
+                <TextView
+                    android:id="@+id/txt_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="\u20b9 0.00"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginTop="10dp"/>
+
+
+
+
+            </LinearLayout>
+
+<!--            <ImageView-->
+<!--                android:id="@+id/img_cancle"-->
+<!--                android:layout_width="20dp"-->
+<!--                android:layout_height="20dp"-->
+<!--                android:src="@drawable/remove"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                />-->
+
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical">
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unit :"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/txt_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="bottles"
+                android:textColor="@color/light_white"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginStart="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end"
+                >
+
+                <ImageView
+                    android:id="@+id/img_delete"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/delete"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    />
+
+
+                <ImageView
+                    android:id="@+id/img_sub"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/minus"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/txt_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    android:text="1"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/img_add"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/add"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Expiry"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:textSize="16sp"-->
+<!--                android:layout_gravity="center_vertical"/>-->
+
+            <RadioGroup
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:gravity="center"
+                android:layout_marginStart="10dp">
+
+                <RadioButton
+                    android:id="@+id/radio_urgent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Urgent"
+                    android:textColor="@color/black"/>
+
+                <RadioButton
+                    android:id="@+id/radio_today"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Today"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="10dp"/>
+                <RadioButton
+                    android:id="@+id/radio_tomorrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tomorrow"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="10dp"/>
+
+
+
+
+
+
+
+
+
+
+
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1.5dp"
+            android:background="@color/grey"
+            android:layout_marginTop="10dp"/>
+
+
+
+
+
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:id="@+id/btn_addCart"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="50dp"-->
+<!--            app:cardCornerRadius="20dp"-->
+<!--            android:layout_marginTop="40dp"-->
+<!--            app:cardBackgroundColor="@color/green"-->
+<!--            android:layout_marginBottom="20dp"-->
+<!--            >-->
+
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:text="Add to Cart"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:textSize="18sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:gravity="center"/>-->
+
+
+<!--        </androidx.cardview.widget.CardView>-->
+
+
+
+
+
+    </LinearLayout>
+
+</LinearLayout>

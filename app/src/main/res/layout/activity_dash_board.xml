@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.DashBoardActivity">
+
+
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_container"/>
+
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bottomAppbar"
+        android:layout_gravity="bottom"
+        style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+        android:backgroundTint="@color/white"
+        app:fabAlignmentMode="center"
+        app:fabCradleMargin="10dp"
+        app:fabCradleRoundedCornerRadius="10dp"
+        app:hideOnScroll="true"
+
+
+        >
+
+        <me.ertugrul.lib.SuperBottomBar
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:sbb_activeColor="@color/green"
+            app:sbb_backgroundColor="@color/white"
+            app:sbb_iconMargin="13dp"
+            app:sbb_iconSize="21.50dp"
+            app:sbb_menu="@menu/bottom_items"
+            app:sbb_pressedColor="@color/green"
+            app:sbb_textColor="@color/green"
+            app:sbb_textSize="12sp" />
+
+<!--        <superB-->
+<!--            android:id="@+id/bottom_navigation"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:menu="@menu/bottom_items"-->
+<!--            app:itemIconTint="@color/colorAccent"-->
+<!--            app:itemTextColor="@color/colorAccent"-->
+<!--            android:background="@color/white"-->
+<!--            app:itemHorizontalTranslationEnabled="true"-->
+<!--            app:labelVisibilityMode="labeled"-->
+<!--            android:layout_marginEnd="15dp"-->
+
+<!--            />-->
+
+
+
+
+
+
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/baseline_stroller"
+        app:layout_anchor="@id/bottomAppbar"
+        app:layout_anchorGravity="center"
+        android:backgroundTint="@color/green"
+        android:id="@+id/flotingBtn"
+        />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
