@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Home Menu Item -->
+    <item
+        android:id="@+id/home"
+        android:title="Home"
+        android:icon="@drawable/baseline_home"
+         /> <!-- Optional: 'ifRoom' shows icon when there's room -->
+
+    <!-- Urgent Menu Item -->
+    <item
+        android:id="@+id/urgent"
+        android:title="Urgent"
+        android:icon="@drawable/baseline_emergency"
+        />
+
+    <!-- Order Menu Item -->
+    <item
+        android:id="@+id/order"
+        android:title="Orders"
+        android:icon="@drawable/baseline_shopping_bag"
+       />
+
+    <!-- Profile Menu Item -->
+    <item
+        android:id="@+id/profile"
+        android:title="Profile"
+        android:icon="@drawable/baseline_person"
+         />
+</menu>
