@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.indosoft.mediBridge.Fragment.HomeFragment;
 import com.indosoft.mediBridge.Fragment.OrderFragment;
 import com.indosoft.mediBridge.Fragment.ProfileFragment;
+import com.indosoft.mediBridge.Fragment.UrgentFragment;
 import com.indosoft.mediBridge.R;
 import com.indosoft.mediBridge.databinding.ActivityDashBoardBinding;
 
@@ -55,6 +56,10 @@ public class DashBoardActivity extends AppCompatActivity {
                     Log.d(TAG, "onItemSelect:INSIDE "+i);
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, new HomeFragment())
+                            .commit();
+                }else if (i == 1) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new UrgentFragment(), "fragmentTag")
                             .commit();
                 }
                 else if (i == 2) {

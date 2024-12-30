@@ -41,80 +41,58 @@ public class LoginActivity extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-//        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-//        loginViewModel.init(this);
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        loginViewModel.init(this);
         sign = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
         sign.init(this);
 
         sign.getAllSignUPData();
-        initclicks();
-        onAttachObservers();
+        initClicks();
+        attachObservers();
+        checkUserSession();
 
     }
 
-    private void onAttachObservers() {
+    private void checkUserSession() {
 
+        String retailerId = AppSession.getInstance(this).getString(Constants.RELAILER_ID);
+        if (retailerId != null && !retailerId.isEmpty()) {
+            navigateToDashboard();
+        }
+    }
+
+    private void attachObservers() {
         sign.getLiveData().observe(this, responses -> {
             if (responses != null) {
                 getAllUserList.clear();
                 getAllUserList.addAll(responses);
-
-                for (GetSignUpUserResponse response : responses) {
-                    // Use HashMap to store user data
-                    HashMap<String, String> userData = new HashMap<>();
-                    userData.put(Constants.RELAILER_PHONE, response.getRetailerPhone());
-                    userData.put(Constants.RELAILER_PASSWORD, response.getRetailerPassword());
-                    userData.put(Constants.RELAILER_ID, response.getRetailerId());
-                    userData.put(Constants.RELAILER_NAME, response.getRetailerName());
-
-                    // Store all data in AppSession
-                    for (HashMap.Entry<String, String> entry : userData.entrySet()) {
-                        AppSession.getInstance(this).putString(entry.getKey(), entry.getValue());
-                    }
-
-                    // Log data for debugging
-                    Log.d("AppSessionData", "Phone: " + response.getRetailerPhone());
-                    Log.d("AppSessionData", "Name: " + response.getRetailerName());
-                    Log.d("AppSessionData", "ID: " + response.getRetailerId());
-                    Log.d("AppSessionData", "Password: " + response.getRetailerPassword());
-                }
             } else {
                 Log.e("LoginActivity", "Sign-up response is null or empty");
             }
         });
 
-
-
+        loginViewModel.getLiveData().observe(this, loginResponses -> {
+            if (loginResponses != null) {
+                navigateToDashboard();
+            }
+        });
     }
 
-    private void initclicks() {
+    private void initClicks() {
         binding.txtForgetpass.setPaintFlags(binding.txtForgetpass.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         binding.btnLogin.setOnClickListener(v -> {
+            String enteredMobile = binding.edtMobile.getText().toString().trim();
+            String enteredPassword = binding.edtPassword.getText().toString().trim();
 
-            Intent intent = new Intent(LoginActivity.this, DashBoardActivity.class);
-            startActivity(intent);
-//
-//            String storedPhone = AppSession.getInstance(this).getString(Constants.RELAILER_PHONE);
-//            String storedPassword = AppSession.getInstance(this).getString(Constants.RELAILER_PASSWORD);
-//
-//            String enteredMobile = binding.edtMobile.getText().toString().trim();
-//            String enteredPassword = binding.edtPassword.getText().toString().trim();
-//
-//            if (enteredMobile.isEmpty()) {
-//                Toast.makeText(this, "Enter mobile number", Toast.LENGTH_SHORT).show();
-//            } else if (!enteredMobile.equals(storedPhone)) {
-//                Toast.makeText(this, "Incorrect mobile number", Toast.LENGTH_SHORT).show();
-//            } else if (enteredPassword.isEmpty()) {
-//                Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show();
-//            } else if (!enteredPassword.equals(storedPassword)) {
-//                Toast.makeText(this, "Incorrect password", Toast.LENGTH_SHORT).show();
-//            } else {
-//
-//            }
+            if (enteredMobile.isEmpty()) {
+                Toast.makeText(this, "Enter mobile number", Toast.LENGTH_SHORT).show();
+            } else if (enteredPassword.isEmpty()) {
+                Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show();
+            } else {
+                validateCredentials(enteredMobile, enteredPassword);
+            }
         });
-
-
 
         binding.txtForgetpass.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), ForgetPasswordActivity.class);
@@ -126,17 +104,46 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        binding.imgEye.setOnClickListener(v -> {
-            isPasswordVisible = !isPasswordVisible;
+        binding.imgEye.setOnClickListener(v -> togglePasswordVisibility());
+    }
+    private void validateCredentials(String mobile, String password) {
+        boolean isValidUser = false;
+        for (GetSignUpUserResponse user : getAllUserList) {
+            if (mobile.equals(user.getRetailerPhone()) &&
+                    password.equals(user.getRetailerPassword())) {
+                isValidUser = true;
 
-            if (isPasswordVisible) {
-                binding.edtPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                binding.imgEye.setImageResource(R.drawable.eye);
-            } else {
-                binding.edtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                binding.imgEye.setImageResource(R.drawable.hide_eye);
+                // Save user details in AppSession
+                AppSession.getInstance(this).putString(Constants.RELAILER_PHONE, user.getRetailerPhone());
+                AppSession.getInstance(this).putString(Constants.RELAILER_PASSWORD, user.getRetailerPassword());
+                AppSession.getInstance(this).putString(Constants.RELAILER_ID, user.getRetailerId());
+                AppSession.getInstance(this).putString(Constants.RELAILER_NAME, user.getRetailerName());
+                break;
             }
-        });
+        }
+
+        if (isValidUser) {
+            loginViewModel.getLoginResData(mobile, password);
+        } else {
+            Toast.makeText(this, "Incorrect mobile number or password", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void togglePasswordVisibility() {
+        isPasswordVisible = !isPasswordVisible;
+
+        if (isPasswordVisible) {
+            binding.edtPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            binding.imgEye.setImageResource(R.drawable.eye);
+        } else {
+            binding.edtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            binding.imgEye.setImageResource(R.drawable.hide_eye);
+        }
+    }
+    private void navigateToDashboard() {
+        Intent intent = new Intent(LoginActivity.this, DashBoardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
 }

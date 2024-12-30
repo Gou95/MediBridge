@@ -15,6 +15,10 @@ public class Constants {
     public static final String UNIT_ID = "unit_id";
     public static final String COMPANY_ID = "company_id";
     public static final String DEALER_ID = "dealer_id";
+    public static final String Email = "retailer_email";
+    public static final String RETAILER_GST = "retailer_gst";
+    public static final String RETAILER_DL = "retailer_dl_no";
+    public static final String STATUS = "status";
 
 
 

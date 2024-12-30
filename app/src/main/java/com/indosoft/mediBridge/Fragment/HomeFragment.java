@@ -99,8 +99,8 @@ public class HomeFragment extends Fragment {
         imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
 
         String retailerName = AppSession.getInstance(getContext()).getString(Constants.RELAILER_NAME);
-        binding.txtRetailerName.setText(retailerName != null ? retailerName : "Default Retailer");
-
+//        binding.txtRetailerName.setText("Welcome To"+"/"+retailerName != null ? retailerName : "Default Retailer");
+        binding.txtRetailerName.setText("Welcome" + retailerName);
 
         String user_id = AppSession.getInstance(getContext()).getString(Constants.RELAILER_ID);
 
@@ -292,9 +292,6 @@ public class HomeFragment extends Fragment {
                 if (response != null) {
                     Toast.makeText(requireContext(), response.getMessage(), Toast.LENGTH_SHORT).show();
 
-                    // If the cart is updated successfully, navigate to CartActivity
-                    Intent intent = new Intent(getContext(), CartActivity.class);
-                    startActivity(intent);
                 } else {
                     // Handle failure if the response is null
                     Toast.makeText(requireContext(), "Failed to add to cart. Please try again.", Toast.LENGTH_SHORT).show();
@@ -308,7 +305,7 @@ public class HomeFragment extends Fragment {
         try {
             number.set(Integer.parseInt(txtNumber.getText().toString()));
         } catch (NumberFormatException e) {
-            txtNumber.setText("0");
+            txtNumber.setText("1");
         }
 
         imgSub.setOnClickListener(v -> {

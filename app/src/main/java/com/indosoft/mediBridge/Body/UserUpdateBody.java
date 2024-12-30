@@ -1,9 +1,10 @@
-package com.indosoft.mediBridge.Model;
+package com.indosoft.mediBridge.Body;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class GetSignUpUserResponse {
+public class UserUpdateBody {
+
     @SerializedName("retailer_id")
     @Expose
     private String retailerId;
@@ -82,8 +83,8 @@ public class GetSignUpUserResponse {
         this.retailerPassword = retailerPassword;
     }
 
-    public String getRetailerEmail() {
-        return (String) retailerEmail;
+    public Object getRetailerEmail() {
+        return retailerEmail;
     }
 
     public void setRetailerEmail(Object retailerEmail) {
@@ -122,16 +123,16 @@ public class GetSignUpUserResponse {
         this.retailerAddress = retailerAddress;
     }
 
-    public String getRetailerGst() {
-        return (String) retailerGst;
+    public Object getRetailerGst() {
+        return retailerGst;
     }
 
     public void setRetailerGst(Object retailerGst) {
         this.retailerGst = retailerGst;
     }
 
-    public String getRetailerDlNo() {
-        return (String) retailerDlNo;
+    public Object getRetailerDlNo() {
+        return retailerDlNo;
     }
 
     public void setRetailerDlNo(Object retailerDlNo) {
@@ -169,5 +170,4 @@ public class GetSignUpUserResponse {
     public void setEdittime(Object edittime) {
         this.edittime = edittime;
     }
-
 }

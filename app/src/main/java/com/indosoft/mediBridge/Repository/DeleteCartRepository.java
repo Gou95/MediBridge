@@ -5,9 +5,10 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 
 import com.indosoft.mediBridge.Listener.DealerListener;
-import com.indosoft.mediBridge.Listener.LoginListener;
+import com.indosoft.mediBridge.Listener.DeleteCartListener;
+import com.indosoft.mediBridge.Model.AddtoCartResponse;
 import com.indosoft.mediBridge.Model.DealersResponse;
-import com.indosoft.mediBridge.Model.LoginResponse;
+import com.indosoft.mediBridge.Model.DeleteCartResponse;
 import com.indosoft.mediBridge.RetrofitServices.ApiInterface;
 import com.indosoft.mediBridge.RetrofitServices.RetrofitService;
 
@@ -17,16 +18,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginRepository {
-    public static LoginRepository repository;
+public class DeleteCartRepository {
 
-    private final MutableLiveData<List<LoginResponse>> mutableLiveData = new MutableLiveData<>();
+    public static DeleteCartRepository repository;
+
+    private final MutableLiveData<DeleteCartResponse> mutableLiveData = new MutableLiveData<>();
 
 
     // Singleton pattern
-    public static LoginRepository getInstance() {
+    public static DeleteCartRepository getInstance() {
         if (repository == null) {
-            repository = new LoginRepository();
+            repository = new DeleteCartRepository();
         }
         return repository;
     }
@@ -34,15 +36,15 @@ public class LoginRepository {
     private final ApiInterface apiInterface;
 
     // Constructor
-    public LoginRepository() {
+    public DeleteCartRepository() {
         apiInterface = RetrofitService.userService(ApiInterface.class);
     }
 
-    public MutableLiveData<List<LoginResponse>> getLoginData(Context context,String retailer_phone,String retailer_password, LoginListener listener) {
-        Call<List<LoginResponse>> call = apiInterface.loginRes(retailer_phone,retailer_password);
-        call.enqueue(new Callback<List<LoginResponse>>() {
+    public MutableLiveData<DeleteCartResponse> getDeleteData(Context context,String cart_id, DeleteCartListener listener) {
+        Call<DeleteCartResponse> call = apiInterface.deleteCart(cart_id);
+        call.enqueue(new Callback<DeleteCartResponse>() {
             @Override
-            public void onResponse(Call<List<LoginResponse>> call, Response<List<LoginResponse>> response) {
+            public void onResponse(Call<DeleteCartResponse> call, Response<DeleteCartResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     listener.onSuccess(response.body());
 
@@ -55,11 +57,12 @@ public class LoginRepository {
             }
 
             @Override
-            public void onFailure(Call<List<LoginResponse>> call, Throwable t) {
+            public void onFailure(Call<DeleteCartResponse> call, Throwable t) {
                 listener.onError("Something went wrong: " + t.getMessage());
 
             }
         });
         return mutableLiveData;
     }
+
 }

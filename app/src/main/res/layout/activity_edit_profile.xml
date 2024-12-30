@@ -57,7 +57,30 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Name"
+                android:text="Shop Name"
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"/>
+
+
+            <TextView
+                android:id="@+id/txt_shopName"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/edit_background"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:paddingLeft="10dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Contact Person"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 android:layout_marginHorizontal="20dp"
@@ -65,8 +88,9 @@
 
 
             <EditText
+                android:id="@+id/edt_contactPerson"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:background="@drawable/edit_background"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
@@ -74,6 +98,7 @@
                 android:imeOptions="actionNext"
                 android:paddingLeft="10dp"
                 android:layout_marginBottom="10dp"/>
+
 
             <TextView
                 android:layout_width="match_parent"
@@ -86,8 +111,9 @@
 
 
             <EditText
+                android:id="@+id/edt_email"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:background="@drawable/edit_background"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
@@ -108,58 +134,21 @@
                 android:layout_marginTop="10dp"/>
 
 
-            <EditText
+            <TextView
+                android:id="@+id/txt_phoneNumber"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:background="@drawable/edit_background"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
-                android:inputType="number"
-                android:maxLength="10"
-                android:imeOptions="actionNext"
+                android:textColor="@color/black"
+                android:gravity="center_vertical"
+                android:textSize="16sp"
                 android:paddingLeft="10dp"
                 android:layout_marginBottom="10dp"/>
 
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="State"
-                android:textColor="@color/black"
-                android:textSize="17sp"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="10dp"/>
 
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/edit_background"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="20dp"
-                android:paddingLeft="10dp"
-                android:layout_marginBottom="10dp"
-                />
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="City"
-                android:textColor="@color/black"
-                android:textSize="17sp"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="10dp"/>
-
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/edit_background"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="20dp"
-                android:paddingLeft="10dp"
-                android:layout_marginBottom="10dp"/>
 
 
             <TextView
@@ -173,8 +162,9 @@
 
 
             <EditText
+                android:id="@+id/edt_dlNumber"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:background="@drawable/edit_background"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
@@ -194,8 +184,9 @@
 
 
             <EditText
+                android:id="@+id/edt_gstNumber"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:background="@drawable/edit_background"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
@@ -207,7 +198,7 @@
 
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/btn_login"
+                android:id="@+id/btn_submit"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginHorizontal="20dp"

@@ -2,10 +2,13 @@ package com.indosoft.mediBridge.RetrofitServices;
 
 import com.indosoft.mediBridge.Body.AddtoCartBody;
 import com.indosoft.mediBridge.Body.SignUpBody;
+import com.indosoft.mediBridge.Body.UserUpdateBody;
 import com.indosoft.mediBridge.Model.AddtoCartResponse;
 import com.indosoft.mediBridge.Model.CardListResponse;
 import com.indosoft.mediBridge.Model.DealersResponse;
+import com.indosoft.mediBridge.Model.DeleteCartResponse;
 import com.indosoft.mediBridge.Model.GetSignUpUserResponse;
+import com.indosoft.mediBridge.Model.GetUrgentCartResponse;
 import com.indosoft.mediBridge.Model.IndiaStateResponse;
 import com.indosoft.mediBridge.Model.LoginResponse;
 import com.indosoft.mediBridge.Model.MedicineListResponse;
@@ -13,15 +16,19 @@ import com.indosoft.mediBridge.Model.ShowCartResponse;
 import com.indosoft.mediBridge.Model.SignUpResponse;
 import com.indosoft.mediBridge.Model.StateCityResponse;
 import com.indosoft.mediBridge.Model.UnitResponse;
+import com.indosoft.mediBridge.Model.UrgentCartResponse;
+import com.indosoft.mediBridge.Model.UserUpdateResponse;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 public interface ApiInterface {
@@ -58,9 +65,9 @@ public interface ApiInterface {
     @POST("showcart.php")
     Call<List<ShowCartResponse>> showCartList(@Query("retailer_id") String retailer_id);
 
-    @FormUrlEncoded
+
     @POST("login.php")
-    Call<List<LoginResponse>> loginRes(@Field("mobile") String mobile,@Field("password") String password);
+    Call<List<LoginResponse>> loginRes(@Query("retailer_phone") String retailer_phone,@Query("retailer_password") String retailer_password);
 
     @POST("users.php")
     Call<SignUpResponse> getRegisterRes(@Body SignUpBody body);
@@ -68,4 +75,16 @@ public interface ApiInterface {
     @POST("cart.php")
     Call<AddtoCartResponse> getAddToCartRes(@Body AddtoCartBody body);
 
+
+    @PUT("users.php")
+    Call<UserUpdateResponse> updateUsers(@Body UserUpdateBody body);
+
+    @PUT("showcart.php")
+    Call<UrgentCartResponse> urgentCart(@Query("cart_id") String cart_id);
+
+    @DELETE("showcart.php")
+    Call<DeleteCartResponse> deleteCart(@Query("cart_id") String cart_id );
+
+    @POST("urgentcart.php")
+    Call<List<GetUrgentCartResponse>> removeUrgentCart(@Query("retailer_id") String retailer_id);
 }

@@ -6,27 +6,26 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.indosoft.mediBridge.Listener.CartListener;
-import com.indosoft.mediBridge.Listener.LoginListener;
-import com.indosoft.mediBridge.Model.CardListResponse;
-import com.indosoft.mediBridge.Model.LoginResponse;
-import com.indosoft.mediBridge.Repository.CartRepository;
-import com.indosoft.mediBridge.Repository.LoginRepository;
+import com.indosoft.mediBridge.Listener.GetSignUpUserListener;
+import com.indosoft.mediBridge.Listener.GetUrgentCartListener;
+import com.indosoft.mediBridge.Model.GetSignUpUserResponse;
+import com.indosoft.mediBridge.Model.GetUrgentCartResponse;
+import com.indosoft.mediBridge.Repository.GetSignUpUserRepository;
+import com.indosoft.mediBridge.Repository.GetUrgentCartRepository;
 
 import java.util.List;
 
-public class LoginViewModel extends ViewModel {
-
+public class GetUrgentCartViewModel extends ViewModel {
     private Context context;
 
     private MutableLiveData<String> isFailed = new MutableLiveData<>();
 
     private MutableLiveData<Boolean> isConnecting = new MutableLiveData<>();
 
-    private MutableLiveData<List<LoginResponse>> responseMutableLiveData;
+    private MutableLiveData<List<GetUrgentCartResponse>> responseMutableLiveData;
 
 
-    private LoginRepository repository;
+    private GetUrgentCartRepository repository;
 
     public LiveData<String> getIsFailed(){
         return isFailed;
@@ -38,7 +37,7 @@ public class LoginViewModel extends ViewModel {
 
     }
 
-    public LiveData<List<LoginResponse>>getLiveData(){
+    public LiveData<List<GetUrgentCartResponse>>getLiveData(){
         if (responseMutableLiveData == null){
             responseMutableLiveData = new MutableLiveData<>();
         }
@@ -50,13 +49,11 @@ public class LoginViewModel extends ViewModel {
         if (responseMutableLiveData == null){
             return;
         }
-        repository = LoginRepository.getInstance();
+        repository = GetUrgentCartRepository.getInstance();
     }
-    LoginListener listener = new LoginListener() {
-
-
+    GetUrgentCartListener listener = new GetUrgentCartListener() {
         @Override
-        public void onSuccess(List<LoginResponse> response) {
+        public void onSuccess(List<GetUrgentCartResponse> response) {
             responseMutableLiveData.setValue(response);
         }
 
@@ -65,12 +62,10 @@ public class LoginViewModel extends ViewModel {
             isFailed.setValue(error);
         }
     };
-    public void getLoginResData(String retailer_phone,String retailer_password) {
+    public void getRemoveAllCartData(String retailer_id) {
         isConnecting.setValue(true);  // Show loading state
-        repository = LoginRepository.getInstance();
-        repository.getLoginData(context,retailer_phone,retailer_password, listener);
+        repository = GetUrgentCartRepository.getInstance();
+        repository.getAllRemoveCartData(context,retailer_id, listener);
 
     }
-
-
 }

@@ -146,15 +146,15 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
 
-        signUpViewModel.getLiveData().observe(this, signUpResponse -> {
-            if (signUpResponse != null) {
-                Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(SignUpActivity.this, DashBoardActivity.class);
-                startActivity(intent);
-               // AppSession.getInstance(this).putObject(Constants.SIGN_UP_MASSAGE,signUpResponse);
-                finish();
-            }
-        });
+//        signUpViewModel.getLiveData().observe(this, signUpResponse -> {
+//            if (signUpResponse != null) {
+//                Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
+//                Intent intent = new Intent(SignUpActivity.this, DashBoardActivity.class);
+//                startActivity(intent);
+//               // AppSession.getInstance(this).putObject(Constants.SIGN_UP_MASSAGE,signUpResponse);
+//                finish();
+//            }
+//        });
     }
 
 
@@ -163,41 +163,74 @@ public class SignUpActivity extends AppCompatActivity {
         binding.txtLogin.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), LoginActivity.class)));
 
         binding.btnSignin.setOnClickListener(v -> {
+            // Get the user inputs
             String shopName = binding.edtShopName.getText().toString().trim();
             String mobileNumber = binding.edtMobileNo.getText().toString().trim();
             String password = binding.edtPassword.getText().toString().trim();
             String stateName = binding.edtState.getText().toString().trim();
             String cityName = binding.edtCity.getText().toString().trim();
 
+            // Get state and city IDs from session
             String stateId = AppSession.getInstance(this).getString(Constants.STATE_ID);
             String cityId = AppSession.getInstance(this).getString(Constants.CITY_ID);
 
-
-
+            // Validate inputs and display appropriate error messages
             if (shopName.isEmpty()) {
                 Toast.makeText(this, "Enter shop name", Toast.LENGTH_SHORT).show();
-            } else if (mobileNumber.isEmpty()) {
+                return;
+            }
+            if (mobileNumber.isEmpty()) {
                 Toast.makeText(this, "Enter mobile number", Toast.LENGTH_SHORT).show();
-            } else if (password.isEmpty()) {
+                return;
+            }
+            if (password.isEmpty()) {
                 Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show();
-            } else if (stateName.isEmpty() || stateId.isEmpty()) {
+                return;
+            }
+            if (stateName.isEmpty() || stateId == null || stateId.isEmpty()) {
                 Toast.makeText(this, "Select a state", Toast.LENGTH_SHORT).show();
-            } else if (cityName.isEmpty() || cityId.isEmpty()) {
+                return;
+            }
+            if (cityName.isEmpty() || cityId == null || cityId.isEmpty()) {
                 Toast.makeText(this, "Select a city", Toast.LENGTH_SHORT).show();
-            } if (!binding.checkbox.isChecked()) {
+                return;
+            }
+            if (!binding.checkbox.isChecked()) {
                 Toast.makeText(this, "You must agree to the Terms & Conditions to proceed.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            else {
-                SignUpBody body = new SignUpBody();
-                body.setRetailerName(shopName);
-                body.setRetailerPhone(mobileNumber);
-                body.setRetailerPassword(password);
-                body.setStateId(Integer.valueOf(stateId));
-                body.setCityId(Integer.valueOf(cityId));
-                signUpViewModel.getSignData(body);
-            }
+
+            // Proceed with signup if all validations pass
+            SignUpBody body = new SignUpBody();
+            body.setRetailerName(shopName);
+            body.setRetailerPhone(mobileNumber);
+            body.setRetailerPassword(password);
+            body.setStateId(Integer.valueOf(stateId));
+            body.setCityId(Integer.valueOf(cityId));
+
+            signUpViewModel.getSignData(body);
+
+            // Observe the response to navigate to the dashboard
+            signUpViewModel.getLiveData().observe(this, signUpResponse -> {
+                if (signUpResponse != null) {
+                    Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    // Navigate to the dashboard only after successful response
+                    Intent intent = new Intent(SignUpActivity.this, DashBoardActivity.class);
+                    startActivity(intent);
+
+                    AppSession.getInstance(this).putString(Constants.RELAILER_NAME,shopName);
+                    AppSession.getInstance(this).putString(Constants.RELAILER_PHONE,mobileNumber);
+                    AppSession.getInstance(this).putString(Constants.RELAILER_PASSWORD,password);
+                   // AppSession.getInstance(this).putString(Constants.RELAILER_NAME,shopName);
+
+                    finish();
+                } else {
+                    Toast.makeText(this, "Signup failed. Please try again.", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
+
 
         binding.checkbox.setOnClickListener(v -> showTermsConditionsPopup());
 

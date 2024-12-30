@@ -3,8 +3,7 @@ package com.indosoft.mediBridge.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ShowCartResponse {
-
+public class GetUrgentCartResponse {
     @SerializedName("cart_id")
     @Expose
     private String cartId;

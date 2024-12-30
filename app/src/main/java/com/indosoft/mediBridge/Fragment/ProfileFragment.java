@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.indosoft.mediBridge.Activities.AddressActivity;
 import com.indosoft.mediBridge.Activities.EditProfile;
 import com.indosoft.mediBridge.Activities.LoginActivity;
 import com.indosoft.mediBridge.R;
@@ -40,6 +41,13 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent  = new Intent(getContext(), EditProfile.class);
+                startActivity(intent);
+            }
+        });
+        binding.txtAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), AddressActivity.class);
                 startActivity(intent);
             }
         });

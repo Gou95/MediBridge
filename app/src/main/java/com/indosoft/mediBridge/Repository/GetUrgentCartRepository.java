@@ -4,10 +4,10 @@ import android.content.Context;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.indosoft.mediBridge.Listener.DealerListener;
-import com.indosoft.mediBridge.Listener.LoginListener;
-import com.indosoft.mediBridge.Model.DealersResponse;
-import com.indosoft.mediBridge.Model.LoginResponse;
+import com.indosoft.mediBridge.Listener.GetSignUpUserListener;
+import com.indosoft.mediBridge.Listener.GetUrgentCartListener;
+import com.indosoft.mediBridge.Model.GetSignUpUserResponse;
+import com.indosoft.mediBridge.Model.GetUrgentCartResponse;
 import com.indosoft.mediBridge.RetrofitServices.ApiInterface;
 import com.indosoft.mediBridge.RetrofitServices.RetrofitService;
 
@@ -17,16 +17,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginRepository {
-    public static LoginRepository repository;
+public class GetUrgentCartRepository {
+    public static GetUrgentCartRepository repository;
 
-    private final MutableLiveData<List<LoginResponse>> mutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<GetUrgentCartResponse>> mutableLiveData = new MutableLiveData<>();
 
 
     // Singleton pattern
-    public static LoginRepository getInstance() {
+    public static GetUrgentCartRepository getInstance() {
         if (repository == null) {
-            repository = new LoginRepository();
+            repository = new GetUrgentCartRepository();
         }
         return repository;
     }
@@ -34,15 +34,15 @@ public class LoginRepository {
     private final ApiInterface apiInterface;
 
     // Constructor
-    public LoginRepository() {
+    public GetUrgentCartRepository() {
         apiInterface = RetrofitService.userService(ApiInterface.class);
     }
 
-    public MutableLiveData<List<LoginResponse>> getLoginData(Context context,String retailer_phone,String retailer_password, LoginListener listener) {
-        Call<List<LoginResponse>> call = apiInterface.loginRes(retailer_phone,retailer_password);
-        call.enqueue(new Callback<List<LoginResponse>>() {
+    public MutableLiveData<List<GetUrgentCartResponse>> getAllRemoveCartData(Context context,String retailer_id, GetUrgentCartListener listener) {
+        Call<List<GetUrgentCartResponse>> call = apiInterface.removeUrgentCart(retailer_id);
+        call.enqueue(new Callback<List<GetUrgentCartResponse>>() {
             @Override
-            public void onResponse(Call<List<LoginResponse>> call, Response<List<LoginResponse>> response) {
+            public void onResponse(Call<List<GetUrgentCartResponse>> call, Response<List<GetUrgentCartResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     listener.onSuccess(response.body());
 
@@ -55,7 +55,7 @@ public class LoginRepository {
             }
 
             @Override
-            public void onFailure(Call<List<LoginResponse>> call, Throwable t) {
+            public void onFailure(Call<List<GetUrgentCartResponse>> call, Throwable t) {
                 listener.onError("Something went wrong: " + t.getMessage());
 
             }
