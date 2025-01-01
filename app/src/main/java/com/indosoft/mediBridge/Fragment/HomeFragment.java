@@ -35,6 +35,7 @@ import com.indosoft.mediBridge.Adapter.DealerListAdapter;
 import com.indosoft.mediBridge.Adapter.DropDownAdapter;
 import com.indosoft.mediBridge.Body.AddtoCartBody;
 import com.indosoft.mediBridge.Listener.DealerListener;
+import com.indosoft.mediBridge.Model.CityDealerResponse;
 import com.indosoft.mediBridge.Model.DealersResponse;
 import com.indosoft.mediBridge.Model.IndiaStateResponse;
 import com.indosoft.mediBridge.Model.MedicineListResponse;
@@ -43,6 +44,7 @@ import com.indosoft.mediBridge.R;
 import com.indosoft.mediBridge.Session.AppSession;
 import com.indosoft.mediBridge.Session.Constants;
 import com.indosoft.mediBridge.ViewModel.AddtoCartViewModel;
+import com.indosoft.mediBridge.ViewModel.CityDealerViewModel;
 import com.indosoft.mediBridge.ViewModel.DealerViewModel;
 import com.indosoft.mediBridge.ViewModel.MedicineViewModel;
 import com.indosoft.mediBridge.ViewModel.UnitViewModel;
@@ -63,11 +65,13 @@ public class HomeFragment extends Fragment {
     ArrayList<DealersResponse> dealerList = new ArrayList<>();
     ArrayList<UnitResponse> unitList = new ArrayList<>();
     ArrayList<MedicineListResponse> itemList = new ArrayList<>();
+    ArrayList<CityDealerResponse> cityDealerList = new ArrayList<>();
 
     DealerViewModel dealerViewModel;
     UnitViewModel unitViewModel;
     MedicineViewModel medicineViewModel;
     AddtoCartViewModel cartViewModel;
+    CityDealerViewModel cityDealerViewModel;
 
     String selectDealerId;
     String selectUnitId;
@@ -99,13 +103,24 @@ public class HomeFragment extends Fragment {
         imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
 
         String retailerName = AppSession.getInstance(getContext()).getString(Constants.RELAILER_NAME);
-//        binding.txtRetailerName.setText("Welcome To"+"/"+retailerName != null ? retailerName : "Default Retailer");
-        binding.txtRetailerName.setText("Welcome" + retailerName);
+        String retailerpass = AppSession.getInstance(getContext()).getString(Constants.RELAILER_PASSWORD);
+        String retailerPhone = AppSession.getInstance(getContext()).getString(Constants.RELAILER_PHONE);
+        String retailerState = AppSession.getInstance(getContext()).getString(Constants.STATE_NAME);
+        String retailerCity = AppSession.getInstance(getContext()).getString(Constants.CITY_NAME);
+        String city_id = AppSession.getInstance(getContext()).getString(Constants.CITY_ID);
+
+        binding.txtRetailerName.setText("Welcome " + (retailerName != null ? retailerName : "Default Retailer"));
+
 
         String user_id = AppSession.getInstance(getContext()).getString(Constants.RELAILER_ID);
 
         Log.d("nnnn", "onCreateView: "+retailerName);
         Log.d("userid", "onCreateView: "+user_id);
+        Log.d("pass", "onCreateView: "+retailerpass);
+        Log.d("phone", "onCreateView: "+retailerPhone);
+        Log.d("state", "onCreateView: "+retailerState);
+        Log.d("city", "onCreateView: "+retailerCity);
+        Log.d("cityid", "onCreateView: "+city_id);
         initCliks();
 
 
@@ -155,27 +170,33 @@ public class HomeFragment extends Fragment {
 
     }
 
-    @SuppressLint("MissingInflatedId")
     private void showPopup(String selectedProductName) {
         // Initialize the ViewModels
         unitViewModel = new ViewModelProvider(this).get(UnitViewModel.class);
         unitViewModel.init(requireContext());  // Use requireContext() instead of getContext()
-        dealerViewModel = new ViewModelProvider(this).get(DealerViewModel.class);
-        dealerViewModel.init(requireContext());
+//        dealerViewModel = new ViewModelProvider(this).get(DealerViewModel.class);
+//        dealerViewModel.init(requireContext());
         cartViewModel = new ViewModelProvider(this).get(AddtoCartViewModel.class);
         cartViewModel.init(requireContext());
 
-        // Get units and dealers data
-        unitViewModel.getUnits();
-        dealerViewModel.getDealerData();
+        cityDealerViewModel = new ViewModelProvider(this).get(CityDealerViewModel.class);
+        cityDealerViewModel.init(requireContext());
 
-        // Inflate the popup layout
+        unitViewModel.getUnits();
+//        dealerViewModel.getDealerData();
+
+        cityDealerViewModel.cityDealerData(AppSession.getInstance(getActivity()).getString(Constants.CITY_ID));
+
         View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.search_list_layout, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setView(popupView);
+        AlertDialog dialog = builder.create();
 
         TextView txtItemDetails = popupView.findViewById(R.id.txt_medicineName);
         txtItemDetails.setText(selectedProductName);
 
         TextView txtNumber = popupView.findViewById(R.id.txt_number);
+     // TextView txtUnitName = popupView.findViewById(R.id.txt_unitName);
 
         ImageView imgSub = popupView.findViewById(R.id.img_sub);
         ImageView imgAdd = popupView.findViewById(R.id.img_add);
@@ -184,7 +205,6 @@ public class HomeFragment extends Fragment {
         Spinner unitSpn = popupView.findViewById(R.id.spinner_unit);
         AutoCompleteTextView dealerName = popupView.findViewById(R.id.auto_dealerName);
 
-        // Observe unit data and set the adapter for units spinner
         unitViewModel.getLiveData().observe(getViewLifecycleOwner(), unitResponses -> {
             if (unitResponses != null && !unitResponses.isEmpty()) {
                 unitList.clear();
@@ -201,41 +221,73 @@ public class HomeFragment extends Fragment {
 
                 // Set the default unit for the selected product
                 String selectedUnitName = getUnitForProduct(selectedProductName);
-                int unitPosition = unitNames.indexOf(selectedUnitName);
-                if (unitPosition >= 0) {
-                    unitSpn.setSelection(unitPosition);
+                if (selectedUnitName != null) {
+                   // txtUnitName.setText(selectedUnitName);
+
+                    int unitPosition = unitNames.indexOf(selectedUnitName);
+                    if (unitPosition >= 0) {
+                        unitSpn.setSelection(unitPosition); // Select unit
+                    } else {
+                        Log.e("UnitSelection", "Unit not found in list: " + selectedUnitName);
+                    }
                 }
 
                 unitSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         selectUnitId = unitList.get(position).getUnitId();
-                      //  AppSession.getInstance(getContext()).putString(Constants.UNIT_ID,selectUnitId);
+                      //  txtUnitName.setText(unitNames.get(position));
+
                     }
 
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {}
                 });
+
+
             }
         });
 
+//        dealerViewModel.getLiveData().observe(getViewLifecycleOwner(), dealersResponses -> {
+//            if (dealersResponses != null && !dealersResponses.isEmpty()) {
+//                List<String> dealerNameList = new ArrayList<>();
+//                dealerMap.clear(); // Clear the map to avoid duplicates
+//
+//                for (DealersResponse response : dealersResponses) {
+//                    if (response != null && response.getDealerId() != null) {
+//                        dealerNameList.add(response.getDealerName());
+//                        dealerMap.put(response.getDealerName(), response.getDealerId());
+//                    }
+//                }
+//
+//                // Set up the adapter
+//                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.dealer_items, dealerNameList);
+//                dealerName.setAdapter(adapter);
+//
+//                dealerName.setOnItemClickListener((parent, view, position, id) -> {
+//                    String selectedDealerName = parent.getItemAtPosition(position).toString();
+//                    selectDealerId = dealerMap.get(selectedDealerName);
+//                    if (selectDealerId != null) {
+//                        AppSession.getInstance(requireContext()).putString(Constants.DEALER_ID, selectDealerId);
+//                    }
+//                });
+//            }
+//        });
 
+        cityDealerViewModel.getLiveData().observe(getViewLifecycleOwner(),responses -> {
+            if (responses != null && !responses.isEmpty()){
+//                cityDealerList.clear();
+//                cityDealerList.addAll(responses);
 
-
-        dealerViewModel.getLiveData().observe(getViewLifecycleOwner(), dealersResponses -> {
-            if (dealersResponses != null && !dealersResponses.isEmpty()) {
-                List<String> dealerNameList = new ArrayList<>();
-                dealerMap.clear(); // Clear the map to avoid duplicates
-
-                for (DealersResponse response : dealersResponses) {
+              List<String> stockitsList = new ArrayList<>();
+              dealerMap.clear();
+                for (CityDealerResponse response : responses) {
                     if (response != null && response.getDealerId() != null) {
-                        dealerNameList.add(response.getDealerName());
+                        stockitsList.add(response.getDealerName());
                         dealerMap.put(response.getDealerName(), response.getDealerId());
                     }
                 }
-
-                // Set up the adapter
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),R.layout.dealer_items, dealerNameList);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.dealer_items, stockitsList);
                 dealerName.setAdapter(adapter);
 
                 dealerName.setOnItemClickListener((parent, view, position, id) -> {
@@ -245,20 +297,21 @@ public class HomeFragment extends Fragment {
                         AppSession.getInstance(requireContext()).putString(Constants.DEALER_ID, selectDealerId);
                     }
                 });
+
+
             }
         });
 
         addCart.setOnClickListener(v -> {
-            // Get the values from the session or UI elements
+
             String product_id = AppSession.getInstance(requireContext()).getString(Constants.PRODUCT_ID);
             String quantity = txtNumber.getText().toString();
-            String dealerId = selectDealerId;  // Replace this with how you retrieve the dealer ID
-            String unitId = selectUnitId;      // Replace this with how you retrieve the unit ID
-
+            String dealerId = selectDealerId;
+            String unitId = selectUnitId;
 
             if (product_id == null || product_id.isEmpty()) {
                 Toast.makeText(requireContext(), "Please select a product", Toast.LENGTH_SHORT).show();
-                return;  // Exit the method if the product is missing
+                return;
             }
 
             if (dealerId == null || dealerId.isEmpty()) {
@@ -276,7 +329,6 @@ public class HomeFragment extends Fragment {
                 return;
             }
 
-            // If all fields are valid, proceed with creating the request body
             AddtoCartBody body = new AddtoCartBody();
             body.setDealerId(dealerId);
             body.setUnit(unitId);
@@ -287,19 +339,18 @@ public class HomeFragment extends Fragment {
             // Call the ViewModel to add to cart
             cartViewModel.getAddToCardData(body);
 
-            // Observe the response from ViewModel
             cartViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
                 if (response != null) {
                     Toast.makeText(requireContext(), response.getMessage(), Toast.LENGTH_SHORT).show();
 
+                    if (dialog != null && dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
                 } else {
-                    // Handle failure if the response is null
                     Toast.makeText(requireContext(), "Failed to add to cart. Please try again.", Toast.LENGTH_SHORT).show();
                 }
             });
         });
-
-
 
         AtomicInteger number = new AtomicInteger();
         try {
@@ -309,7 +360,7 @@ public class HomeFragment extends Fragment {
         }
 
         imgSub.setOnClickListener(v -> {
-            if (number.get() > 0) {
+            if (number.get() > 1) {
                 number.getAndDecrement();
                 txtNumber.setText(String.valueOf(number.get()));
             }
@@ -320,12 +371,7 @@ public class HomeFragment extends Fragment {
             txtNumber.setText(String.valueOf(number.get()));
         });
 
-        // Create and show the popup dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setView(popupView);
-        AlertDialog dialog = builder.create();
-
-        // Handle cancel button click
+        // Cancel the dialog
         imgCancel.setOnClickListener(v -> dialog.dismiss());
 
         // Configure the dialog window
@@ -341,6 +387,7 @@ public class HomeFragment extends Fragment {
 
         dialog.show();
     }
+
 
 
 

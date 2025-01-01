@@ -108,26 +108,38 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void validateCredentials(String mobile, String password) {
         boolean isValidUser = false;
+
         for (GetSignUpUserResponse user : getAllUserList) {
-            if (mobile.equals(user.getRetailerPhone()) &&
-                    password.equals(user.getRetailerPassword())) {
+            if (mobile.equals(user.getRetailerPhone()) && password.equals(user.getRetailerPassword())) {
                 isValidUser = true;
 
-                // Save user details in AppSession
-                AppSession.getInstance(this).putString(Constants.RELAILER_PHONE, user.getRetailerPhone());
-                AppSession.getInstance(this).putString(Constants.RELAILER_PASSWORD, user.getRetailerPassword());
-                AppSession.getInstance(this).putString(Constants.RELAILER_ID, user.getRetailerId());
-                AppSession.getInstance(this).putString(Constants.RELAILER_NAME, user.getRetailerName());
+                AppSession appSession = AppSession.getInstance(this);
+                appSession.putString(Constants.RELAILER_ID, user.getRetailerId());
+//                appSession.putString(Constants.RELAILER_NAME, user.getRetailerName());
+//                appSession.putString(Constants.RELAILER_PHONE, user.getRetailerPhone());
+//                appSession.putString(Constants.RELAILER_PASSWORD, user.getRetailerPassword());
+                appSession.putString(Constants.STATE_NAME, user.getStateName());
+                appSession.putString(Constants.CITY_NAME, user.getCity());
+                appSession.putString(Constants.CITY_ID, user.getCityId());
+                appSession.putString(Constants.STATE_ID, user.getStateId());
+
+                // Debug logs
+                Log.d("LoginActivity", "User validated: " + user.getRetailerName());
+                Log.d("LoginActivity", "Retailer ID: " + user.getRetailerId());
+                Log.d("LoginActivity", "City: " + user.getCity());
+                Log.d("LoginActivity", "State: " + user.getStateName());
                 break;
             }
         }
 
         if (isValidUser) {
+            // Notify ViewModel to fetch login response
             loginViewModel.getLoginResData(mobile, password);
         } else {
             Toast.makeText(this, "Incorrect mobile number or password", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void togglePasswordVisibility() {
         isPasswordVisible = !isPasswordVisible;
 

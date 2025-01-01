@@ -25,30 +25,15 @@ public class GetSignUpUserResponse {
     @SerializedName("state_id")
     @Expose
     private String stateId;
+    @SerializedName("state_name")
+    @Expose
+    private String stateName;
     @SerializedName("city_id")
     @Expose
     private String cityId;
-    @SerializedName("retailer_address")
+    @SerializedName("city")
     @Expose
-    private Object retailerAddress;
-    @SerializedName("retailer_gst")
-    @Expose
-    private Object retailerGst;
-    @SerializedName("retailer_dl_no")
-    @Expose
-    private Object retailerDlNo;
-    @SerializedName("status")
-    @Expose
-    private String status;
-    @SerializedName("firstorderplaced")
-    @Expose
-    private String firstorderplaced;
-    @SerializedName("addtime")
-    @Expose
-    private String addtime;
-    @SerializedName("edittime")
-    @Expose
-    private Object edittime;
+    private String city;
 
     public String getRetailerId() {
         return retailerId;
@@ -106,6 +91,14 @@ public class GetSignUpUserResponse {
         this.stateId = stateId;
     }
 
+    public String getStateName() {
+        return stateName;
+    }
+
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
+
     public String getCityId() {
         return cityId;
     }
@@ -114,60 +107,13 @@ public class GetSignUpUserResponse {
         this.cityId = cityId;
     }
 
-    public Object getRetailerAddress() {
-        return retailerAddress;
+    public String getCity() {
+        return city;
     }
 
-    public void setRetailerAddress(Object retailerAddress) {
-        this.retailerAddress = retailerAddress;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    public String getRetailerGst() {
-        return (String) retailerGst;
-    }
-
-    public void setRetailerGst(Object retailerGst) {
-        this.retailerGst = retailerGst;
-    }
-
-    public String getRetailerDlNo() {
-        return (String) retailerDlNo;
-    }
-
-    public void setRetailerDlNo(Object retailerDlNo) {
-        this.retailerDlNo = retailerDlNo;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getFirstorderplaced() {
-        return firstorderplaced;
-    }
-
-    public void setFirstorderplaced(String firstorderplaced) {
-        this.firstorderplaced = firstorderplaced;
-    }
-
-    public String getAddtime() {
-        return addtime;
-    }
-
-    public void setAddtime(String addtime) {
-        this.addtime = addtime;
-    }
-
-    public Object getEdittime() {
-        return edittime;
-    }
-
-    public void setEdittime(Object edittime) {
-        this.edittime = edittime;
-    }
 
 }

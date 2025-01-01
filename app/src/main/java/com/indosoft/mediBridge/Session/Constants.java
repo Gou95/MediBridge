@@ -19,6 +19,9 @@ public class Constants {
     public static final String RETAILER_GST = "retailer_gst";
     public static final String RETAILER_DL = "retailer_dl_no";
     public static final String STATUS = "status";
+    public static final String CONTACT_PERSON = "contact_person";
+    public static final String STATE_NAME = "id";
+    public static final String CITY_NAME = "city_id";
 
 
 

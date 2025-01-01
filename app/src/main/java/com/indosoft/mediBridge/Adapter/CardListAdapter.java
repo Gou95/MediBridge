@@ -138,7 +138,32 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
             holder.sub.setVisibility(View.VISIBLE);
         }
     }
+    private void moveToUrgentCart(String cartId, int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Confirmation")
+                .setMessage("Do you want to move this item to the urgent cart?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    cartViewModel.getUrgentCart(cartId);
+                    cartViewModel.getLiveData().observe((LifecycleOwner) context, response -> {
+                        if (response != null) {
+                            list.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, list.size());
+                            Toast.makeText(context, response.getMessage(), Toast.LENGTH_SHORT).show();
 
+                        } else {
+                            Toast.makeText(context, "Failed to move item to urgent cart.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+
+                })
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+
+        builder.create().show();
+    }
 
     @Override
     public int getItemCount() {
@@ -163,35 +188,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
         }
     }
 
-    private void moveToUrgentCart(String cartId, int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Confirmation")
-                .setMessage("Do you want to move this item to the urgent cart?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    cartViewModel.getUrgentCart(cartId);
-                    cartViewModel.getLiveData().observe((LifecycleOwner) context, response -> {
-                        if (response != null && "success".equalsIgnoreCase(response.getMessage())) {
-                            list.remove(position);
-                            notifyItemRemoved(position);
-                            notifyItemRangeChanged(position, list.size());
-                            Toast.makeText(context, "Moved to urgent cart successfully!", Toast.LENGTH_SHORT).show();
-                            // Trigger a refresh for the remaining cart items
-                         //   refreshCart(cartId);
-                        } else {
-                            Toast.makeText(context, "Failed to move item to urgent cart.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    cartViewModel.getIsFailed().observe((LifecycleOwner) context, error -> {
-                        if (error != null) {
-                            Toast.makeText(context, "Error: " + error, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                })
-                .setNegativeButton("No", (dialog, which) -> dialog.dismiss());
 
-        builder.create().show();
-    }
 
 //    private void refreshCart(String cartId) {
 //

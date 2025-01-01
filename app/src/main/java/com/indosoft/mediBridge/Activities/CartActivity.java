@@ -59,6 +59,8 @@ public class CartActivity extends AppCompatActivity {
 
 
         String retailerId = AppSession.getInstance(this).getString(Constants.RELAILER_ID);
+        Log.d("TAG", "onCreate: "+retailerId);
+
 
         Toast.makeText(this, retailerId, Toast.LENGTH_SHORT).show();
         showCartViewModel.getShowPostCartData(retailerId);

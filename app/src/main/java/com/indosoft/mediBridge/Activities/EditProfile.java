@@ -50,12 +50,14 @@ public class EditProfile extends AppCompatActivity {
         String phoneNumber = AppSession.getInstance(this).getString(Constants.RELAILER_PHONE);
         String dlNumber = AppSession.getInstance(this).getString(Constants.RETAILER_DL);
         String gstNumber = AppSession.getInstance(this).getString(Constants.RETAILER_GST);
+        String contactPerson = AppSession.getInstance(this).getString(Constants.CONTACT_PERSON);
 
         binding.txtShopName.setText(shopName);
         binding.txtPhoneNumber.setText(phoneNumber);
         binding.edtEmail.setText(email);
         binding.edtDlNumber.setText(dlNumber);
         binding.edtGstNumber.setText(gstNumber);
+        binding.edtContactPerson.setText(contactPerson);
     }
 
     private void onAttachObservers() {
@@ -68,20 +70,19 @@ public class EditProfile extends AppCompatActivity {
                     // Use HashMap to store user data
                     HashMap<String, String> userData = new HashMap<>();
                     userData.put(Constants.Email, response.getRetailerEmail());
-                    userData.put(Constants.RETAILER_GST, response.getRetailerGst());
-                    userData.put(Constants.RETAILER_DL, response.getRetailerDlNo());
-                   // userData.put(Constants.RELAILER_NAME, response.getRetailerName());
+                    userData.put(Constants.Email, response.getStateName());
+                    userData.put(Constants.Email, response.getCity());
 
-                    // Store all data in AppSession
                     for (HashMap.Entry<String, String> entry : userData.entrySet()) {
                         AppSession.getInstance(this).putString(entry.getKey(), entry.getValue());
                     }
 
                     // Log data for debugging
                     Log.d("AppSessionData", "email: " + response.getRetailerEmail());
-                    Log.d("AppSessionData", "gst: " + response.getRetailerGst());
-                    Log.d("AppSessionData", "dl: " + response.getRetailerDlNo());
-//                    Log.d("AppSessionData", "Password: " + response.getRetailerPassword());
+                    Log.d("AppSessionData", "state: " + response.getStateName());
+                    Log.d("AppSessionData", "city: " + response.getCity());
+
+
                 }
             } else {
                 Log.e("LoginActivity", "Sign-up response is null or empty");
@@ -91,6 +92,7 @@ public class EditProfile extends AppCompatActivity {
         model.getLiveData().observe(this,userUpdateResponse -> {
             if (userUpdateResponse !=null){
                 Toast.makeText(this, userUpdateResponse.getMessage(), Toast.LENGTH_SHORT).show();
+
             }
         });
     }
@@ -104,11 +106,6 @@ public class EditProfile extends AppCompatActivity {
             String email = binding.edtEmail.getText().toString();
             String dlno = binding.edtDlNumber.getText().toString();
             String gstno = binding.edtGstNumber.getText().toString();
-
-            if (contactPerson.isEmpty() || email.isEmpty() || dlno.isEmpty() || gstno.isEmpty()) {
-                Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
-                return;
-            }
 
             UserUpdateBody body = new UserUpdateBody();
             body.setRetailerName(AppSession.getInstance(this).getString(Constants.RELAILER_NAME));
@@ -129,7 +126,10 @@ public class EditProfile extends AppCompatActivity {
             // Log for debugging
             Log.d("UserUpdateRequest", "Body: " + body.toString());
 
-            // Call ViewModel to update user data
+            AppSession.getInstance(this).putString(Constants.Email,email);
+            AppSession.getInstance(this).putString(Constants.RETAILER_DL,dlno);
+            AppSession.getInstance(this).putString(Constants.RETAILER_GST,gstno);
+            AppSession.getInstance(this).putString(Constants.CONTACT_PERSON,contactPerson);
             model.getUserUpdateData(body);
         });
 

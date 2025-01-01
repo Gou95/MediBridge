@@ -5,6 +5,7 @@ import com.indosoft.mediBridge.Body.SignUpBody;
 import com.indosoft.mediBridge.Body.UserUpdateBody;
 import com.indosoft.mediBridge.Model.AddtoCartResponse;
 import com.indosoft.mediBridge.Model.CardListResponse;
+import com.indosoft.mediBridge.Model.CityDealerResponse;
 import com.indosoft.mediBridge.Model.DealersResponse;
 import com.indosoft.mediBridge.Model.DeleteCartResponse;
 import com.indosoft.mediBridge.Model.GetSignUpUserResponse;
@@ -17,6 +18,7 @@ import com.indosoft.mediBridge.Model.SignUpResponse;
 import com.indosoft.mediBridge.Model.StateCityResponse;
 import com.indosoft.mediBridge.Model.UnitResponse;
 import com.indosoft.mediBridge.Model.UrgentCartResponse;
+import com.indosoft.mediBridge.Model.UrgentDeleteResponse;
 import com.indosoft.mediBridge.Model.UserUpdateResponse;
 
 import java.util.List;
@@ -87,4 +89,10 @@ public interface ApiInterface {
 
     @POST("urgentcart.php")
     Call<List<GetUrgentCartResponse>> removeUrgentCart(@Query("retailer_id") String retailer_id);
+
+    @POST("citystockist.php")
+    Call<List<CityDealerResponse>> cityDealer(@Query("city_id") String city_id);
+
+    @DELETE("urgentcart.php")
+    Call<UrgentDeleteResponse> deleteUrgentCart(@Query("cart_id") String cart_id);
 }

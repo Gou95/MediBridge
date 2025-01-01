@@ -16,6 +16,7 @@ import com.indosoft.mediBridge.R;
 import com.indosoft.mediBridge.Session.AppSession;
 import com.indosoft.mediBridge.Session.Constants;
 import com.indosoft.mediBridge.ViewModel.GetUrgentCartViewModel;
+import com.indosoft.mediBridge.ViewModel.UrgentDeleteViewModel;
 import com.indosoft.mediBridge.databinding.FragmentUrgentBinding;
 
 import java.io.Serializable;
@@ -28,6 +29,7 @@ public class UrgentFragment extends Fragment {
     GetUrgentCartViewModel viewModel;
     UrgentCartAdapter urgentCartAdapter;
     ArrayList<GetUrgentCartResponse> list = new ArrayList<>();
+    UrgentDeleteViewModel urgentDeleteViewModel;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -35,6 +37,8 @@ public class UrgentFragment extends Fragment {
         binding =  FragmentUrgentBinding.inflate(inflater, container, false);
         viewModel = new ViewModelProvider(this).get(GetUrgentCartViewModel.class);
         viewModel.init(getContext());
+        urgentDeleteViewModel = new ViewModelProvider(this).get(UrgentDeleteViewModel.class);
+        urgentDeleteViewModel.init(getContext());
 
         String retailerId = AppSession.getInstance(getContext()).getString(Constants.RELAILER_ID);
         viewModel.getRemoveAllCartData(retailerId);
@@ -48,8 +52,7 @@ public class UrgentFragment extends Fragment {
         if (retailerId != null && !retailerId.isEmpty()) {
             viewModel.getRemoveAllCartData(retailerId);
         } else {
-            // Handle the case where retailerId is null or empty
-            // Optionally, show an error message to the user
+
         }
 
         return binding.getRoot();
@@ -61,10 +64,9 @@ public class UrgentFragment extends Fragment {
                 list.clear();
                 list.addAll(responses);
 
-                // Notify the adapter about data changes
                 urgentCartAdapter.notifyDataSetChanged();
             } else {
-                // Handle the case where responses are null or empty
+
                 list.clear();
                 urgentCartAdapter.notifyDataSetChanged();
             }
