@@ -7,27 +7,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragment.UrgentFragment">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="MediBridge"
-        android:textColor="@color/black"
-        android:layout_marginBottom="8dp"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"/>
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="MediBridge"-->
+<!--        android:textColor="@color/black"-->
+<!--        android:layout_marginBottom="8dp"-->
+<!--        android:textStyle="bold"-->
+<!--        android:textSize="18sp"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        android:layout_marginTop="10dp"/>-->
 
-    <!-- Subheader Text -->
-    <TextView
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Urgent Cart"
-        android:textColor="@color/black"
-        android:layout_marginBottom="16dp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:textSize="20sp" />
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="20dp">
+
+
+        <ImageView
+            android:id="@+id/img_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/backarrow"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Urgent Cart"
+            android:textColor="@color/black"
+            android:layout_marginStart="20dp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textSize="20sp"/>
+
+    </RelativeLayout>
 
     <!-- RecyclerView for List -->
     <androidx.recyclerview.widget.RecyclerView
@@ -37,10 +53,39 @@
         android:layout_weight="1"
         android:layout_marginBottom="20dp"
         android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
         />
+    <LinearLayout
+        android:id="@+id/linear_hide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+       >
 
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:src="@drawable/empty"
+            android:layout_gravity="center"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="1dp"/>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cart is empty! keep ordering"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
     <!-- Summary Section -->
     <RelativeLayout
+        android:id="@+id/relative_total"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -62,7 +107,7 @@
             android:textColor="@color/black"
             android:layout_alignParentEnd="true"
             android:textStyle="bold"
-            android:textSize="15sp" />
+            android:textSize="18sp" />
     </RelativeLayout>
 
     <!-- Proceed to Checkout Button -->

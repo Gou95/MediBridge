@@ -3,91 +3,178 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".Activities.CartActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="MediBridge"
-            android:textColor="@color/black"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="20dp"
-            android:textStyle="bold"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="My Cart"
-            android:textColor="@color/black"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="20dp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:textSize="20sp"/>
+        android:orientation="vertical"
+        android:padding="10dp">
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:id="@+id/recyclerView"
-            android:layout_marginTop="10dp"/>
+        <ImageView
+            android:id="@+id/img_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/backarrow" />
 
 
-        <ProgressBar
-            android:id="@+id/progressBar"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_gravity="center"
-            android:visibility="gone"/>
-
-
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:layout_marginHorizontal="10dp">
-
-
+            android:layout_marginTop="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Medicine in the Cart"
+                android:text="stockist Name:"
                 android:textColor="@color/black"
-                android:textStyle="bold"
-                android:textSize="15sp"/>
+                android:textSize="16sp"/>
 
             <TextView
+                android:id="@+id/txt_dealername"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="\u20b9 0.00"
-                android:textColor="@color/black"
-                android:layout_alignParentEnd="true"
+                android:textColor="@color/green"
                 android:textStyle="bold"
-                android:textSize="15sp"/>
+                android:textSize="16sp"
+                android:layout_marginStart="10dp"/>
 
 
-
-
-        </RelativeLayout>
+        </LinearLayout>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/btn_addCart"
+            android:id="@+id/cardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="11dp"
+          app:cardBackgroundColor="@color/white"
+            android:layout_marginHorizontal="5dp"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                android:layout_marginHorizontal="10dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="5dp">
+
+                <ImageView
+                    android:id="@+id/img_calendar"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/calendr"
+                    android:scaleType="fitXY"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="01.jan.2025"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"/>
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="01.jan.2025"
+                    android:textColor="@color/black"
+                    android:gravity="end"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"/>
+
+
+
+
+
+
+
+            </LinearLayout>
+
+
+<!--            <AutoCompleteTextView-->
+<!--                android:id="@+id/auto_stockist"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="40dp"-->
+<!--                android:background="@null"-->
+<!--                android:drawableStart="@drawable/calendar"-->
+<!--                android:hint="search for order from date"-->
+<!--                android:paddingStart="20dp"-->
+<!--                android:drawablePadding="10dp"-->
+<!--                android:textSize="16sp"-->
+
+<!--                />-->
+
+
+        </androidx.cardview.widget.CardView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1" />
+
+
+
+
+
+
+<!--        <RelativeLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:layout_marginHorizontal="10dp">-->
+
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Total Medicine in the Cart"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textSize="15sp"/>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text=" 0.00"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textSize="15sp"/>-->
+
+
+
+
+<!--        </RelativeLayout>-->
+
+        <ImageView
+            android:id="@+id/img_whatsapp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/whatsapp"
+            android:scaleType="centerCrop"
+            android:layout_marginEnd="10dp"
+            android:background="@null"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_printInvoice"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             app:cardCornerRadius="25dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             app:cardBackgroundColor="@color/green"
             android:layout_marginBottom="20dp"
             android:layout_marginHorizontal="10dp"
@@ -96,7 +183,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Proceed To Checkout"
+                android:text="Print Invoice"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -107,6 +194,9 @@
 
 
     </LinearLayout>
+
+
+
 
 
 </LinearLayout>

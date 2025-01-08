@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.indosoft.mediBridge'
+    namespace 'com.indosoft.MediBridges'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.indosoft.mediBridge"
+        applicationId "com.indosoft.MediBridges"
         minSdk 24
         targetSdk 34
         versionCode 1

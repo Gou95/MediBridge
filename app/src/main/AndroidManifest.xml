@@ -16,6 +16,13 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+
+
+
+        <activity
+            android:name=".Activities.SeeAllDetailsActivity"
+            android:exported="false" />
         <activity
             android:name=".Activities.AddressActivity"
             android:exported="false" />
@@ -56,6 +63,17 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.IndosoftServices" />
+
+
+<!--        <provider-->
+<!--            android:name="androidx.core.content.FileProvider"-->
+<!--            android:authorities="com.indosoft.MediBridges.fileprovider"-->
+<!--            android:exported="false"-->
+<!--            android:grantUriPermissions="true"-->
+<!--            android:xml="@xml/file_paths" />-->
     </application>
+
+
+
 
 </manifest>
