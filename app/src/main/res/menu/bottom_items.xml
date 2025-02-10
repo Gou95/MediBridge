@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- Home Menu Item -->
+    <item
+        android:id="@+id/home"
+        android:title="Home"
+        android:icon="@drawable/baseline_home"
+         /> <!-- Optional: 'ifRoom' shows icon when there's room -->
+
+
+    <item
+        android:id="@+id/urgent"
+        android:title="Urgent Cart"
+        android:icon="@drawable/baseline_emergency"
+        android:actionLayout="@layout/custom_action_item"
+        app:showAsAction="always"
+
+        />
+    <item android:title=""/>
+
+    <item
+        android:id="@+id/order"
+        android:title="Orders"
+        android:icon="@drawable/baseline_shopping_bag"
+       />
+
+    <!-- Profile Menu Item -->
+    <item
+        android:id="@+id/profile"
+        android:title="Profile"
+        android:icon="@drawable/baseline_person"
+         />
+</menu>

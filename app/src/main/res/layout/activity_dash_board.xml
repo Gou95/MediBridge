@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.DashBoardActivity">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_container"/>
+
+
+    <RelativeLayout
+        android:id="@+id/noConnectionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/noConnectionImage"
+            android:layout_width="wrap_content"
+            android:layout_height="500dp"
+            android:src="@drawable/notfound"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:id="@+id/txtNoConnection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No internet connection"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:layout_below="@id/noConnectionImage"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        style="@style/AppTheme"
+        app:fabAlignmentMode="center"
+        app:hideOnScroll="false">
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:padding="0dp"
+                app:itemIconTint="@color/green"
+                app:itemTextColor="@color/green"
+                app:menu="@menu/bottom_items"
+                app:labelVisibilityMode="labeled"
+                />
+
+        </FrameLayout>
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+
+    <FrameLayout
+        android:id="@+id/frame_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="30dp">
+
+        <!-- Floating Action Button -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/flotingBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/baseline_stroller"
+            app:layout_anchor="@id/bottomAppbar"
+            app:layout_anchorGravity="center"
+            app:tint="@android:color/white"
+            android:backgroundTint="@color/green"/>
+
+        <!-- Badge for FAB -->
+        <TextView
+            android:id="@+id/txt_badge"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:background="@drawable/badge_background"
+            android:textColor="@android:color/white"
+            android:elevation="7dp"
+            android:visibility="gone"
+            android:layout_gravity="end|top"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="5dp"/>
+
+    </FrameLayout>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

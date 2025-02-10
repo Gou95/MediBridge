@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "103188310506",
+    "project_id": "medibridge-733f8",
+    "storage_bucket": "medibridge-733f8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:103188310506:android:764de90d931a4548a4ea93",
+        "android_client_info": {
+          "package_name": "com.indosoft.medibridge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBt72jBrpEH9f8JG_vuUUpIKGBfbipC9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
