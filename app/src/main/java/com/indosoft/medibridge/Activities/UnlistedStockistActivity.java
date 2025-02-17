@@ -1,6 +1,15 @@
 package com.indosoft.medibridge.Activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,6 +38,7 @@ ActivityUnlistedStockistBinding binding;
     CityViewModel cityViewModel;
     ArrayList<IndiaStateResponse> stateList = new ArrayList<>();
     ArrayList<StateCityResponse> cityList = new ArrayList<>();
+    private boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +96,7 @@ ActivityUnlistedStockistBinding binding;
             body.setDealerPhone(mobile);
             body.setStateId(stateId);
             body.setCityId(cityId);
+            body.setFcmId(AppSession.getInstance(this).getValue(Constants.STOCKIST_FCM_TOKEN));
 
             sign.registerStockist(body);
 
@@ -191,5 +202,56 @@ ActivityUnlistedStockistBinding binding;
         }
         return null;
     }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
 
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+
+                reloadData();
+            } else {
+
+            }
+        }
+    };
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, filter);
+            isReceiverRegistered = true;
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+    private void reloadData() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 5000);
+    }
 }

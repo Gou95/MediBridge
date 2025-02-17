@@ -20,6 +20,10 @@ public class SignUpBody {
     @Expose
     private Integer cityId;
 
+    @SerializedName("fcm_id")
+    @Expose
+    private String fcmId;
+
     public String getRetailerName() {
         return retailerName;
     }
@@ -58,5 +62,12 @@ public class SignUpBody {
 
     public void setCityId(Integer cityId) {
         this.cityId = cityId;
+    }
+    public String getFcmId() {
+        return fcmId;
+    }
+
+    public void setFcmId(String fcmId) {
+        this.fcmId = fcmId;
     }
 }

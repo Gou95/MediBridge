@@ -83,13 +83,8 @@ FragmentOrderBinding binding;
                         .commit();
             }
         });
-        binding.txtStartDate.setOnClickListener(v -> {
-            openCalendarDialog("start"); // Pass a flag to indicate which date is being selected
-        });
-
-        binding.txtLastDate.setOnClickListener(v -> {
-            openCalendarDialog("last"); // Pass a flag to indicate which date is being selected
-        });
+        binding.txtStartDate.setOnClickListener(v -> openCalendarDialog("start"));
+        binding.txtLastDate.setOnClickListener(v -> openCalendarDialog("last"));
 
     }
 
@@ -102,14 +97,14 @@ FragmentOrderBinding binding;
             binding.swipeRefreshLayout.setRefreshing(false);
             if (responses != null) {
                 list.clear();
-                SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
-                SimpleDateFormat filterFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                SimpleDateFormat filterFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
                 try {
                     Date start = filterFormat.parse(startDateSelected);
                     Date end = filterFormat.parse(lastDateSelected);
 
-                    // 🛠 FIX: Ensure end date includes full day (23:59:59)
+                    // Ensure end date covers entire day
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(end);
                     cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -119,8 +114,6 @@ FragmentOrderBinding binding;
 
                     for (OrderListResponse response : responses) {
                         Date orderDate = apiFormat.parse(response.getAddtime());
-
-                        // ✅ FIX: Check if orderDate is within range INCLUDING the last date
                         if (orderDate != null && !orderDate.before(start) && !orderDate.after(end)) {
                             list.add(response);
                         }
@@ -152,29 +145,20 @@ FragmentOrderBinding binding;
         dialog.show();
 
         calendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, (month + 1), dayOfMonth);
-            String formattedDate = dayOfMonth + "." + getMonthName(month) + "." + year;
+            String selectedDate = String.format(Locale.getDefault(), "%02d-%02d-%04d", dayOfMonth, (month + 1), year);
 
             if ("start".equals(dateType)) {
                 startDateSelected = selectedDate;
-                binding.txtStartDate.setText(formattedDate);
+                binding.txtStartDate.setText(selectedDate);
             } else if ("last".equals(dateType)) {
                 lastDateSelected = selectedDate;
-                binding.txtLastDate.setText(formattedDate);
+                binding.txtLastDate.setText(selectedDate);
             }
             dialog.dismiss();
             filterListByDateRange();
-
         });
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
-    }
-    private String getMonthName(int month) {
-        String[] monthNames = {
-                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        };
-        return monthNames[month]; // Month is 0-based, so this is correct
     }
     private void filterListByDateRange() {
         if (startDateSelected == null || lastDateSelected == null) {
@@ -183,14 +167,14 @@ FragmentOrderBinding binding;
         }
 
         ArrayList<OrderListResponse> filteredList = new ArrayList<>();
-        SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
-        SimpleDateFormat filterFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat filterFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
         try {
             Date start = filterFormat.parse(startDateSelected);
             Date end = filterFormat.parse(lastDateSelected);
 
-            // 🛠 FIX: Ensure end date includes the full day (23:59:59)
+            // Ensure end date covers entire day
             Calendar cal = Calendar.getInstance();
             cal.setTime(end);
             cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -199,10 +183,8 @@ FragmentOrderBinding binding;
             end = cal.getTime();
 
             for (OrderListResponse response : list) {
-                Date targetDate = apiFormat.parse(response.getAddtime());
-
-                // ✅ Fix: Check if targetDate is within range INCLUDING last date
-                if (targetDate != null && !targetDate.before(start) && !targetDate.after(end)) {
+                Date orderDate = apiFormat.parse(response.getAddtime());
+                if (orderDate != null && !orderDate.before(start) && !orderDate.after(end)) {
                     filteredList.add(response);
                 }
             }
@@ -213,7 +195,6 @@ FragmentOrderBinding binding;
 
         adapter.updateList(filteredList);
     }
-
 
     private void startNetworkCheckService() {
         Intent serviceIntent = new Intent(getContext(), NetworkCheckService.class);
@@ -238,14 +219,12 @@ FragmentOrderBinding binding;
         });
     }
     private void setDefaultDates() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
 
         lastDateSelected = sdf.format(calendar.getTime());
         binding.txtLastDate.setText(lastDateSelected);
-
-        // Start Date = Current Date - 7 Days
-        calendar.add(Calendar.DAY_OF_MONTH, -7);
+        calendar.add(Calendar.DAY_OF_MONTH, -3);
         startDateSelected = sdf.format(calendar.getTime());
         binding.txtStartDate.setText(startDateSelected);
     }

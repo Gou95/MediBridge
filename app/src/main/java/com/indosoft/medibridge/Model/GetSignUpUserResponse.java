@@ -43,6 +43,9 @@ public class GetSignUpUserResponse {
     @SerializedName("retailer_dl_no")
     @Expose
     private String retailerDlNo;
+    @SerializedName("fcm_id")
+    @Expose
+    private String fcmId;
 
     public String getRetailerId() {
         return retailerId;
@@ -147,6 +150,12 @@ public class GetSignUpUserResponse {
     public void setRetailerDlNo(String retailerDlNo) {
         this.retailerDlNo = retailerDlNo;
     }
+    public String getFcmId() {
+        return fcmId;
+    }
 
+    public void setFcmId(String fcmId) {
+        this.fcmId = fcmId;
+    }
 
 }

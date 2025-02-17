@@ -30,6 +30,8 @@ public class Constants {
     public static final String STOCKIST_GST = "order_status";
     public static final String CART_COUNT = "cart_count";
     public static final String URGENT_BADGE_COUNT = "urgent_badge_count";
+    public static final String FCM_TOKEN = "fcm_token";
+    public static final String STOCKIST_FCM_TOKEN = "fcm_token";
 
 
 

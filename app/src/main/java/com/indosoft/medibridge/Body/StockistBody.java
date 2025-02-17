@@ -19,6 +19,9 @@ public class StockistBody {
     @SerializedName("city_id")
     @Expose
     private String cityId;
+    @SerializedName("fcm_id")
+    @Expose
+    private String fcmId;
 
     public String getDealerName() {
         return dealerName;
@@ -58,6 +61,14 @@ public class StockistBody {
 
     public void setCityId(String cityId) {
         this.cityId = cityId;
+    }
+
+    public String getFcmId() {
+        return fcmId;
+    }
+
+    public void setFcmId(String fcmId) {
+        this.fcmId = fcmId;
     }
 
 }

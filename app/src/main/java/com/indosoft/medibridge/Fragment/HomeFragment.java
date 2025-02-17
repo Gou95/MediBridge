@@ -37,9 +37,10 @@ import com.denzcoskun.imageslider.constants.AnimationTypes;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.indosoft.medibridge.Activities.DashBoardActivity;
+import com.indosoft.medibridge.Activities.ExpiryListActivity;
 import com.indosoft.medibridge.Activities.NotificationActivity;
 import com.indosoft.medibridge.Activities.OrderRegisterActivity;
-import com.indosoft.medibridge.Activities.UnlistedMedicineActivity;
+import com.indosoft.medibridge.Activities.ExpiryRegisterActivity;
 import com.indosoft.medibridge.Activities.UnlistedStockistActivity;
 import com.indosoft.medibridge.Activities.ViewAllStockistActivity;
 import com.indosoft.medibridge.Adapter.RecentStockitsAdapter;
@@ -210,8 +211,9 @@ public class HomeFragment extends Fragment {
         binding.cardViewAll.setOnClickListener(v -> launchActivity(ViewAllStockistActivity.class));
         binding.imgNotification.setOnClickListener(v -> launchActivity(NotificationActivity.class));
         binding.cardOrderRegister.setOnClickListener(v -> launchActivity(OrderRegisterActivity.class));
-        binding.cardUnlistedMedicine.setOnClickListener(v -> launchActivity(UnlistedMedicineActivity.class));
+        binding.cardExpiryRegister.setOnClickListener(v -> launchActivity(ExpiryRegisterActivity.class));
         binding.cardUnlistedStockist.setOnClickListener(v -> launchActivity(UnlistedStockistActivity.class));
+        binding.cardExpiryList.setOnClickListener(v -> launchActivity(ExpiryListActivity.class));
     }
     private void onProductSelected(AdapterView<?> parent, View view, int position, long id) {
         String selectedProductName = parent.getItemAtPosition(position).toString();

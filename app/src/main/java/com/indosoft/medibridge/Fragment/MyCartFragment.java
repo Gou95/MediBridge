@@ -1,10 +1,19 @@
 package com.indosoft.medibridge.Fragment;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.indosoft.medibridge.Activities.DashBoardActivity;
+import com.indosoft.medibridge.Activities.NotificationActivity;
 import com.indosoft.medibridge.Adapter.CardListAdapter;
 import com.indosoft.medibridge.Model.ShowCartResponse;
 import com.indosoft.medibridge.R;
@@ -42,6 +52,9 @@ public class MyCartFragment extends Fragment {
     QuantityChangeViewModel quantityChangeViewModel;
     DeliveryDayViewModel dayViewModel;
     ArrayList<ShowCartResponse> list = new ArrayList<>();
+    ArrayList<ShowCartResponse> urgentCartList = new ArrayList<>();
+    private static final String CHANNEL_ID = "myFirebaseChannel";
+    int counter = 0;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding= FragmentMyCartBinding.inflate(inflater, container, false);
@@ -61,7 +74,7 @@ public class MyCartFragment extends Fragment {
         handleBackPress();
 
         startNetworkCheckService();
-        adapter = new CardListAdapter(getContext(), dayViewModel, list, showCartViewModel);
+        adapter = new CardListAdapter(getContext(), dayViewModel, list, showCartViewModel );
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setVisibility(View.GONE);
@@ -93,10 +106,11 @@ public class MyCartFragment extends Fragment {
                 list.addAll(response);
                 adapter.notifyDataSetChanged();
                 updateCartUI(true);
+
                 updateBadgeCount(list.size());
             } else {
                 updateCartUI(false);
-                updateBadgeCount(0);
+               updateBadgeCount(0);
             }
         });
         deleteCartViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
@@ -157,9 +171,10 @@ public class MyCartFragment extends Fragment {
                     if (getActivity() instanceof DashBoardActivity) {
                         ((DashBoardActivity) getActivity()).resetBadgeCount();  // Reset the badge in parent activity
                     }
-                   // clearCartData();
-                    refreshCartData(); // Cart List Update Karein
-                    navigateToOrderFragment(); // Order Fragment par Navigate Karein
+                    sendNotification("Order Confirmation", "Your order has been successfully placed!");
+
+                    refreshCartData();
+                    navigateToOrderFragment();
                 } else {
                     Log.e("CartActivity", "Failed to place order.");
                 }
@@ -226,5 +241,53 @@ public class MyCartFragment extends Fragment {
         super.onResume();
         updateBadgeCount(list.isEmpty() ? 0 : list.size());
     }
+    public int getCartListSize() {
+        return list != null ? list.size() : 0;
+    }
+    private void sendNotification(String title, String message) {
+        createNotificationChannel();
+
+        Intent intent = new Intent(getContext(), NotificationActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("title", title);
+        intent.putExtra("message", message);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                getContext(),
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification) // Ensure this drawable exists
+                .setContentTitle(title)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent);
+
+        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(getContext());
+        if (managerCompat.areNotificationsEnabled()) {
+            managerCompat.notify(101, builder.build());
+        }
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Firebase Notifications",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Channel for Firebase push notifications");
+
+            NotificationManager manager = requireContext().getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
+
+    }
+
 
 }

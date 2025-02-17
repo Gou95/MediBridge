@@ -10,6 +10,7 @@ import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -20,8 +21,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.indosoft.medibridge.Fragment.HomeFragment;
 import com.indosoft.medibridge.Fragment.MyCartFragment;
 import com.indosoft.medibridge.Fragment.OrderFragment;
@@ -37,7 +41,6 @@ public class DashBoardActivity extends AppCompatActivity {
     private int urgentBadgeCount = 0;
     private int cartCount = 0;
     private boolean isReceiverRegistered = false;
-    private int currentSelectedItemId = R.id.home;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +49,7 @@ public class DashBoardActivity extends AppCompatActivity {
         initClicks();
         bottomNavigation();
         initializeBadge();
+        logFCM();
 
         if (!isNetworkConnected()) {
             showNoConnectionView();
@@ -109,7 +113,7 @@ public class DashBoardActivity extends AppCompatActivity {
         }
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         transaction.commit();
-        updateCartBadge(0);
+
     }
     private void resetBottomNavigationSelection() {
         binding.bottomNavigation.clearFocus();
@@ -162,7 +166,7 @@ public class DashBoardActivity extends AppCompatActivity {
         setBadge(urgentBadgeCount);
     }
     private void setBadge(int urgentBadgeCount) {
-        if (urgentBadgeCount == 0) {
+        if (urgentBadgeCount <= 0) {
             binding.bottomNavigation.removeBadge(R.id.urgent);  // Remove the badge if count is 0
         } else {
             BadgeDrawable badge = binding.bottomNavigation.getOrCreateBadge(R.id.urgent);
@@ -211,8 +215,9 @@ public class DashBoardActivity extends AppCompatActivity {
             registerReceiver(networkReceiver, filter);
             isReceiverRegistered = true;
         }
-        int cartCount = Integer.parseInt(AppSession.getInstance(this).getValue(Constants.CART_COUNT));
-        updateCartBadge(cartCount);
+//        int cartCount = Integer.parseInt(AppSession.getInstance(this).getValue(Constants.CART_COUNT));
+//        updateCartBadge(cartCount);
+
     }
 
     @Override
@@ -232,23 +237,31 @@ public class DashBoardActivity extends AppCompatActivity {
             }
         }, 5000);
     }
-    public void updateTxtBadge(int count) {
-        TextView badgeTextView = findViewById(R.id.txt_badge);
-        if (badgeTextView != null) {
-            if (count > 0) {
-                badgeTextView.setText(String.valueOf(count));
-                badgeTextView.setVisibility(View.VISIBLE);
+    private void updateTxtBadge(int count) {
+        if (count < 0) {
+            count = 0;  // Ensure the count never goes negative
+        }
+        cartCount = count;
+        AppSession.getInstance(this).setValue(Constants.CART_COUNT, String.valueOf(cartCount));
+
+        if (binding.txtBadge != null) {
+            if (cartCount > 0) {
+                binding.txtBadge.setText(String.valueOf(cartCount));
+                binding.txtBadge.setVisibility(View.VISIBLE);
             } else {
-                badgeTextView.setText("");
-                badgeTextView.setVisibility(View.GONE);
+                binding.txtBadge.setVisibility(View.GONE);
             }
         }
     }
+
 
     public void resetBadgeCount() {
         AppSession.getInstance(this).setValue(Constants.CART_COUNT, "0");
         updateTxtBadge(0);
     }
+
+
+
     public void updateCartBadge(int count) {
         if (count == 0) {
             binding.txtBadge.setVisibility(View.GONE);
@@ -268,20 +281,31 @@ public class DashBoardActivity extends AppCompatActivity {
         try {
             badgeCount = Integer.parseInt(savedBadgeCount);
         } catch (NumberFormatException e) {
-            badgeCount = -1;
+            badgeCount = 0;
         }
-        this.cartCount = badgeCount;
         updateTxtBadge(cartCount);
+//        this.cartCount = badgeCount;
+//        if (badgeCount <=0){
+//
+//        }
+
 
         String savedUrgentCount = AppSession.getInstance(this).getValue(Constants.URGENT_BADGE_COUNT);
         int urgentBadgeCount = 0;
+
         try {
             urgentBadgeCount = Integer.parseInt(savedUrgentCount);
         } catch (NumberFormatException e) {
-            urgentBadgeCount = -1;
+            urgentBadgeCount = 0;
         }
+
         this.urgentBadgeCount = urgentBadgeCount;
-        setBadge(urgentBadgeCount);
+
+        if (urgentBadgeCount <= 0) {
+            binding.bottomNavigation.removeBadge(R.id.urgent);
+        } else {
+            setBadge(urgentBadgeCount);
+        }
     }
 
     public int getCartBadgeCount() {
@@ -290,6 +314,22 @@ public class DashBoardActivity extends AppCompatActivity {
     public int getUrgentBadge(){
         return urgentBadgeCount;
     }
+    private void logFCM(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.i("##########FCM_TOKEN##########", "Fetching FCM token failed", task.getException());
+                            return;
+                        }
+                        String token = task.getResult();
+                        Log.i("##########FCM_TOKEN##########", "FCM Token: " + token);
+                        AppSession.getInstance(DashBoardActivity.this).setValue(Constants.STOCKIST_FCM_TOKEN,token);
+                    }
+                });
+}
+
 }
 
 

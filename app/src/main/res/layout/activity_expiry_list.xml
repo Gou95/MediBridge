@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.ExpiryRegisterActivity">
+    tools:context=".Activities.ExpiryListActivity">
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -34,7 +34,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Expiry Register"
+                    android:text="Expiry List"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:fontFamily="@font/gotham_bold"
@@ -48,7 +48,6 @@
 
             </RelativeLayout>
 
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView"
                 android:layout_width="match_parent"
@@ -61,12 +60,68 @@
                 >
 
                 <AutoCompleteTextView
-                    android:id="@+id/auto_search"
+                    android:id="@+id/auto_month"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@null"
+                    android:drawableStart="@drawable/baseline_search"
+                    android:hint="search medicines for month/year"
+                    android:textColorHint="@color/green"
+                    android:fontFamily="@font/gothambold"
+                    android:paddingStart="20dp"
+                    android:textSize="16sp"
+                    android:drawablePadding="10dp"
+
+                    />
+
+
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="11dp"
+                android:backgroundTint="@color/white"
+                >
+
+                <AutoCompleteTextView
+                    android:id="@+id/auto_medicine"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@null"
                     android:drawableStart="@drawable/baseline_search"
                     android:hint="search medicine"
+                    android:textColorHint="@color/green"
+                    android:fontFamily="@font/gothambold"
+                    android:paddingStart="20dp"
+                    android:textSize="16sp"
+                    android:drawablePadding="10dp"
+
+                    />
+
+
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="11dp"
+                android:backgroundTint="@color/white"
+                >
+
+                <AutoCompleteTextView
+                    android:id="@+id/auto_stockist"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@null"
+                    android:drawableStart="@drawable/baseline_search"
+                    android:hint="search by stockist "
                     android:textColorHint="@color/green"
                     android:fontFamily="@font/gothambold"
                     android:paddingStart="20dp"
@@ -96,7 +151,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Batch No"
+                        android:text="Product Name"
                         android:textColor="@color/black"
                         android:textSize="17sp"
                         android:fontFamily="@font/gotham_bold"
@@ -105,7 +160,7 @@
 
 
                     <EditText
-                        android:id="@+id/edt_batchNo"
+                        android:id="@+id/edt_companyName"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/edit_background"
@@ -121,7 +176,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Expiry Month/Year"
+                        android:text="Batch No."
                         android:textColor="@color/black"
                         android:textSize="17sp"
                         android:fontFamily="@font/gotham_bold"
@@ -147,7 +202,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Stock Qty"
+                        android:text="Expiry On"
                         android:textColor="@color/black"
                         android:textSize="17sp"
                         android:fontFamily="@font/gotham_bold"
@@ -156,7 +211,7 @@
 
 
                     <EditText
-                        android:id="@+id/edt_stockQty"
+                        android:id="@+id/edt_medicineName"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/edit_background"
@@ -172,7 +227,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Stockist"
+                        android:text="Stock Quantity"
                         android:textColor="@color/black"
                         android:textSize="17sp"
                         android:fontFamily="@font/gotham_bold"
@@ -181,7 +236,7 @@
 
 
                     <TextView
-                        android:id="@+id/txt_stockistNm"
+                        android:id="@+id/txt_qty"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/edit_background"
@@ -198,30 +253,30 @@
 
 
 
-<!--                    <TextView-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Unit"-->
-<!--                        android:textColor="@color/black"-->
-<!--                        android:textSize="17sp"-->
-<!--                        android:fontFamily="@font/gotham_bold"-->
-<!--                        android:layout_marginHorizontal="20dp"-->
-<!--                        android:layout_marginTop="10dp"/>-->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Stockist"
+                        android:textColor="@color/black"
+                        android:textSize="17sp"
+                        android:fontFamily="@font/gotham_bold"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="10dp"/>
 
 
-<!--                    <Spinner-->
-<!--                        android:id="@+id/spinner_unit"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="40dp"-->
-<!--                        android:layout_marginHorizontal="20dp"-->
-<!--                        android:layout_marginTop="20dp"-->
-<!--                        android:layout_marginBottom="10dp"-->
-<!--                        android:paddingStart="10dp"-->
-<!--                        android:background="@drawable/edit_background"-->
-<!--                        android:spinnerMode="dropdown"-->
-<!--                        android:dropDownWidth="match_parent"-->
-<!--                        android:popupBackground="@color/white"-->
-<!--                        />-->
+                    <Spinner
+                        android:id="@+id/spinner_unit"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="10dp"
+                        android:paddingStart="10dp"
+                        android:background="@drawable/edit_background"
+                        android:spinnerMode="dropdown"
+                        android:dropDownWidth="match_parent"
+                        android:popupBackground="@color/white"
+                        />
 
 
 
@@ -294,4 +349,6 @@
 
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

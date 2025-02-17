@@ -1,13 +1,21 @@
 package com.indosoft.medibridge.Activities;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.print.PageRange;
 import android.print.PrintAttributes;
@@ -41,6 +49,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -51,6 +60,7 @@ public class RecentStockistActivity extends AppCompatActivity {
     ArrayList<StockitsResponse> list = new ArrayList<>();
     private String startDateSelected = null;
     private String lastDateSelected = null;
+    private boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +72,7 @@ public class RecentStockistActivity extends AppCompatActivity {
         onAttachObservers();
         initClicks();
         startNetworkService();
+        setDefaultDates();
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
 
         String dealerName = getIntent().getStringExtra("dealerName");
@@ -121,12 +132,31 @@ public class RecentStockistActivity extends AppCompatActivity {
             binding.swipeRefreshLayout.setRefreshing(false);
             if (responses != null) {
                 list.clear();
+                SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()); // 🔥 FIX API DATE FORMAT
+                SimpleDateFormat filterFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-                String dealerId = getIntent().getStringExtra("dealerId");
-                for (StockitsResponse response : responses) {
-                    if (response.getDealerId().equals(dealerId)) {
-                        list.add(response);
+                try {
+                    Date start = filterFormat.parse(startDateSelected);
+                    Date end = filterFormat.parse(lastDateSelected);
+
+                    // ✅ FIX: Last date ka time 23:59:59 set karein
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(end);
+                    cal.set(Calendar.HOUR_OF_DAY, 23);
+                    cal.set(Calendar.MINUTE, 59);
+                    cal.set(Calendar.SECOND, 59);
+                    end = cal.getTime();
+
+                    for (StockitsResponse response : responses) {
+                        Date orderDate = apiFormat.parse(response.getAddtime()); // ✅ Fix API Format Parsing
+
+                        if (orderDate != null && !orderDate.before(start) && !orderDate.after(end)) {
+                            list.add(response);
+                        }
                     }
+
+                }catch (ParseException e) {
+                    e.printStackTrace();
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -143,11 +173,9 @@ public class RecentStockistActivity extends AppCompatActivity {
                 .setView(calendarView)
                 .create();
         dialog.show();
-
         calendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            String selectedDate = year + "-" + (month + 1) + "-" + dayOfMonth;
+            String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, (month + 1), dayOfMonth);
             String formattedDate = dayOfMonth + "." + getMonthName(month) + "." + year;
-
             if ("start".equals(dateType)) {
                 startDateSelected = selectedDate;
                 binding.txtStartDate.setText(formattedDate);
@@ -156,8 +184,9 @@ public class RecentStockistActivity extends AppCompatActivity {
                 binding.txtLastDate.setText(formattedDate);
             }
 
-            Toast.makeText(this, "Start: " + startDateSelected + " End: " + lastDateSelected, Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, "Start: " + startDateSelected + " End: " + lastDateSelected, Toast.LENGTH_SHORT).show();
             filterListByDateRange();
+            dialog.dismiss();
         });
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
@@ -171,19 +200,38 @@ public class RecentStockistActivity extends AppCompatActivity {
     }
     private void filterListByDateRange() {
         if (startDateSelected == null || lastDateSelected == null) {
-            Toast.makeText(this, "Please select both start and end dates.", Toast.LENGTH_SHORT).show();
+            onAttachObservers();
             return;
         }
-        ArrayList<StockitsResponse> filteredList = new ArrayList<>();
-        for (StockitsResponse response : list) {
-            String addTime = response.getAddtime();
 
-            if (isDateInRange(addTime, startDateSelected, lastDateSelected)) {
-                filteredList.add(response);
+        ArrayList<StockitsResponse> filteredList = new ArrayList<>();
+        SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat filterFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        try {
+            Date start = filterFormat.parse(startDateSelected);
+            Date end = filterFormat.parse(lastDateSelected);
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(end);
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            end = cal.getTime();
+
+            for (StockitsResponse response : list) {
+                Date targetDate = apiFormat.parse(response.getAddtime());
+
+                if (targetDate != null && !targetDate.before(start) && !targetDate.after(end)) {
+                    filteredList.add(response);
+                }
             }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
-        adapter.updateList(filteredList);
+        adapter.updateList(filteredList); // Filtered list update karein
     }
     private boolean isDateInRange(String date, String startDate, String endDate) {
         try {
@@ -333,5 +381,68 @@ public class RecentStockistActivity extends AppCompatActivity {
         startService(networkServiceIntent);
         Log.d("LoginActivity", "NetworkCheckService started");
     }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
 
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+
+                reloadData();
+            } else {
+
+            }
+        }
+    };
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, filter);
+            isReceiverRegistered = true;
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+    private void reloadData() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 5000);
+    }
+    private void setDefaultDates() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+
+        lastDateSelected = sdf.format(calendar.getTime());
+        binding.txtLastDate.setText(lastDateSelected);
+
+        // Start Date = Current Date - 7 Days
+        calendar.add(Calendar.DAY_OF_MONTH, -3);
+        startDateSelected = sdf.format(calendar.getTime());
+        binding.txtStartDate.setText(startDateSelected);
+    }
 }

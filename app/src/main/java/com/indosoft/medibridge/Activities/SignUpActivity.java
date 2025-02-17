@@ -1,10 +1,18 @@
 package com.indosoft.medibridge.Activities;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
@@ -44,6 +52,7 @@ public class SignUpActivity extends AppCompatActivity {
     ArrayList<IndiaStateResponse> stateList = new ArrayList<>();
     ArrayList<StateCityResponse> cityList = new ArrayList<>();
     ExitMobileViewModel exitMobileViewModel;
+    private boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +81,7 @@ public class SignUpActivity extends AppCompatActivity {
         spannableString.setSpan(new StyleSpan(Typeface.BOLD), privacyStart, privacyEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         binding.checkbox.setText(spannableString);
+        Toast.makeText(this, ""+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN), Toast.LENGTH_SHORT).show();
     }
 
     private void onAttachObservers() {
@@ -193,6 +203,8 @@ public class SignUpActivity extends AppCompatActivity {
             signbody.setRetailerPassword(password);
             signbody.setStateId(Integer.parseInt(stateId));
             signbody.setCityId(Integer.parseInt(cityId));
+            signbody.setFcmId(AppSession.getInstance(this).getValue(Constants.FCM_TOKEN));
+            Log.d("token", "initClicks: "+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN));
 
             signUpViewModel.getSignData(signbody);
 
@@ -202,7 +214,7 @@ public class SignUpActivity extends AppCompatActivity {
                     if ("Mobile No. already registered!".equals(message)) {
                         Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
                     } else if ("User added successfully".equals(message)) {
-                       // Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
 
                         AppSession.getInstance(this).setValue(Constants.RELAILER_NAME, shopName);
                         AppSession.getInstance(this).setValue(Constants.RELAILER_PHONE, mobileNumber);
@@ -294,5 +306,56 @@ public class SignUpActivity extends AppCompatActivity {
         startService(networkServiceIntent);
         Log.d("LoginActivity", "NetworkCheckService started");
     }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
 
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+
+                reloadData();
+            } else {
+
+            }
+        }
+    };
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, filter);
+            isReceiverRegistered = true;
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+    private void reloadData() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 5000);
+    }
 }

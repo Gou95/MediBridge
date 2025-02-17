@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+//    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -76,4 +77,9 @@ dependencies {
     implementation 'com.github.denzcoskun:ImageSlideshow:0.1.2'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.ertugrulkaragoz:SuperBottomBar:0.4'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+//    implementation 'com.google.firebase:firebase-messaging:24.1.0'
+//    implementation 'com.google.firebase:firebase-core:21.1.1'  // Optional
+//    implementation 'com.google.auth:google-auth-library-oauth2-http:1.18.0'
+   // implementation 'com.google.firebase:firebase-firestore:24.9.1'
 }

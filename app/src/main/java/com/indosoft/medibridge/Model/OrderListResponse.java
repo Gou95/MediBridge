@@ -31,6 +31,9 @@ public class OrderListResponse {
     @SerializedName("totalmeds")
     @Expose
     private String totalmeds;
+    @SerializedName("fcm_id")
+    @Expose
+    private String fcmId;
 
     public String getDealerId() {
         return dealerId;
@@ -102,5 +105,13 @@ public class OrderListResponse {
 
     public void setTotalmeds(String totalmeds) {
         this.totalmeds = totalmeds;
+    }
+
+    public String getFcmId() {
+        return fcmId;
+    }
+
+    public void setFcmId(String fcmId) {
+        this.fcmId = fcmId;
     }
 }

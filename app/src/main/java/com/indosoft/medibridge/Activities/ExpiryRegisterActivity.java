@@ -10,7 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.indosoft.medibridge.R;
 
-public class UnlistedMedicineActivity extends AppCompatActivity {
+public class ExpiryRegisterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

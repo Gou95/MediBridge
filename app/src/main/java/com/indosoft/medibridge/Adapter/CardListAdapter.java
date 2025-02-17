@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHolder> {
     Context context;
-
     ArrayList<ShowCartResponse> list;
     UrgentCartFragment urgentFragment;
     DeleteCartViewModel deleteCartViewModel;
@@ -42,11 +41,15 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
     ShowCartViewModel showCartViewModel;
     QuantityChangeViewModel quantityChangeViewModel;
 
+
+
+
     public CardListAdapter(Context context, DeliveryDayViewModel dayViewModel, ArrayList<ShowCartResponse> list, ShowCartViewModel showCartViewModel) {
         this.context = context;
         this.dayViewModel = dayViewModel;
         this.list = list;
         this.showCartViewModel = showCartViewModel;
+
     }
 
 
@@ -97,20 +100,6 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
 
             newItem.setQty("1");
             newItem.setProductName(output.getProductName());
-
-            if (context instanceof DashBoardActivity) {
-                DashBoardActivity dashboard = (DashBoardActivity) context;
-                int updatedCount = dashboard.getCartBadgeCount() - 1;
-                dashboard.updateCartBadge(updatedCount);
-            }
-            list.remove(position);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, list.size());
-
-            if (list.isEmpty() && context instanceof DashBoardActivity) {
-                DashBoardActivity dashboard = (DashBoardActivity) context;
-                dashboard.updateCartBadge(-1);
-            }
 
 
         });
@@ -186,11 +175,15 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
 
                 if (context instanceof DashBoardActivity) {
                     DashBoardActivity dashboard = (DashBoardActivity) context;
-
                     int updatedCount = dashboard.getCartBadgeCount() - 1;
                     dashboard.updateCartBadge(updatedCount);
+                }
+                if (context instanceof DashBoardActivity) {
+                    DashBoardActivity dashboard = (DashBoardActivity) context;
                     dashboard.updateUrgentBadge(dashboard.getUrgentBadgeCount() + 1);
                 }
+
+
                 dialog.dismiss();
             });
 
@@ -249,6 +242,8 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
                 holder.number.setText(qty);
                 updateVisibility(holder, number.get());
 
+
+
 //                if (context instanceof DashBoardActivity) {
 //                    DashBoardActivity dashboard = (DashBoardActivity) context;
 //                    int updatedCount = dashboard.getCartBadgeCount() - 1;
@@ -284,13 +279,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
                     DashBoardActivity dashboard = (DashBoardActivity) context;
                     int updatedCount = dashboard.getCartBadgeCount() - 1;
                     dashboard.updateCartBadge(updatedCount);
-
-
-                    if (list.isEmpty()) {
-                        dashboard.updateCartBadge(0);
-                    }
                 }
-
 
             } else {
 

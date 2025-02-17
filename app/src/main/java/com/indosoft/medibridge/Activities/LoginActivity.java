@@ -1,8 +1,16 @@
 package com.indosoft.medibridge.Activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Paint;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -30,6 +38,7 @@ ActivityLoginBinding binding;
     ArrayList<LoginResponse> loginList = new ArrayList<>();
     ArrayList<GetSignUpUserResponse> getAllUserList = new ArrayList<>();
     GetSignUpUserViewModel sign;
+    private boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +53,7 @@ ActivityLoginBinding binding;
         initClicks();
         attachObservers();
         checkUserSession();
+        startNetworkService();
 
     }
     private void checkUserSession() {
@@ -123,6 +133,8 @@ ActivityLoginBinding binding;
                 appSession.setValue(Constants.STATE_NAME, user.getStateName());
                 appSession.setValue(Constants.STATE_ID, user.getStateId());
                 appSession.setValue(Constants.CITY_ID, user.getCityId());
+                Toast.makeText(this, user.getFcmId(), Toast.LENGTH_SHORT).show();
+                Log.d("log", "validateCredentials: "+user.getFcmId());
 
                 Log.d("log", "validateCredentials: "+ user.getCity());
                 Log.d("log", "validateCredentials: "+ user.getStateName());
@@ -154,5 +166,57 @@ ActivityLoginBinding binding;
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
+
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+
+                reloadData();
+            } else {
+
+            }
+        }
+    };
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, filter);
+            isReceiverRegistered = true;
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+    private void reloadData() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 5000);
     }
 }

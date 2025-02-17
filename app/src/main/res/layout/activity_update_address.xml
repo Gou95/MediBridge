@@ -148,13 +148,14 @@
             </androidx.cardview.widget.CardView>
 
 
-            <TextView
-                android:id="@+id/txtddd"
+            <ImageView
+                android:id="@+id/img_map"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:gravity="center"/>
+                android:layout_height="200dp"
+                android:src="@drawable/mobile_map"
+                android:layout_marginTop="20dp"
+                android:scaleType="fitXY"
+                android:layout_marginHorizontal="20dp"/>
 
 
 

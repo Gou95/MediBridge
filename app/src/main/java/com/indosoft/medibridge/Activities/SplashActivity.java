@@ -21,6 +21,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.indosoft.medibridge.Adapter.ViewPagerAdapter;
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.Session.AppSession;
+import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.databinding.ActivitySplashBinding;
 
 public class SplashActivity extends AppCompatActivity {
@@ -67,7 +69,7 @@ public class SplashActivity extends AppCompatActivity {
         });
 
         binding.slideViewPager.addOnPageChangeListener(viewListener);
-        logFCM();
+       logFCM();
     }
     private void logFCM(){
         FirebaseMessaging.getInstance().getToken()
@@ -80,6 +82,7 @@ public class SplashActivity extends AppCompatActivity {
                         }
                         String token = task.getResult();
                         Log.i("##########FCM_TOKEN##########", "FCM Token: " + token);
+                        AppSession.getInstance(SplashActivity.this).setValue(Constants.FCM_TOKEN,token);
                     }
                 });
 
