@@ -27,7 +27,7 @@
                     android:id="@+id/img_logo"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/logo"
+                    android:src="@drawable/medione"
                     android:layout_centerVertical="true"/>
 
                 <LinearLayout

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -40,7 +41,16 @@ public class StockitsListAdapter extends RecyclerView.Adapter<StockitsListAdapte
         holder.orderNo.setText(response.getOrderNo());
         holder.delivery.setText(response.getDeliveryDay());
         holder.time.setText(response.getAddtime());
+        holder.unlisted.setText(response.getUnlistedMedicines());
         holder.serial.setText(String.valueOf(position+1)+".");
+        if ("UNLISTED MEDICINES".equals(response.getProductName())){
+            holder.unlisted.setVisibility(View.VISIBLE);
+            holder.layout.setVisibility(View.GONE);
+        }else {
+            holder.unlisted.setVisibility(View.GONE);
+            holder.layout.setVisibility(View.VISIBLE);
+
+        }
     }
 
     @Override
@@ -56,7 +66,8 @@ public class StockitsListAdapter extends RecyclerView.Adapter<StockitsListAdapte
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView mediName,unitNm,quantity,orderNo,time,delivery,serial;
+        TextView mediName,unitNm,quantity,orderNo,time,delivery,serial,unlisted;
+        LinearLayout layout;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mediName = itemView.findViewById(R.id.txt_mediName);
@@ -66,6 +77,8 @@ public class StockitsListAdapter extends RecyclerView.Adapter<StockitsListAdapte
             delivery = itemView.findViewById(R.id.txt_deliveryDay);
             time = itemView.findViewById(R.id.txt_dateTm);
             serial = itemView.findViewById(R.id.txt_serialNo);
+            layout = itemView.findViewById(R.id.linear_layout);
+            unlisted = itemView.findViewById(R.id.txt_unlisted);
         }
     }
 }

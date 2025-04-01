@@ -32,10 +32,20 @@ public class Constants {
     public static final String URGENT_BADGE_COUNT = "urgent_badge_count";
     public static final String FCM_TOKEN = "fcm_token";
     public static final String STOCKIST_FCM_TOKEN = "fcm_token";
+    public static final String FREE_PLAN_START_DATE = "free_plan_start_date";
+    public static final String FREE_PLAN_USED = "free_plan_used";
+    public static final String PLAN_EXPIRY_DATE = "De-active";
+    public static final String RELAILER_STATUS = "De-active";
 
+    public static final String PLAN_SELECTED = "PLAN_SELECTED";
+    public static final String SUBSCRIPTION_PLAN = "SUBSCRIPTION_PLAN";
 
+    public static final String PLAN_EXPIRY = "plan_expiry";
+    public static final String SUBSCRIPTION_PLAN_NAME = "subscription_plan_name";
 
-
-
-
+    public static final String INVOICE_PATH = "invoice_path";
+    public static final String SELECTED_PLAN = "selected_plan";
+    public static final String SELECTED_PLAN_DURATION = "selected_plan_duration";
+    public static final String SELECTED_PLAN_NAME = "selected_plan_name";
+    public static final String RETAILER_STATUS = "status";
 }

@@ -1,5 +1,6 @@
 package com.indosoft.medibridge.Fragment;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,6 +18,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,15 +39,18 @@ import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.AnimationTypes;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.models.SlideModel;
+import com.google.android.material.textfield.TextInputEditText;
 import com.indosoft.medibridge.Activities.DashBoardActivity;
 import com.indosoft.medibridge.Activities.ExpiryListActivity;
 import com.indosoft.medibridge.Activities.NotificationActivity;
 import com.indosoft.medibridge.Activities.OrderRegisterActivity;
 import com.indosoft.medibridge.Activities.ExpiryRegisterActivity;
+import com.indosoft.medibridge.Activities.SubscribeActivity;
 import com.indosoft.medibridge.Activities.UnlistedStockistActivity;
 import com.indosoft.medibridge.Activities.ViewAllStockistActivity;
 import com.indosoft.medibridge.Adapter.RecentStockitsAdapter;
 import com.indosoft.medibridge.Body.AddtoCartBody;
+import com.indosoft.medibridge.Body.UnlistedBody;
 import com.indosoft.medibridge.Model.CityDealerResponse;
 import com.indosoft.medibridge.Model.LastStockitsResponse;
 import com.indosoft.medibridge.Model.MedicineListResponse;
@@ -61,6 +67,7 @@ import com.indosoft.medibridge.ViewModel.LastStockitsViewModel;
 import com.indosoft.medibridge.ViewModel.MedicineViewModel;
 import com.indosoft.medibridge.ViewModel.NotificationViewModel;
 import com.indosoft.medibridge.ViewModel.RecentStockitsViewModel;
+import com.indosoft.medibridge.ViewModel.SignUpViewModel;
 import com.indosoft.medibridge.ViewModel.UnitViewModel;
 import com.indosoft.medibridge.databinding.FragmentHomeBinding;
 
@@ -84,6 +91,7 @@ public class HomeFragment extends Fragment {
     LastStockitsViewModel lastStockitsViewModel;
     RecentStockitsViewModel recentStockitsViewModel;
     NotificationViewModel notificationViewModel;
+    SignUpViewModel sign;
     private ArrayList<NotificationResponse> list = new ArrayList<>();
     String selectDealerId;
     String selectUnitId;
@@ -105,6 +113,8 @@ public class HomeFragment extends Fragment {
         notificationViewModel.init(getContext());
         cartViewModel = new ViewModelProvider(this).get(AddtoCartViewModel.class);
         cartViewModel.init(requireContext());
+        sign = new ViewModelProvider(this).get(SignUpViewModel.class);
+        sign.init(requireContext());
         medicineViewModel.getMedicineData();
         imageSlider = binding.imageSlider;
         onAttachObservers();
@@ -112,46 +122,16 @@ public class HomeFragment extends Fragment {
         setUpImageSlider();
         handleRetailerName();
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
+        binding.swipeRefreshLayout.setRefreshing(false);
         initCliks();
         recentStockitsViewModel.recentStockits(AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID));
         adapter = new RecentStockitsAdapter(getContext(), recentList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.horizontalRecyclerView.setLayoutManager(layoutManager);
         binding.horizontalRecyclerView.setAdapter(adapter);
-
-
-        cartViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
-            if (response != null) {
-                String cartCountStr = AppSession.getInstance(getContext()).getValue(Constants.CART_COUNT);
-                int cartCount = (cartCountStr == null || cartCountStr.isEmpty()) ? 0 : Integer.parseInt(cartCountStr);
-                cartCount++;
-                AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, String.valueOf(cartCount));
-                if (getActivity() instanceof DashBoardActivity) {
-                    ((DashBoardActivity) getActivity()).updateCartBadge(cartCount);
-                }
-
-            }
-        });
         return binding.getRoot();
     }
-    private void setUpImageSlider() {
-        ArrayList<SlideModel> imageList = new ArrayList<>();
-        imageList.add(new SlideModel(R.drawable.b1, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.b2, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.b3, ScaleTypes.FIT));
-        imageSlider.setImageList(imageList, ScaleTypes.CENTER_CROP);
-        imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
-    }
 
-    private void handleRetailerName() {
-        String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
-        if (retailerId != null) {
-        } else {
-            Log.d("Dashboard", "Retailer ID not available");
-        }
-        String updatedRetailerName = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_NAME);
-        binding.txtRetailerName.setText("Welcome " + (updatedRetailerName != null ? updatedRetailerName : "Default Retailer"));
-    }
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
         medicineViewModel.getLiveData().observe(getViewLifecycleOwner(), medicineListResponses -> {
@@ -166,6 +146,7 @@ public class HomeFragment extends Fragment {
                         productNameList.add(response.getProductName());
                         productMap.put(response.getProductName(), response.getProductId());
                         AppSession.getInstance(getContext()).setValue(Constants.PRODUCT_ID, response.getProductId());
+
                     }
                 }
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_items, productNameList);
@@ -196,18 +177,61 @@ public class HomeFragment extends Fragment {
                 updateNotificationBadge(0); // Hide the badge if no notifications
             }
         });
+        cartViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
+            if (response != null) {
+                String cartCountStr = AppSession.getInstance(getContext()).getValue(Constants.CART_COUNT);
+                int cartCount = (cartCountStr == null || cartCountStr.isEmpty()) ? 0 : Integer.parseInt(cartCountStr);
+               cartCount++;
+                AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, String.valueOf(cartCount));
+                if (getActivity() instanceof DashBoardActivity) {
+                    ((DashBoardActivity) getActivity()).updateBadgeCounter(cartCount);
+                }
+
+            }
+        });
+        sign.getLiveData().observe(getViewLifecycleOwner(),signUpResponse -> {
+            if (signUpResponse !=null){
+                String cartCountStr = AppSession.getInstance(getContext()).getValue(Constants.CART_COUNT);
+                int cartCount = (cartCountStr == null || cartCountStr.isEmpty()) ? 0 : Integer.parseInt(cartCountStr);
+                cartCount++;
+                AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, String.valueOf(cartCount));
+                if (getActivity() instanceof DashBoardActivity) {
+                    ((DashBoardActivity) getActivity()).updateBadgeCounter(cartCount);
+                }
+            }
+        });
     }
-    private void updateNotificationBadge(int notificationCount) {
-        TextView notificationBadge = binding.notificationBadge;
-        if (notificationCount > 0) {
-            notificationBadge.setVisibility(View.VISIBLE);
-            notificationBadge.setText(String.valueOf(notificationCount));
-        } else {
-            notificationBadge.setVisibility(View.GONE);
-        }
-    }
+
     private void initCliks() {
         binding.autoSearch.setOnItemClickListener(this::onProductSelected);
+        binding.autoSearch.addTextChangedListener(new TextWatcher() {
+            private Handler handler = new Handler();
+            private Runnable inputFinishChecker;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (inputFinishChecker != null) {
+                    handler.removeCallbacks(inputFinishChecker);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String enteredText = s.toString().trim();
+
+                inputFinishChecker = () -> {
+                    if (!enteredText.isEmpty() && !productMap.containsKey(enteredText)) {
+                      //  Toast.makeText(getContext(), "This product is not in the list. Please select unlisted medicine.", Toast.LENGTH_SHORT).show();
+                    }
+                };
+
+                handler.postDelayed(inputFinishChecker, 2000); // 1 second delay
+            }
+        });
+
         binding.cardViewAll.setOnClickListener(v -> launchActivity(ViewAllStockistActivity.class));
         binding.imgNotification.setOnClickListener(v -> launchActivity(NotificationActivity.class));
         binding.cardOrderRegister.setOnClickListener(v -> launchActivity(OrderRegisterActivity.class));
@@ -218,17 +242,19 @@ public class HomeFragment extends Fragment {
     private void onProductSelected(AdapterView<?> parent, View view, int position, long id) {
         String selectedProductName = parent.getItemAtPosition(position).toString();
         String selectedProductId = productMap.get(selectedProductName);
+
         if (selectedProductId != null) {
-            AppSession.getInstance(getContext()).setValue(Constants.PRODUCT_ID, selectedProductId);
-            String supplierName = getSupplierNameForProduct(selectedProductId);
-            showPopup(selectedProductName, supplierName);
+            if (selectedProductId.equals("1680")) {
+                unlistedShowPopup(selectedProductName);
+            } else {
+                AppSession.getInstance(getContext()).setValue(Constants.PRODUCT_ID, selectedProductId);
+                String supplierName = getSupplierNameForProduct(selectedProductId);
+                showPopup(selectedProductName, supplierName);
+            }
             binding.autoSearch.setText("");
         }
     }
-    private void launchActivity(Class<?> activityClass) {
-        Intent intent = new Intent(getContext(), activityClass);
-        startActivity(intent);
-    }
+
     private String getSupplierNameForProduct(String productId) {
         for (MedicineListResponse medicine : itemList) {
             if (medicine.getProductId().equals(productId)) {
@@ -240,15 +266,90 @@ public class HomeFragment extends Fragment {
     private String getUnitForProduct(String productName) {
         for (MedicineListResponse medicine : itemList) {
             if (medicine.getProductName().equalsIgnoreCase(productName)) {
+               // Toast.makeText(getContext(), medicine.getProductId(), Toast.LENGTH_SHORT).show();
                 return (String) medicine.getUnitName();
             }
         }
         return null;
     }
+    @SuppressLint("MissingInflatedId")
+    private void unlistedShowPopup(String selectedProductName) {
+        cityDealerViewModel = new ViewModelProvider(this).get(CityDealerViewModel.class);
+        cityDealerViewModel.init(requireContext());
+        View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.unlisted_medicine, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setView(popupView);
+        AlertDialog dialog = builder.create();
+        TextView txtItemDetails = popupView.findViewById(R.id.txt_unListedmedicine);
+        txtItemDetails.setText(selectedProductName);
+        AutoCompleteTextView unlistedStockist = popupView.findViewById(R.id.auto_unlistedDealerName);
+        ImageView imgCancel = popupView.findViewById(R.id.img_cancle);
+        TextInputEditText text =popupView.findViewById(R.id.et_enterMedicine);
+        CardView submit = popupView.findViewById(R.id.btn_unListaddCart);
+
+        imgCancel.setOnClickListener(v -> dialog.dismiss());
+        cityDealerViewModel.cityDealerData(AppSession.getInstance(getActivity()).getValue(Constants.CITY_ID));
+        cityDealerViewModel.getLiveData().observe(getViewLifecycleOwner(), cityDealerResponses -> {
+            if (cityDealerResponses != null) {
+                List<String> stockitsList = new ArrayList<>();
+                dealerMap.clear();
+                for (CityDealerResponse response : cityDealerResponses) {
+                    if (response != null && response.getDealerId() != null) {
+                        stockitsList.add(response.getDealerName());
+                        dealerMap.put(response.getDealerName(), response.getDealerId());
+                    }
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.dealer_items, stockitsList);
+                unlistedStockist.setAdapter(adapter);
+                unlistedStockist.setOnClickListener(v -> {
+                    unlistedStockist.setText("");
+                    if (unlistedStockist.getText().toString().isEmpty()) {
+                        selectDealerId = null;
+                        AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, null);
+                    }
+                });
+                unlistedStockist.setOnItemClickListener((parent, view, position, id) -> {
+                    String selectedDealerName = parent.getItemAtPosition(position).toString();
+                    selectDealerId = dealerMap.get(selectedDealerName);
+                    AppSession.getInstance(requireContext()).setValue(Constants.DEALER_ID, selectDealerId);
+                    unlistedStockist.setText(selectedDealerName);
+                });
+            }
+        });
+        submit.setOnClickListener(v -> {
+            String dealerId = selectDealerId;
+            String enter = text.getText().toString();
+            String productId = "1680"; // Ensure correct product_id is passed
+
+            if (dealerId == null || dealerId.isEmpty()) {
+                Toast.makeText(requireContext(), "Please select a dealer", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (enter.isEmpty()) {
+                Toast.makeText(requireContext(), "Please enter product", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Log.d("UnlistedPopup", "Submitting Product ID: " + productId); // Debugging
+
+            UnlistedBody body = new UnlistedBody();
+            body.setRetailerId(AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID));
+            body.setDealerId(dealerId);
+            body.setProductId(productId); // Always pass "1680"
+            body.setUnlistedMedicines(enter);
+
+            sign.unlistedMedicine(body);
+
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
     private void showPopup(String selectedProductName, String supplierName) {
         unitViewModel = new ViewModelProvider(this).get(UnitViewModel.class);
         unitViewModel.init(requireContext());
-
         cityDealerViewModel = new ViewModelProvider(this).get(CityDealerViewModel.class);
         cityDealerViewModel.init(requireContext());
         lastStockitsViewModel = new ViewModelProvider(this).get(LastStockitsViewModel.class);
@@ -411,6 +512,8 @@ public class HomeFragment extends Fragment {
         }
         dialog.show();
     }
+
+
     private void startNetworkCheckService() {
         Intent serviceIntent = new Intent(getContext(), NetworkCheckService.class);
         requireActivity().startService(serviceIntent);
@@ -453,11 +556,43 @@ public class HomeFragment extends Fragment {
             getActivity().unregisterReceiver(networkReceiver);  // Unregister receiver only if registered
             isReceiverRegistered = false;
         }
-    }private void reloadData() {
+    }
+    private void reloadData() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
             }
         }, 5000);
+    }
+    private void updateNotificationBadge(int notificationCount) {
+        TextView notificationBadge = binding.notificationBadge;
+        if (notificationCount > 0) {
+            notificationBadge.setVisibility(View.VISIBLE);
+            notificationBadge.setText(String.valueOf(notificationCount));
+        } else {
+            notificationBadge.setVisibility(View.GONE);
+        }
+    }
+    private void launchActivity(Class<?> activityClass) {
+        Intent intent = new Intent(getContext(), activityClass);
+        startActivity(intent);
+    }
+    private void setUpImageSlider() {
+        ArrayList<SlideModel> imageList = new ArrayList<>();
+        imageList.add(new SlideModel(R.drawable.b1, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.b2, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.b3, ScaleTypes.FIT));
+        imageSlider.setImageList(imageList, ScaleTypes.CENTER_CROP);
+        imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
+    }
+
+    private void handleRetailerName() {
+        String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
+        if (retailerId != null) {
+        } else {
+            Log.d("Dashboard", "Retailer ID not available");
+        }
+        String updatedRetailerName = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_NAME);
+        binding.txtRetailerName.setText("Welcome " + (updatedRetailerName != null ? updatedRetailerName : "Default Retailer"));
     }
 }

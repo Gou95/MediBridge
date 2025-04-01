@@ -78,6 +78,11 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.ertugrulkaragoz:SuperBottomBar:0.4'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.razorpay:checkout:1.6.26'
+    implementation 'com.itextpdf:itext7-core:7.1.15'
+
+
+
 //    implementation 'com.google.firebase:firebase-messaging:24.1.0'
 //    implementation 'com.google.firebase:firebase-core:21.1.1'  // Optional
 //    implementation 'com.google.auth:google-auth-library-oauth2-http:1.18.0'

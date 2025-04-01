@@ -16,6 +16,12 @@ public class LoginResponse {
     @SerializedName("retailer_password")
     @Expose
     private String retailerPassword;
+    @SerializedName("status")
+    @Expose
+    private String status;
+    @SerializedName("subs_expiry_date")
+    @Expose
+    private String subsExpiryDate;
 
     public String getRetailerId() {
         return retailerId;
@@ -48,5 +54,22 @@ public class LoginResponse {
     public void setRetailerPassword(String retailerPassword) {
         this.retailerPassword = retailerPassword;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getSubsExpiryDate() {
+        return subsExpiryDate;
+    }
+
+    public void setSubsExpiryDate(String subsExpiryDate) {
+        this.subsExpiryDate = subsExpiryDate;
+    }
+
 
 }

@@ -29,13 +29,14 @@ import com.indosoft.medibridge.ViewModel.GetSignUpUserViewModel;
 import com.indosoft.medibridge.ViewModel.LoginViewModel;
 import com.indosoft.medibridge.databinding.ActivityLoginBinding;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity {
 ActivityLoginBinding binding;
     boolean isPasswordVisible = false;
     LoginViewModel loginViewModel;
-    ArrayList<LoginResponse> loginList = new ArrayList<>();
     ArrayList<GetSignUpUserResponse> getAllUserList = new ArrayList<>();
     GetSignUpUserViewModel sign;
     private boolean isReceiverRegistered = false;
@@ -44,24 +45,29 @@ ActivityLoginBinding binding;
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-        loginViewModel.init(this);
-        sign = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
-        sign.init(this);
+        String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
+        String retailerStatus = AppSession.getInstance(this).getValue(Constants.RETAILER_STATUS); // Store this when user logs in
 
-        sign.getAllSignUPData();
-        initClicks();
-        attachObservers();
-        checkUserSession();
-        startNetworkService();
+        if (retailerId != null && !retailerId.isEmpty() && "Active".equalsIgnoreCase(retailerStatus)) {
+            navigateToDashboard();
+        } else {
+            loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+            loginViewModel.init(this);
+            sign = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
+            sign.init(this);
+            sign.getAllSignUPData();
+            initClicks();
+            attachObservers();
+            startNetworkService();
+            checkSubscriptionStatus();
+        }
 
     }
-    private void checkUserSession() {
 
+    private void checkSubscriptionStatus() {
         String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
-        if (retailerId != null && !retailerId.isEmpty()) {
-            navigateToDashboard();
-        }
+        boolean hasSelectedPlan = AppSession.getInstance(this).getBoolean(Constants.PLAN_SELECTED + "_" + retailerId, false);
+        Log.d("Subscription", hasSelectedPlan ? "Plan already selected, hiding Free Plan." : "No active plan found, allowing Free Plan.");
     }
 
     private void attachObservers() {
@@ -70,15 +76,25 @@ ActivityLoginBinding binding;
                 getAllUserList.clear();
                 getAllUserList.addAll(responses);
 
+                String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
+                for (GetSignUpUserResponse response : responses) {
+                    if (retailerId.equals(response.getRetailerId()) && "Active".equalsIgnoreCase(response.getStatus())) {
+                        navigateToDashboard();
 
+                         break;
+                    }
+                }
             } else {
                 Log.e("LoginActivity", "Sign-up response is null or empty");
             }
         });
 
         loginViewModel.getLiveData().observe(this, loginResponses -> {
-            if (loginResponses != null) {
-                navigateToDashboard();
+            if (loginResponses != null && !loginResponses.isEmpty()) {
+                String status = loginResponses.get(0).getStatus();
+                checkUserSubscription(status);
+            } else {
+                Toast.makeText(this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -133,7 +149,8 @@ ActivityLoginBinding binding;
                 appSession.setValue(Constants.STATE_NAME, user.getStateName());
                 appSession.setValue(Constants.STATE_ID, user.getStateId());
                 appSession.setValue(Constants.CITY_ID, user.getCityId());
-                Toast.makeText(this, user.getFcmId(), Toast.LENGTH_SHORT).show();
+                appSession.setValue(Constants.RETAILER_STATUS, user.getStatus());
+           //     Toast.makeText(this, user.getFcmId(), Toast.LENGTH_SHORT).show();
                 Log.d("log", "validateCredentials: "+user.getFcmId());
 
                 Log.d("log", "validateCredentials: "+ user.getCity());
@@ -145,6 +162,7 @@ ActivityLoginBinding binding;
 
         if (isValidUser) {
             loginViewModel.getLoginResData(mobile, password);
+
         } else {
             Toast.makeText(this, "Incorrect mobile number or password", Toast.LENGTH_SHORT).show();
         }
@@ -161,12 +179,8 @@ ActivityLoginBinding binding;
             binding.imgEye.setImageResource(R.drawable.hide_eye);
         }
     }
-    private void navigateToDashboard() {
-        Intent intent = new Intent(LoginActivity.this, DashBoardActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
-    }
+
+
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) {
@@ -219,4 +233,25 @@ ActivityLoginBinding binding;
             }
         }, 5000);
     }
+    private void checkUserSubscription(String status) {
+        if ("De-active".equalsIgnoreCase(status)) {
+            navigateToSubscription();
+        } else {
+            navigateToDashboard();
+        }
+    }
+
+    private void navigateToDashboard() {
+        Intent intent = new Intent(this, DashBoardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+    private void navigateToSubscription() {
+        Intent intent = new Intent(this, SubscribeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
 }

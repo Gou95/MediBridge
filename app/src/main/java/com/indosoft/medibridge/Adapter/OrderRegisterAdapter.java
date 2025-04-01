@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,14 @@ public class OrderRegisterAdapter extends RecyclerView.Adapter<OrderRegisterAdap
         holder.status.setText(response.getOrderStatus());
         holder.time.setText(response.getAddtime());
         holder.serial.setText(String.valueOf(position+1)+".");
+        holder.unlisted.setText(response.getUnlistedMedicines());
+        if ("UNLISTED MEDICINES".equals(response.getProductName())){
+            holder.unlisted.setVisibility(View.VISIBLE);
+            holder.linearLayout.setVisibility(View.GONE);
+        }else {
+            holder.unlisted.setVisibility(View.GONE);
+            holder.linearLayout.setVisibility(View.VISIBLE);
+        }
 
 
     }
@@ -57,7 +66,8 @@ public class OrderRegisterAdapter extends RecyclerView.Adapter<OrderRegisterAdap
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView medicine,unitName,unitQty,stockist,delivary,status ,serial,time;
+        TextView medicine,unitName,unitQty,stockist,delivary,status ,serial,time,unlisted;
+        LinearLayout linearLayout;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             medicine = itemView.findViewById(R.id.txt_orderMedicineNm);
@@ -68,6 +78,8 @@ public class OrderRegisterAdapter extends RecyclerView.Adapter<OrderRegisterAdap
             status = itemView.findViewById(R.id.txt_orderStt);
             serial = itemView.findViewById(R.id.txt_orderSerial);
             time = itemView.findViewById(R.id.txt_orderDot);
+            linearLayout = itemView.findViewById(R.id.linear_orderLayout);
+            unlisted = itemView.findViewById(R.id.txt_orderUnlisted);
         }
     }
 }

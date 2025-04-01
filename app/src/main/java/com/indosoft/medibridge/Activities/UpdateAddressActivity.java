@@ -19,7 +19,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -117,7 +116,8 @@ public class UpdateAddressActivity extends AppCompatActivity {
                     if (response != null && response.getRetailerId() != null && response.getRetailerId().equals(retailerId)) {
                         binding.txtState.setText(response.getStateName() != null ? response.getStateName() : "State not available");
                         binding.txtCity.setText(response.getCity() != null ? response.getCity() : "City not available");
-                        binding.edtPermanent.setText(response.getRetailerAddress() != null ? response.getRetailerAddress() : "Address not available");
+                        binding.edtPermanent.setText
+                                 (response.getRetailerAddress() != null ? (CharSequence) response.getRetailerAddress() : "Address not available");
                     }
                 }
             }

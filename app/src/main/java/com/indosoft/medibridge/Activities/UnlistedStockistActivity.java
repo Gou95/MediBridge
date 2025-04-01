@@ -22,11 +22,13 @@ import androidx.lifecycle.ViewModelProvider;
 import com.indosoft.medibridge.Body.StockistBody;
 import com.indosoft.medibridge.Model.IndiaStateResponse;
 import com.indosoft.medibridge.Model.StateCityResponse;
+import com.indosoft.medibridge.Model.UnitResponse;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.CityViewModel;
 import com.indosoft.medibridge.ViewModel.SignUpViewModel;
 import com.indosoft.medibridge.ViewModel.StatesViewModel;
+import com.indosoft.medibridge.ViewModel.UnitViewModel;
 import com.indosoft.medibridge.databinding.ActivityUnlistedStockistBinding;
 
 import java.util.ArrayList;
@@ -36,9 +38,12 @@ ActivityUnlistedStockistBinding binding;
     SignUpViewModel sign;
     StatesViewModel statesViewModel;
     CityViewModel cityViewModel;
+    UnitViewModel unitViewModel;
     ArrayList<IndiaStateResponse> stateList = new ArrayList<>();
     ArrayList<StateCityResponse> cityList = new ArrayList<>();
+    ArrayList<UnitResponse> unitList = new ArrayList<>();
     private boolean isReceiverRegistered = false;
+    String selectUnitId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +56,7 @@ ActivityUnlistedStockistBinding binding;
         statesViewModel.init(this);
         cityViewModel = new ViewModelProvider(this).get(CityViewModel.class);
         cityViewModel.init(this);
+
         statesViewModel.getStateData();
 
         onAttachObservers();
@@ -146,7 +152,6 @@ ActivityUnlistedStockistBinding binding;
                 });
             }
         });
-
         cityViewModel.getLiveData().observe(this, stateCityResponses -> {
             if (stateCityResponses != null) {
                 cityList.clear();
@@ -183,6 +188,7 @@ ActivityUnlistedStockistBinding binding;
                 });
             }
         });
+
 
     }
 

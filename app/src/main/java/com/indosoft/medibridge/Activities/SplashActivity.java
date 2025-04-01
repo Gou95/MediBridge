@@ -43,6 +43,7 @@ public class SplashActivity extends AppCompatActivity {
         if (isOnboardingCompleted) {
             startActivity(new Intent(SplashActivity.this, LoginActivity.class));
             finish();
+         //   checkUserSession();
             return;
         }
 
@@ -71,6 +72,35 @@ public class SplashActivity extends AppCompatActivity {
         binding.slideViewPager.addOnPageChangeListener(viewListener);
        logFCM();
     }
+//    private void checkUserSession() {
+//        AppSession session = AppSession.getInstance(this);
+//        String retailerId = session.getValue(Constants.RELAILER_ID);
+//        String status = session.getValue(Constants.RELAILER_STATUS);
+//
+//        Log.i("SESSION_DEBUG", "Retailer ID: " + retailerId);
+//        Log.i("SESSION_DEBUG", "Retailer Status: " + status);
+//
+//        if (retailerId != null && !retailerId.isEmpty() && "Active".equalsIgnoreCase(status)) {
+//            navigateToDashboard();
+//        } else {
+//            navigateToLogin();
+//        }
+//    }
+//
+//
+//    private void navigateToDashboard() {
+//        Intent intent = new Intent(this, DashBoardActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(intent);
+//        finish();
+//    }
+//
+//    private void navigateToLogin() {
+//        Intent intent = new Intent(this, LoginActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(intent);
+//        finish();
+//    }
     private void logFCM(){
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {

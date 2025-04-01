@@ -23,13 +23,13 @@ public class ViewPagerAdapter extends PagerAdapter {
     }
 
     private int[] slide_images = {
-            R.drawable.b1,
-            R.drawable.b2,
-            R.drawable.b3
+            R.drawable.medibro,
+            R.drawable.medibro,
+            R.drawable.medibro
     };
 
     private String[] slide_headings = {
-            "EAT",
+            "Company",
             "SLEEP",
             "CODE"
     };

@@ -21,7 +21,7 @@
                 android:id="@+id/img_logo"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/logo"
+                android:src="@drawable/medione"
                 android:layout_centerVertical="true"/>
 
             <LinearLayout
@@ -52,6 +52,7 @@
 
 
                 <LinearLayout
+                    android:id="@+id/linearUnit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -65,14 +66,13 @@
                         android:layout_height="wrap_content"
                         android:text="Unit :"
                         android:textColor="@color/black"
-                        android:textStyle="bold"
+                      android:fontFamily="@font/gotham_bold"
                         android:textSize="16sp"/>
 
                     <TextView
                         android:id="@+id/txt_unitcartName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Stocket name"
                         android:textColor="@color/green"
                         android:textSize="14sp"
                         android:fontFamily="@font/gotham_bold"
@@ -81,6 +81,16 @@
 
 
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/unlistedMedicine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                   android:fontFamily="@font/gotham_bold"
+                    android:textSize="16sp"
+                    android:visibility="gone"/>
+
 
 
 

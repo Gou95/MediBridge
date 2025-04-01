@@ -38,6 +38,9 @@ public class StockitsResponse {
     @SerializedName("dealer_name")
     @Expose
     private String dealerName;
+    @SerializedName("unlisted_medicines")
+    @Expose
+    private Object unlistedMedicines;
 
     public String getOrderNo() {
         return orderNo;
@@ -125,5 +128,13 @@ public class StockitsResponse {
 
     public void setDealerName(String dealerName) {
         this.dealerName = dealerName;
+    }
+
+    public CharSequence getUnlistedMedicines() {
+        return (CharSequence) unlistedMedicines;
+    }
+
+    public void setUnlistedMedicines(Object unlistedMedicines) {
+        this.unlistedMedicines = unlistedMedicines;
     }
 }

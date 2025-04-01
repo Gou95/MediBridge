@@ -9,18 +9,19 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.databinding.ActivityPrivacyPolicyBinding;
 
 public class PrivacyPolicyActivity extends AppCompatActivity {
-
+ActivityPrivacyPolicyBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_privacy_policy);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+  binding = ActivityPrivacyPolicyBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        initClicks();
+    }
+
+    private void initClicks() {
+        binding.webView.loadUrl("https://medibro.in/privacy_notice.html");
     }
 }

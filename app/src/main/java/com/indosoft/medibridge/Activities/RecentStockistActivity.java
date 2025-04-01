@@ -1,6 +1,7 @@
 package com.indosoft.medibridge.Activities;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,20 +9,16 @@ import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CancellationSignal;
+import android.os.Environment;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
-import android.print.PageRange;
-import android.print.PrintAttributes;
-import android.print.PrintDocumentAdapter;
-import android.print.PrintDocumentInfo;
-import android.print.PrintManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -32,10 +29,12 @@ import android.widget.CalendarView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.indosoft.medibridge.Adapter.StockitsListAdapter;
+import com.indosoft.medibridge.Model.OrderDetailsResponse;
 import com.indosoft.medibridge.Model.StockitsResponse;
 import com.indosoft.medibridge.R;
 import com.indosoft.medibridge.Services.NetworkCheckService;
@@ -44,6 +43,7 @@ import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.StockitsViewModel;
 import com.indosoft.medibridge.databinding.ActivityRecentStockistBinding;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
@@ -51,6 +51,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class RecentStockistActivity extends AppCompatActivity {
@@ -74,6 +75,7 @@ public class RecentStockistActivity extends AppCompatActivity {
         startNetworkService();
         setDefaultDates();
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
+        binding.swipeRefreshLayout.setRefreshing(false);
 
         String dealerName = getIntent().getStringExtra("dealerName");
         String dealerId = getIntent().getStringExtra("dealerId");
@@ -95,7 +97,7 @@ public class RecentStockistActivity extends AppCompatActivity {
             onBackPressed();
         });
         binding.btnPrintInvoice.setOnClickListener(v -> {
-            printOrderInvoice();
+          generateInvoicePdf();
         });
         binding.txtStartDate.setOnClickListener(v -> {
             openCalendarDialog("start");
@@ -104,9 +106,7 @@ public class RecentStockistActivity extends AppCompatActivity {
         binding.txtLastDate.setOnClickListener(v -> {
             openCalendarDialog("last");
         });
-        binding.imgWhatsApp.setOnClickListener(v -> {
 
-        });
         binding.autoMedicineName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -132,14 +132,14 @@ public class RecentStockistActivity extends AppCompatActivity {
             binding.swipeRefreshLayout.setRefreshing(false);
             if (responses != null) {
                 list.clear();
-                SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()); // 🔥 FIX API DATE FORMAT
-                SimpleDateFormat filterFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()); // ✅ API DATE FORMAT FIX
+                SimpleDateFormat filterFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
                 try {
                     Date start = filterFormat.parse(startDateSelected);
                     Date end = filterFormat.parse(lastDateSelected);
 
-                    // ✅ FIX: Last date ka time 23:59:59 set karein
+                    // ✅ Last date ka time 23:59:59 set karein taaki end date bhi include ho
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(end);
                     cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -148,20 +148,21 @@ public class RecentStockistActivity extends AppCompatActivity {
                     end = cal.getTime();
 
                     for (StockitsResponse response : responses) {
-                        Date orderDate = apiFormat.parse(response.getAddtime()); // ✅ Fix API Format Parsing
+                        Date orderDate = apiFormat.parse(response.getAddtime()); // ✅ Correct API date parsing
 
                         if (orderDate != null && !orderDate.before(start) && !orderDate.after(end)) {
                             list.add(response);
                         }
                     }
 
-                }catch (ParseException e) {
+                } catch (ParseException e) {
                     e.printStackTrace();
                 }
                 adapter.notifyDataSetChanged();
             }
         });
     }
+
     private void openCalendarDialog(String dateType) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View calendarView = inflater.inflate(R.layout.custom_calendar, null);
@@ -205,8 +206,8 @@ public class RecentStockistActivity extends AppCompatActivity {
         }
 
         ArrayList<StockitsResponse> filteredList = new ArrayList<>();
-        SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        SimpleDateFormat filterFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy ", Locale.getDefault());
+        SimpleDateFormat filterFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
         try {
             Date start = filterFormat.parse(startDateSelected);
@@ -233,134 +234,8 @@ public class RecentStockistActivity extends AppCompatActivity {
 
         adapter.updateList(filteredList); // Filtered list update karein
     }
-    private boolean isDateInRange(String date, String startDate, String endDate) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            Date targetDate = sdf.parse(date);
-            Date start = sdf.parse(startDate);
-            Date end = sdf.parse(endDate);
-            return (targetDate.equals(start) || targetDate.after(start)) &&
-                    (targetDate.equals(end) || targetDate.before(end));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    private void printOrderInvoice() {
 
-        PrintManager printManager = (PrintManager) getSystemService(PRINT_SERVICE);
 
-        String orderNo = getIntent().getStringExtra("dealerId");
-        String dateTime = getIntent().getStringExtra("dealerName");
-
-        PrintDocumentAdapter printAdapter = new PrintDocumentAdapter() {
-
-            @Override
-            public void onStart() {
-                super.onStart();
-            }
-
-            @Override
-            public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes, CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle extras) {
-                String printContent = generateInvoiceContent(orderNo, dateTime);
-                String[] lines = printContent.split("\n");
-
-                int linesPerPage = 40; // Number of lines that fit per page
-                int totalPages = (int) Math.ceil((double) lines.length / linesPerPage);
-
-                callback.onLayoutFinished(new PrintDocumentInfo.Builder("Invoice")
-                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-                        .setPageCount(totalPages)
-                        .build(), true);
-            }
-
-            @Override
-            public void onWrite(PageRange[] pages, ParcelFileDescriptor destination, CancellationSignal cancellationSignal, WriteResultCallback callback) {
-                try {
-                    PdfDocument document = new PdfDocument();
-                    String printContent = generateInvoiceContent(orderNo, dateTime);
-                    String[] lines = printContent.split("\n");
-
-                    int linesPerPage = 40; // Lines per page
-                    int totalPages = (int) Math.ceil((double) lines.length / linesPerPage);
-
-                    for (int pageNum = 0; pageNum < totalPages; pageNum++) {
-                        if (cancellationSignal.isCanceled()) {
-                            callback.onWriteCancelled();
-                            document.close();
-                            return;
-                        }
-
-                        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(600, 800, pageNum + 1).create();
-                        PdfDocument.Page page = document.startPage(pageInfo);
-
-                        Canvas canvas = page.getCanvas();
-                        Paint paint = new Paint();
-                        paint.setColor(Color.BLACK);
-                        paint.setTextSize(16);
-
-                        float x = 10;
-                        float y = 20;
-
-                        // Write the lines for the current page
-                        int startLine = pageNum * linesPerPage;
-                        int endLine = Math.min(startLine + linesPerPage, lines.length);
-                        for (int i = startLine; i < endLine; i++) {
-                            canvas.drawText(lines[i], x, y, paint);
-                            y += 20; // Move down for the next line
-                        }
-
-                        document.finishPage(page);
-                    }
-
-                    // Write the document to the output stream
-                    FileOutputStream out = new FileOutputStream(destination.getFileDescriptor());
-                    document.writeTo(out);
-                    document.close();
-
-                    // Indicate that writing is complete
-                    callback.onWriteFinished(new PageRange[]{PageRange.ALL_PAGES});
-
-                } catch (IOException e) {
-                    Log.e("PrintError", "Error writing document: " + e.getMessage());
-                    callback.onWriteFailed("Error writing document");
-                }
-            }
-        };
-
-        // Start the print job
-        printManager.print("Invoice_" + orderNo, printAdapter, new PrintAttributes.Builder().build());
-    }
-    private String generateInvoiceContent(String orderNo, String dateTime) {
-        StringBuilder content = new StringBuilder();
-
-        // content.append("Order Id: #").append(orderNo).append("\n\n");
-        content.append("dealerName: ").append(dateTime).append("\n\n");
-
-        content.append("------------------------------------------------\n");
-
-        content.append("Product Details:\n");
-
-        content.append("------------------------------------------------\n");
-
-        if (list != null && !list.isEmpty()) {
-            int serialNumber = 1;
-
-            for (StockitsResponse response : list) {
-                content.append(serialNumber).append(". ").append(response.getProductName()).append("\n");
-                content.append("Unit: ").append(response.getUnitName()).append("\n");
-                content.append("Quantity: ").append(response.getOrderQty()).append("\n");
-                content.append("Delivery Day: ").append(response.getDeliveryDay()).append("\n");
-                content.append("------------------------------------------------\n");
-
-                serialNumber++;
-            }
-        } else {
-            content.append("No products found in the order.\n");
-        }
-
-        return content.toString();
-    }
     private void filterListByProductName(String productName) {
         if (productName.isEmpty()) {
             adapter.updateList(list); // Show the full list if input is empty
@@ -434,7 +309,7 @@ public class RecentStockistActivity extends AppCompatActivity {
         }, 5000);
     }
     private void setDefaultDates() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
 
         lastDateSelected = sdf.format(calendar.getTime());
@@ -445,4 +320,178 @@ public class RecentStockistActivity extends AppCompatActivity {
         startDateSelected = sdf.format(calendar.getTime());
         binding.txtStartDate.setText(startDateSelected);
     }
+    private void generateInvoicePdf() {
+        String dealer = getIntent().getStringExtra("name");
+        if (dealer == null) dealer = ""; // Prevent null pointer issues
+
+        if (list == null || list.isEmpty()) {
+            Toast.makeText(this, "No order details available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        PdfDocument pdfDocument = new PdfDocument();
+        Paint paint = new Paint();
+        Paint titlePaint = new Paint();
+        Paint dealerPaint = new Paint();
+        Paint borderPaint = new Paint();
+
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setColor(Color.BLACK);
+        borderPaint.setStrokeWidth(1);
+
+        int pageWidth = 600;
+        int pageHeight = 800;
+        int marginTop = 50;
+        int rowHeight = 40;
+        int availableHeight = pageHeight - 150;
+
+        int col1 = 150, col2 = 100, col3 = 100, col4 = 100, col5 = 80;
+
+        int itemIndex = 0;
+
+        while (itemIndex < list.size()) {
+            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create();
+            PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+            Canvas canvas = page.getCanvas();
+
+            titlePaint.setTextSize(20);
+            titlePaint.setColor(Color.BLACK);
+            titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            canvas.drawText("Purchase Order", 250, marginTop, titlePaint);
+
+            dealerPaint.setTextSize(16);
+            dealerPaint.setColor(Color.DKGRAY);
+            dealerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            canvas.drawText("Stockist: " + dealer, 50, marginTop + 30, dealerPaint);
+
+            int y = marginTop + 70;
+            paint.setTextSize(14);
+            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+            int startX = 50;
+            int endX = startX + col1 + col2 + col3 + col4 + col5;
+            int headerBottom = y + rowHeight;
+
+            // **Header Row**
+            canvas.drawText("Product Name", startX + 10, y + 25, paint);
+            canvas.drawText("Unit", startX + col1 + 10, y + 25, paint);
+            canvas.drawText("Delivery Day", startX + col1 + col2 + 10, y + 25, paint);
+            canvas.drawText("OrderNo", startX + col1 + col2 + col3 + 10, y + 25, paint);
+            canvas.drawText("Remarks", startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
+
+            canvas.drawRect(startX, y, endX, headerBottom, borderPaint);
+            y += rowHeight;
+            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+
+            // **Loop through list items**
+            while (itemIndex < list.size() && y + rowHeight < availableHeight) {
+                StockitsResponse item = list.get(itemIndex);
+
+                String productName = (item.getProductName() != null) ? item.getProductName() : "";
+                String unitName = (item.getUnitName() != null) ? item.getUnitName() : "";
+                String deliveryDay = (item.getDeliveryDay() != null) ? item.getDeliveryDay() : "";
+               String orderNumber = (item.getOrderNo() != null) ? item.getOrderNo() : "";
+                String remarks = "";
+
+                int textY = y;
+                int rowLines = 1;  // Track total lines for row height
+
+                if (productName.equalsIgnoreCase("UNLISTED MEDICINES")) {
+                    String unlistedMedicines = (item.getUnlistedMedicines() != null) ? (String) item.getUnlistedMedicines() : "";
+                    String[] medicineList = unlistedMedicines.split(",");
+
+                    // Pehle title likh rahe hain
+                    canvas.drawText("UNLISTED MEDICINES", startX + 10, textY + 20, paint);
+                    textY += 20;
+                    rowLines++;
+
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
+                    paint.setTextSize(12);
+
+                    for (String medicine : medicineList) {
+                        canvas.drawText(medicine.trim(), startX + 10, textY + 20, paint);
+                        textY += 20;
+                        rowLines++;
+                    }
+
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                } else {
+                    // Agar normal product hai toh normal text wrapping use karein
+                    List<String> wrappedText = wrapText(productName, paint, col1 - 20);
+                    for (String line : wrappedText) {
+                        canvas.drawText(line, startX + 10, textY + 20, paint);
+                        textY += 20;
+                        rowLines++;
+                    }
+                }
+
+                int actualRowHeight = Math.max(rowHeight, rowLines * 20 + 10);
+
+                // **Other columns**
+                canvas.drawText(!unitName.isEmpty() ? unitName : "-", startX + col1 + 10, y + 25, paint);
+                canvas.drawText(!deliveryDay.isEmpty() ? deliveryDay : "-", startX + col1 + col2 + 10, y + 25, paint);
+                canvas.drawText(!orderNumber.isEmpty() ? orderNumber : "-", startX + col1 + col2 + col3 + 10, y + 25, paint);
+                canvas.drawText(remarks, startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
+
+                // **Border draw karna na bhoolen**
+                canvas.drawRect(startX, y, endX, y + actualRowHeight, borderPaint);
+
+                y += actualRowHeight;
+                itemIndex++;
+            }
+
+            pdfDocument.finishPage(page);
+        }
+
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Purchase Invoice.pdf");
+
+        try {
+            pdfDocument.writeTo(new FileOutputStream(file));
+            Toast.makeText(this, "PDF Saved Successfully", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to Save PDF", Toast.LENGTH_SHORT).show();
+        }
+
+        pdfDocument.close();
+        openPdf(file);
+    }
+
+
+
+    private List<String> wrapText(String text, Paint paint, int maxWidth) {
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            float textWidth = paint.measureText(testLine);
+
+            if (textWidth < maxWidth) {
+                currentLine.append(word).append(" ");
+            } else {
+                lines.add(currentLine.toString().trim());
+                currentLine = new StringBuilder(word).append(" ");
+            }
+        }
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString().trim());
+        }
+
+        return lines;
+    }
+    private void openPdf(File file) {
+        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(uri, "application/pdf");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No PDF Viewer Installed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

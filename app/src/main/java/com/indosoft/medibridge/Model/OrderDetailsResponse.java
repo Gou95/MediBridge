@@ -18,10 +18,10 @@ public class OrderDetailsResponse {
     private String productName;
     @SerializedName("order_qty")
     @Expose
-    private String orderQty;
+    private Object orderQty;
     @SerializedName("unit_name")
     @Expose
-    private String unitName;
+    private Object unitName;
     @SerializedName("dealer_name")
     @Expose
     private String dealerName;
@@ -37,6 +37,9 @@ public class OrderDetailsResponse {
     @SerializedName("order_status")
     @Expose
     private String orderStatus;
+    @SerializedName("unlisted_medicines")
+    @Expose
+    private String unlistedMedicines;
 
     public String getOrderNo() {
         return orderNo;
@@ -70,19 +73,19 @@ public class OrderDetailsResponse {
         this.productName = productName;
     }
 
-    public String getOrderQty() {
-        return orderQty;
+    public CharSequence getOrderQty() {
+        return (CharSequence) orderQty;
     }
 
-    public void setOrderQty(String orderQty) {
+    public void setOrderQty(Object orderQty) {
         this.orderQty = orderQty;
     }
 
     public String getUnitName() {
-        return unitName;
+        return (String) unitName;
     }
 
-    public void setUnitName(String unitName) {
+    public void setUnitName(Object unitName) {
         this.unitName = unitName;
     }
 
@@ -124,5 +127,13 @@ public class OrderDetailsResponse {
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public String getUnlistedMedicines() {
+        return unlistedMedicines;
+    }
+
+    public void setUnlistedMedicines(String unlistedMedicines) {
+        this.unlistedMedicines = unlistedMedicines;
     }
 }

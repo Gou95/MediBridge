@@ -62,7 +62,7 @@ FragmentOrderBinding binding;
         setDefaultDates();
 
         binding.swipeRefreshLayout.setOnRefreshListener(this::refreshOrderList);
-
+        binding.swipeRefreshLayout.setRefreshing(false);
         refreshOrderList();
 
 

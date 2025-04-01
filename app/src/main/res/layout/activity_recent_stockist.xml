@@ -102,12 +102,6 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="20dp"/>
 
-
-
-
-
-
-
                 </LinearLayout>
 
 
@@ -179,7 +173,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Print Invoice"
+                        android:text="Print Order"
                         android:textColor="@color/white"
                         android:textSize="15sp"
                         android:fontFamily="@font/gothambold"
@@ -188,13 +182,7 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <ImageView
-                    android:id="@+id/img_whatsApp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/whatsapp"
-                    android:scaleType="centerCrop"
-                    android:background="@null"/>
+
             </LinearLayout>
 
 

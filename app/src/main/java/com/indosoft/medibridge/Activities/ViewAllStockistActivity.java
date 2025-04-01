@@ -52,7 +52,7 @@ public class ViewAllStockistActivity extends AppCompatActivity {
 
         binding.imgBack.setOnClickListener(v -> onBackPressed());
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
-
+        binding.swipeRefreshLayout.setRefreshing(false);
         initClicks();
     }
     private void initClicks() {

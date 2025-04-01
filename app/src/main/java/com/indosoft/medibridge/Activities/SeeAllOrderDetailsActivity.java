@@ -1,5 +1,6 @@
 package com.indosoft.medibridge.Activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,13 +8,16 @@ import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.print.PageRange;
@@ -26,6 +30,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -39,9 +44,11 @@ import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.ViewModel.OrderDetailsViewModel;
 import com.indosoft.medibridge.databinding.ActivitySeeAllOrderDetailsBinding;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SeeAllOrderDetailsActivity extends AppCompatActivity {
 
@@ -89,12 +96,9 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
             onBackPressed();
         });
         binding.btnPrintInvoice.setOnClickListener(v -> {
-            printOrderInvoice();
+            generateInvoicePdf();
         });
-        binding.imgWhatsapp.setOnClickListener(v -> {
 
-            whatsappOpen();
-        });
     }
 
     private void whatsappOpen() {
@@ -126,124 +130,299 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
         });
     }
 
-    private void printOrderInvoice() {
+    private void generateInvoicePdf() {
+        String dealer = getIntent().getStringExtra("name");
+        if (dealer == null) dealer = ""; // Prevent null pointer issues
 
-        PrintManager printManager = (PrintManager) getSystemService(PRINT_SERVICE);
-        String dealerName = getIntent().getStringExtra("name");
-        String orderNo = getIntent().getStringExtra("orderNo");
-        String dateTime = getIntent().getStringExtra("dot");
-
-        PrintDocumentAdapter printAdapter = new PrintDocumentAdapter() {
-
-            @Override
-            public void onStart() {
-                super.onStart();
-            }
-
-            @Override
-            public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes, CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle extras) {
-                String printContent = generateInvoiceContent(dealerName,orderNo, dateTime);
-                String[] lines = printContent.split("\n");
-
-                int linesPerPage = 40; // Number of lines that fit per page
-                int totalPages = (int) Math.ceil((double) lines.length / linesPerPage);
-
-                callback.onLayoutFinished(new PrintDocumentInfo.Builder("Invoice")
-                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-                        .setPageCount(totalPages)
-                        .build(), true);
-            }
-
-            @Override
-            public void onWrite(PageRange[] pages, ParcelFileDescriptor destination, CancellationSignal cancellationSignal, WriteResultCallback callback) {
-                try {
-                    PdfDocument document = new PdfDocument();
-                    String printContent = generateInvoiceContent(dealerName,orderNo, dateTime);
-                    String[] lines = printContent.split("\n");
-
-                    int linesPerPage = 40; // Lines per page
-                    int totalPages = (int) Math.ceil((double) lines.length / linesPerPage);
-
-                    for (int pageNum = 0; pageNum < totalPages; pageNum++) {
-                        if (cancellationSignal.isCanceled()) {
-                            callback.onWriteCancelled();
-                            document.close();
-                            return;
-                        }
-
-                        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(600, 800, pageNum + 1).create();
-                        PdfDocument.Page page = document.startPage(pageInfo);
-
-                        Canvas canvas = page.getCanvas();
-                        Paint paint = new Paint();
-                        paint.setColor(Color.BLACK);
-                        paint.setTextSize(16);
-
-                        float x = 10;
-                        float y = 20;
-
-                        // Write the lines for the current page
-                        int startLine = pageNum * linesPerPage;
-                        int endLine = Math.min(startLine + linesPerPage, lines.length);
-                        for (int i = startLine; i < endLine; i++) {
-                            canvas.drawText(lines[i], x, y, paint);
-                            y += 20; // Move down for the next line
-                        }
-
-                        document.finishPage(page);
-                    }
-
-                    // Write the document to the output stream
-                    FileOutputStream out = new FileOutputStream(destination.getFileDescriptor());
-                    document.writeTo(out);
-                    document.close();
-
-                    // Indicate that writing is complete
-                    callback.onWriteFinished(new PageRange[]{PageRange.ALL_PAGES});
-
-                } catch (IOException e) {
-                    Log.e("PrintError", "Error writing document: " + e.getMessage());
-                    callback.onWriteFailed("Error writing document");
-                }
-            }
-        };
-
-        // Start the print job
-        printManager.print("Invoice_" + orderNo, printAdapter, new PrintAttributes.Builder().build());
-    }
-
-
-
-    private String generateInvoiceContent(String name,String orderNo, String dateTime) {
-        StringBuilder content = new StringBuilder();
-        content.append("Stockist : #").append(name).append("\n\n");
-        content.append("Order No: #").append(orderNo).append("\n\n");
-        content.append("Date: ").append(dateTime).append("\n\n");
-
-        content.append("------------------------------------------------\n");
-
-        content.append("Product Details:\n");
-
-        content.append("------------------------------------------------\n");
-
-        if (list != null && !list.isEmpty()) {
-            int serialNumber = 1;
-
-            for (OrderDetailsResponse response : list) {
-                content.append(serialNumber).append(". ").append(response.getProductName()).append("\n");
-//                content.append("Dealer Name: ").append(response.getDealerName()).append("\n");
-                content.append("Unit: ").append(response.getUnitName()).append("\n");
-                content.append("Quantity: ").append(response.getOrderQty()).append("\n");
-                content.append("------------------------------------------------\n");
-
-                serialNumber++;
-            }
-        } else {
-            content.append("No products found in the order.\n");
+        if (list == null || list.isEmpty()) {
+            Toast.makeText(this, "No order details available", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        return content.toString();
+        PdfDocument pdfDocument = new PdfDocument();
+        Paint paint = new Paint();
+        Paint titlePaint = new Paint();
+        Paint dealerPaint = new Paint();
+        Paint borderPaint = new Paint();
+
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setColor(Color.BLACK);
+        borderPaint.setStrokeWidth(1);
+
+        int pageWidth = 600;
+        int pageHeight = 800;
+        int marginTop = 50;
+        int rowHeight = 40;
+        int availableHeight = pageHeight - 150;
+
+        int col1 = 150, col2 = 100, col3 = 100, col4 = 100, col5 = 80;
+
+        int itemIndex = 0;
+
+        while (itemIndex < list.size()) {
+            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create();
+            PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+            Canvas canvas = page.getCanvas();
+
+            titlePaint.setTextSize(20);
+            titlePaint.setColor(Color.BLACK);
+            titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            canvas.drawText("Purchase Order", 250, marginTop, titlePaint);
+
+            dealerPaint.setTextSize(16);
+            dealerPaint.setColor(Color.DKGRAY);
+            dealerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            canvas.drawText("Stockist: " + dealer, 50, marginTop + 30, dealerPaint);
+
+            int y = marginTop + 70;
+            paint.setTextSize(14);
+            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+            int startX = 50;
+            int endX = startX + col1 + col2 + col3 + col4 + col5;
+            int headerBottom = y + rowHeight;
+
+            // **Header Row**
+            canvas.drawText("Product Name", startX + 10, y + 25, paint);
+            canvas.drawText("Unit", startX + col1 + 10, y + 25, paint);
+            canvas.drawText("Delivery Day", startX + col1 + col2 + 10, y + 25, paint);
+            canvas.drawText("Status", startX + col1 + col2 + col3 + 10, y + 25, paint);
+            canvas.drawText("Remarks", startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
+
+            canvas.drawRect(startX, y, endX, headerBottom, borderPaint);
+            y += rowHeight;
+            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+
+            // **Loop through list items**
+            while (itemIndex < list.size() && y + rowHeight < availableHeight) {
+                OrderDetailsResponse item = list.get(itemIndex);
+
+                String productName = (item.getProductName() != null) ? item.getProductName() : "";
+                String unitName = (item.getUnitName() != null) ? item.getUnitName() : "";
+                String deliveryDay = (item.getDeliveryDay() != null) ? item.getDeliveryDay() : "";
+                String orderStatus = (item.getOrderStatus() != null) ? item.getOrderStatus() : "";
+                String remarks = "";
+
+                int textY = y;
+                int rowLines = 1;  // Track total lines for row height
+
+                if (productName.equalsIgnoreCase("UNLISTED MEDICINES")) {
+                    String unlistedMedicines = (item.getUnlistedMedicines() != null) ? item.getUnlistedMedicines() : "";
+                    String[] medicineList = unlistedMedicines.split(",");
+
+                    // Pehle title likh rahe hain
+                    canvas.drawText("UNLISTED MEDICINES", startX + 10, textY + 20, paint);
+                    textY += 20;
+                    rowLines++;
+
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
+                    paint.setTextSize(12);
+
+                    for (String medicine : medicineList) {
+                        canvas.drawText(medicine.trim(), startX + 10, textY + 20, paint);
+                        textY += 20;
+                        rowLines++;
+                    }
+
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                } else {
+                    // Agar normal product hai toh normal text wrapping use karein
+                    List<String> wrappedText = wrapText(productName, paint, col1 - 20);
+                    for (String line : wrappedText) {
+                        canvas.drawText(line, startX + 10, textY + 20, paint);
+                        textY += 20;
+                        rowLines++;
+                    }
+                }
+
+                int actualRowHeight = Math.max(rowHeight, rowLines * 20 + 10);
+
+                // **Other columns**
+                canvas.drawText(!unitName.isEmpty() ? unitName : "-", startX + col1 + 10, y + 25, paint);
+                canvas.drawText(!deliveryDay.isEmpty() ? deliveryDay : "-", startX + col1 + col2 + 10, y + 25, paint);
+                canvas.drawText(!orderStatus.isEmpty() ? orderStatus : "-", startX + col1 + col2 + col3 + 10, y + 25, paint);
+                canvas.drawText(remarks, startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
+
+                // **Border draw karna na bhoolen**
+                canvas.drawRect(startX, y, endX, y + actualRowHeight, borderPaint);
+
+                y += actualRowHeight;
+                itemIndex++;
+            }
+
+            pdfDocument.finishPage(page);
+        }
+
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Purchase Invoice.pdf");
+
+        try {
+            pdfDocument.writeTo(new FileOutputStream(file));
+            Toast.makeText(this, "PDF Saved Successfully", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to Save PDF", Toast.LENGTH_SHORT).show();
+        }
+
+        pdfDocument.close();
+        openPdf(file);
     }
+    private List<String> wrapText(String text, Paint paint, int maxWidth) {
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            float textWidth = paint.measureText(testLine);
+
+            if (textWidth < maxWidth) {
+                currentLine.append(word).append(" ");
+            } else {
+                lines.add(currentLine.toString().trim());
+                currentLine = new StringBuilder(word).append(" ");
+            }
+        }
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString().trim());
+        }
+
+        return lines;
+    }
+    private void openPdf(File file) {
+        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(uri, "application/pdf");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No PDF Viewer Installed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
+
+
+//    private void printOrderInvoice() {
+//
+//        PrintManager printManager = (PrintManager) getSystemService(PRINT_SERVICE);
+//        String dealerName = getIntent().getStringExtra("name");
+//        String orderNo = getIntent().getStringExtra("orderNo");
+//        String dateTime = getIntent().getStringExtra("dot");
+//
+//        PrintDocumentAdapter printAdapter = new PrintDocumentAdapter() {
+//
+//            @Override
+//            public void onStart() {
+//                super.onStart();
+//            }
+//
+//            @Override
+//            public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes, CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle extras) {
+//                String printContent = generateInvoiceContent(dealerName,orderNo, dateTime);
+//                String[] lines = printContent.split("\n");
+//
+//                int linesPerPage = 40; // Number of lines that fit per page
+//                int totalPages = (int) Math.ceil((double) lines.length / linesPerPage);
+//
+//                callback.onLayoutFinished(new PrintDocumentInfo.Builder("Invoice")
+//                        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+//                        .setPageCount(totalPages)
+//                        .build(), true);
+//            }
+//
+//            @Override
+//            public void onWrite(PageRange[] pages, ParcelFileDescriptor destination, CancellationSignal cancellationSignal, WriteResultCallback callback) {
+//                try {
+//                    PdfDocument document = new PdfDocument();
+//                    String printContent = generateInvoiceContent(dealerName,orderNo, dateTime);
+//                    String[] lines = printContent.split("\n");
+//
+//                    int linesPerPage = 40; // Lines per page
+//                    int totalPages = (int) Math.ceil((double) lines.length / linesPerPage);
+//
+//                    for (int pageNum = 0; pageNum < totalPages; pageNum++) {
+//                        if (cancellationSignal.isCanceled()) {
+//                            callback.onWriteCancelled();
+//                            document.close();
+//                            return;
+//                        }
+//
+//                        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(600, 800, pageNum + 1).create();
+//                        PdfDocument.Page page = document.startPage(pageInfo);
+//
+//                        Canvas canvas = page.getCanvas();
+//                        Paint paint = new Paint();
+//                        paint.setColor(Color.BLACK);
+//                        paint.setTextSize(16);
+//
+//                        float x = 10;
+//                        float y = 20;
+//
+//                        // Write the lines for the current page
+//                        int startLine = pageNum * linesPerPage;
+//                        int endLine = Math.min(startLine + linesPerPage, lines.length);
+//                        for (int i = startLine; i < endLine; i++) {
+//                            canvas.drawText(lines[i], x, y, paint);
+//                            y += 20; // Move down for the next line
+//                        }
+//
+//                        document.finishPage(page);
+//                    }
+//
+//                    // Write the document to the output stream
+//                    FileOutputStream out = new FileOutputStream(destination.getFileDescriptor());
+//                    document.writeTo(out);
+//                    document.close();
+//
+//                    // Indicate that writing is complete
+//                    callback.onWriteFinished(new PageRange[]{PageRange.ALL_PAGES});
+//
+//                } catch (IOException e) {
+//                    Log.e("PrintError", "Error writing document: " + e.getMessage());
+//                    callback.onWriteFailed("Error writing document");
+//                }
+//            }
+//        };
+//
+//        // Start the print job
+//        printManager.print("Invoice_" + orderNo, printAdapter, new PrintAttributes.Builder().build());
+//    }
+//
+//
+//
+//    private String generateInvoiceContent(String name,String orderNo, String dateTime) {
+//        StringBuilder content = new StringBuilder();
+//        content.append("Stockist : #").append(name).append("\n\n");
+//        content.append("Order No: #").append(orderNo).append("\n\n");
+//        content.append("Date: ").append(dateTime).append("\n\n");
+//
+//        content.append("------------------------------------------------\n");
+//
+//        content.append("Product Details:\n");
+//
+//        content.append("------------------------------------------------\n");
+//
+//        if (list != null && !list.isEmpty()) {
+//            int serialNumber = 1;
+//
+//            for (OrderDetailsResponse response : list) {
+//                content.append(serialNumber).append(". ").append(response.getProductName()).append("\n");
+////                content.append("Dealer Name: ").append(response.getDealerName()).append("\n");
+//                content.append("Unit: ").append(response.getUnitName()).append("\n");
+//                content.append("Quantity: ").append(response.getOrderQty()).append("\n");
+//                content.append("------------------------------------------------\n");
+//
+//                serialNumber++;
+//            }
+//        } else {
+//            content.append("No products found in the order.\n");
+//        }
+//
+//        return content.toString();
+//    }
 
     private void startNetworkService() {
         Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);

@@ -15,6 +15,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.View;
@@ -47,12 +51,12 @@ public class SignUpActivity extends AppCompatActivity {
     StatesViewModel statesViewModel;
     SignUpViewModel signUpViewModel;
     CityViewModel cityViewModel;
-    String text = "I accept and agree to the Terms & Conditions and privacy policy";
-    SpannableString spannableString = new SpannableString(text);
+
     ArrayList<IndiaStateResponse> stateList = new ArrayList<>();
     ArrayList<StateCityResponse> cityList = new ArrayList<>();
     ExitMobileViewModel exitMobileViewModel;
     private boolean isReceiverRegistered = false;
+    private boolean isPasswordVisible = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,17 +75,36 @@ public class SignUpActivity extends AppCompatActivity {
 
         onAttachObservers();
         startNetworkService();
+setupSpannableText();
 
+       // Toast.makeText(this, ""+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN), Toast.LENGTH_SHORT).show();
+    }
+    private void setupSpannableText() {
+        String text = "I accept and agree to the Terms & Conditions and privacy policy";
+        SpannableString spannableString = new SpannableString(text);
         int termsStart = text.indexOf("Terms & Conditions");
         int termsEnd = termsStart + "Terms & Conditions".length();
         int privacyStart = text.indexOf("privacy policy");
         int privacyEnd = privacyStart + "privacy policy".length();
-
+        ClickableSpan termsClick = new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                startActivity(new Intent(SignUpActivity.this, TermsActivity.class));
+            }
+        };
+        ClickableSpan privacyClick = new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                startActivity(new Intent(SignUpActivity.this, PrivacyPolicyActivity.class));
+            }
+        };
+        spannableString.setSpan(termsClick, termsStart, termsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(privacyClick, privacyStart, privacyEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableString.setSpan(new StyleSpan(Typeface.BOLD), termsStart, termsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableString.setSpan(new StyleSpan(Typeface.BOLD), privacyStart, privacyEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
         binding.checkbox.setText(spannableString);
-        Toast.makeText(this, ""+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN), Toast.LENGTH_SHORT).show();
+        binding.checkbox.setMovementMethod(LinkMovementMethod.getInstance());
+
     }
 
     private void onAttachObservers() {
@@ -223,6 +246,7 @@ public class SignUpActivity extends AppCompatActivity {
                         AppSession.getInstance(this).setValue(Constants.CITY_NAME, cityName);
 
 
+
                         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
@@ -246,10 +270,22 @@ public class SignUpActivity extends AppCompatActivity {
 
             }
         });
+
+        binding.imgEye.setOnClickListener(v -> togglePasswordVisibility());
     }
 
 
+    private void togglePasswordVisibility() {
+        isPasswordVisible = !isPasswordVisible;
 
+        if (isPasswordVisible) {
+            binding.edtPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            binding.imgEye.setImageResource(R.drawable.eye);
+        } else {
+            binding.edtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            binding.imgEye.setImageResource(R.drawable.hide_eye);
+        }
+    }
     private void showTermsConditionsPopup() {
         View view = getLayoutInflater().inflate(R.layout.popup_layout, null);
 

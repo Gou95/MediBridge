@@ -51,61 +51,27 @@
                 android:id="@+id/cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
                 android:layout_marginTop="10dp"
-                app:cardCornerRadius="10dp"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="11dp"
-                app:cardBackgroundColor="@color/white"
-                android:layout_marginHorizontal="5dp"
+                android:backgroundTint="@color/white"
                 >
 
-                <LinearLayout
+                <AutoCompleteTextView
+                    android:id="@+id/auto_month"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginHorizontal="10dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginBottom="5dp">
+                    android:layout_height="40dp"
+                    android:background="@null"
+                    android:drawableStart="@drawable/baseline_search"
+                    android:hint="search medicines "
+                    android:textColorHint="@color/green"
+                    android:fontFamily="@font/gothambold"
+                    android:paddingStart="20dp"
+                    android:textSize="16sp"
+                    android:drawablePadding="10dp"
 
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@drawable/calendr"
-                        android:scaleType="fitXY"/>
-
-                    <TextView
-                        android:id="@+id/txt_startDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Start Date"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:fontFamily="@font/gothambook"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="20dp"/>
-
-
-                    <TextView
-                        android:id="@+id/txt_lastDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Last date"
-                        android:textColor="@color/black"
-                        android:gravity="end"
-                        android:textSize="16sp"
-                        android:fontFamily="@font/gothambook"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="20dp"/>
-
-
-
-
-
-
-
-                </LinearLayout>
-
-
+                    />
 
 
             </androidx.cardview.widget.CardView>
@@ -173,7 +139,7 @@
 
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/btn_printInvoice"
+                    android:id="@+id/btn_printOrder"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     app:cardCornerRadius="25dp"
@@ -190,7 +156,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Print Invoice"
+                        android:text="Print Order"
                         android:textColor="@color/white"
                         android:textSize="15sp"
                         android:fontFamily="@font/gothambold"
@@ -199,13 +165,7 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <ImageView
-                    android:id="@+id/img_whatsapp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/whatsapp"
-                    android:scaleType="centerCrop"
-                    android:background="@null"/>
+
             </LinearLayout>
 
 

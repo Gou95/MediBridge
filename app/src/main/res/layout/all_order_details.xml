@@ -38,12 +38,13 @@
                 android:layout_marginStart="5dp"
                 android:fontFamily="@font/gotham_bold"
                 android:textColor="@color/black"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
 
         <LinearLayout
+            android:id="@+id/linear_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -68,32 +69,16 @@
                 android:textSize="14sp" />
 
         </LinearLayout>
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/unlistedMedicine"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal">
+            android:textColor="@color/black"
+            android:fontFamily="@font/gotham_bold"
+            android:textSize="16sp"
+            android:visibility="gone"/>
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/gotham_bold"
-                android:text="Stockist Name :"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/txt_stockitName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:fontFamily="@font/gotham_bold"
-                android:textColor="@color/green"
-                android:textSize="14sp" />
-
-        </LinearLayout>
 
 
         <LinearLayout
@@ -117,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:fontFamily="@font/gotham_bold"
-                android:textColor="@color/green"
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
         </LinearLayout>

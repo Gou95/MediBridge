@@ -1,6 +1,5 @@
 package com.indosoft.medibridge.Adapter;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
@@ -8,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.indosoft.medibridge.Activities.DashBoardActivity;
-import com.indosoft.medibridge.Fragment.UrgentCartFragment;
 import com.indosoft.medibridge.Model.GetUrgentCartResponse;
 import com.indosoft.medibridge.Model.ShowCartResponse;
 import com.indosoft.medibridge.R;
@@ -35,73 +34,63 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHolder> {
     Context context;
     ArrayList<ShowCartResponse> list;
-    UrgentCartFragment urgentFragment;
     DeleteCartViewModel deleteCartViewModel;
     DeliveryDayViewModel dayViewModel;
     ShowCartViewModel showCartViewModel;
     QuantityChangeViewModel quantityChangeViewModel;
-
-
-
-
     public CardListAdapter(Context context, DeliveryDayViewModel dayViewModel, ArrayList<ShowCartResponse> list, ShowCartViewModel showCartViewModel) {
         this.context = context;
         this.dayViewModel = dayViewModel;
         this.list = list;
         this.showCartViewModel = showCartViewModel;
-
     }
-
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.card_list_layout, parent, false);
         return new ViewHolder(view);
     }
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ShowCartResponse output = list.get(position);
-
         holder.medicinename.setText(output.getProductName());
         holder.dealerName.setText(output.getDealerName());
         holder.unit.setText(output.getUnitName());
         holder.number.setText(output.getQty());
+        holder.unlisted.setText(output.getUnlistedMedicines());
+        Log.d("AdapterDebug", "Position: " + position + " | Product ID: " + output.getProductId() + " | Product Name: " + output.getProductName());
 
-
-        AtomicInteger number = new AtomicInteger((int) Float.parseFloat(output.getQty()));
+        if ("1680".equals(output.getProductId())) {
+            holder.linearLayout.setVisibility(View.GONE);
+            holder.unlisted.setVisibility(View.VISIBLE);
+            holder.unlisted.setText(output.getUnlistedMedicines() != null ? output.getUnlistedMedicines() : "N/A");
+        } else {
+            holder.linearLayout.setVisibility(View.VISIBLE);
+            holder.unlisted.setVisibility(View.GONE);
+            holder.unit.setText(output.getUnitName() != null ? output.getUnitName() : "N/A");
+        }
+        AtomicInteger number = new AtomicInteger(tryParseFloat(output.getQty(), 1));
         String cartId = output.getCartId();
         String productId = output.getProductId();
         updateVisibility(holder, number.get());
-
-
         holder.add.setOnClickListener(v -> {
             int newQty = number.incrementAndGet();
             updateQuantity(cartId, productId, String.valueOf(newQty), holder, number, position);
         });
-
         holder.sub.setOnClickListener(v -> {
             if (number.get() > 1) {
                 int newQty = number.decrementAndGet();
                 updateQuantity(cartId, productId, String.valueOf(newQty), holder, number, position);
             }
         });
-
-
         holder.delete.setOnClickListener(v -> {
             deleteCartItem(cartId, position);
-
         });
-
         holder.urgent.setOnClickListener(v -> {
             handleDeliveryDayUpdate(holder, cartId, "Urgent");
             GetUrgentCartResponse newItem = new GetUrgentCartResponse();
-
             newItem.setQty("1");
             newItem.setProductName(output.getProductName());
-
-
         });
 
         holder.today.setOnClickListener(v -> {
@@ -115,9 +104,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
                 holder.today.setEnabled(true);
             });
         });
-
         holder.tomorrow.setOnClickListener(v -> {
-
             holder.tomorrow.setEnabled(false);
             String tomorrow = "Tomorrow";
             dayViewModel.deliveryDayData(cartId,tomorrow);
@@ -125,42 +112,35 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
                 if (response != null){
                    // Toast.makeText(context, response.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-           ;
-                holder.tomorrow.setEnabled(true);
+           holder.tomorrow.setEnabled(true);
             });
         });
-
-
     }
-
-    @SuppressLint("MissingInflatedId")
+    private int tryParseFloat(String value, int defaultValue) {
+        try {
+            return value != null ? (int) Float.parseFloat(value.trim()) : defaultValue;
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
     private void handleDeliveryDayUpdate(ViewHolder holder, String cartId, String day) {
         if ("Urgent".equals(day)) {
             if (showCartViewModel == null) {
-                Log.e("CardListAdapter", "showCartViewModel is null!");
                 return;
             }
-
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
             String retailerId = AppSession.getInstance(context).getValue(Constants.RELAILER_ID);
             showCartViewModel.getShowPostCartData(retailerId); // This line will work now as showCartViewModel is initialized
-
             LayoutInflater inflater = LayoutInflater.from(context);
             View popupView = inflater.inflate(R.layout.popup_layout, null);
-
             TextView productName = popupView.findViewById(R.id.popup_product_name);
             TextView title = popupView.findViewById(R.id.popup_title);
             TextView message = popupView.findViewById(R.id.popup_message);
             TextView yes = popupView.findViewById(R.id.popup_confirm);
             TextView no = popupView.findViewById(R.id.popup_cancel);
-
             AlertDialog dialog = builder.setView(popupView).setCancelable(false).create();
-
             title.setText("Confirm Urgent Day");
             message.setText("Do you want to move this product");
-
-            // Observe the showCartViewModel LiveData
             showCartViewModel.getLiveData().observe((LifecycleOwner) context, showCartResponses -> {
                 if (showCartResponses != null && !showCartResponses.isEmpty()) {
                     for (ShowCartResponse response : showCartResponses) {
@@ -168,49 +148,53 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
                     }
                 }
             });
-
             yes.setOnClickListener(v -> {
                 holder.urgent.setEnabled(false);
                 callDeliveryDayAPI(holder, cartId, day, true);
+                int newBadgeCount = Math.max(list.size() - 1, 0);
+                AppSession.getInstance(context).setValue(Constants.CART_COUNT, String.valueOf(newBadgeCount));
 
                 if (context instanceof DashBoardActivity) {
                     DashBoardActivity dashboard = (DashBoardActivity) context;
-                    int updatedCount = dashboard.getCartBadgeCount() - 1;
-                    dashboard.updateCartBadge(updatedCount);
+                    int newbadgeCount = dashboard.getCartBadgeCount() - 1;
+                    dashboard.updateCartBadge(Math.max(newbadgeCount, 0)); // Count kabhi negative na ho
                 }
+
                 if (context instanceof DashBoardActivity) {
                     DashBoardActivity dashboard = (DashBoardActivity) context;
-                    dashboard.updateUrgentBadge(dashboard.getUrgentBadgeCount() + 1);
+                    int currentUrgentCount = dashboard.getUrgentBadgeCount();
+                    dashboard.updateUrgentBadge(currentUrgentCount + 1); // Increase count
                 }
-
-
+                for (ShowCartResponse response : list) {
+                    if ("1680".equals(response.getProductId()) || "UNLISTED MEDICINES".equalsIgnoreCase(response.getProductName())) {
+                        if (context instanceof DashBoardActivity) {
+                            DashBoardActivity dashboard = (DashBoardActivity) context;
+                            int currentUrgentCount = dashboard.getUrgentBadgeCount();
+                            dashboard.updateUrgentBadge(currentUrgentCount + 1); // Increase count
+                        }
+                        break; // No need to continue loop
+                    }
+                }
                 dialog.dismiss();
-            });
 
+            });
             no.setOnClickListener(v -> {
-               // Toast.makeText(context, "Action canceled.", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             });
-
             dialog.show();
         } else {
             callDeliveryDayAPI(holder, cartId, day, false);
         }
     }
-
-
     private void callDeliveryDayAPI(ViewHolder holder, String cartId, String day, boolean isUrgent) {
         if (dayViewModel != null) {
             holder.today.setEnabled(false);
             holder.tomorrow.setEnabled(false);
             holder.urgent.setEnabled(false);
-
             dayViewModel.deliveryDayData(cartId, day);
-
             dayViewModel.getLiveData().observe((LifecycleOwner) context, response -> {
                 if (response != null) {
                     Toast.makeText(context, response.getMessage(), Toast.LENGTH_SHORT).show();
-
                     for (int i = 0; i < list.size(); i++) {
                         if (list.get(i).getCartId().equals(cartId)) {
                             list.remove(i);
@@ -219,12 +203,9 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
                             break;
                         }
                     }
-
                 } else {
                     Toast.makeText(context, "Failed to update delivery day to " + day, Toast.LENGTH_SHORT).show();
                 }
-
-
                 holder.urgent.setEnabled(true);
             });
         }
@@ -242,59 +223,43 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
                 holder.number.setText(qty);
                 updateVisibility(holder, number.get());
 
-
-
-//                if (context instanceof DashBoardActivity) {
-//                    DashBoardActivity dashboard = (DashBoardActivity) context;
-//                    int updatedCount = dashboard.getCartBadgeCount() - 1;
-//                    dashboard.updateCartBadge(updatedCount);
-//
-//                    if (list.isEmpty()) {
-//                        dashboard.updateCartBadge(0);
-//                    }
-//                }
-
             } else {
                 number.getAndSet(Integer.parseInt(list.get(position).getQty()));
                 Toast.makeText(context, "Failed to update quantity.", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
     private void deleteCartItem(String cartId, int position) {
         if (deleteCartViewModel == null) {
             deleteCartViewModel = new DeleteCartViewModel();
             deleteCartViewModel.init(context);
         }
-
         deleteCartViewModel.deleteCartData(cartId);
-
         deleteCartViewModel.getLiveData().observe((LifecycleOwner) context, response -> {
-            if (response != null) {
+            if (position >= 0 && position < list.size()) {
                 list.remove(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, list.size());
 
                 if (context instanceof DashBoardActivity) {
                     DashBoardActivity dashboard = (DashBoardActivity) context;
-                    int updatedCount = dashboard.getCartBadgeCount() - 1;
-                    dashboard.updateCartBadge(updatedCount);
+                    int newBadgeCount = dashboard.getCartBadgeCount() - 1;
+                    dashboard.updateCartBadge(Math.max(newBadgeCount, 0));
                 }
 
+
+
+
             } else {
-
                 Toast.makeText(context, "Failed to delete item: " + response.getMessage(), Toast.LENGTH_SHORT).show();
-
             }
         });
-
         deleteCartViewModel.getIsFailed().observe((LifecycleOwner) context, error -> {
             if (error != null) {
                 Toast.makeText(context, "Error: " + error, Toast.LENGTH_SHORT).show();
             }
         });
     }
-
     private void updateVisibility(ViewHolder holder, int quantity) {
         if (quantity == 1) {
             holder.delete.setVisibility(View.VISIBLE);
@@ -304,19 +269,17 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
             holder.sub.setVisibility(View.VISIBLE);
         }
     }
-
     @Override
     public int getItemCount() {
         return list.size();
     }
     public class ViewHolder extends RecyclerView.ViewHolder {
-
-        TextView medicinename,dealerName,unit,number;
+        TextView medicinename,dealerName,unit,number,unlisted;
         RadioButton urgent,today,tomorrow;
         ImageView delete,sub,add;
+        LinearLayout linearLayout;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             medicinename = itemView.findViewById(R.id.txt_medicine);
             dealerName = itemView.findViewById(R.id.txt_stockitName);
             unit = itemView.findViewById(R.id.txt_unitcartName);
@@ -327,6 +290,8 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
             delete = itemView.findViewById(R.id.img_delete);
             sub = itemView.findViewById(R.id.img_sub);
             add = itemView.findViewById(R.id.img_add);
+            linearLayout = itemView.findViewById(R.id.linearUnit);
+            unlisted = itemView.findViewById(R.id.unlistedMedicine);
         }
     }
 

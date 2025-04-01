@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class UserUpdateBody {
-
     @SerializedName("retailer_name")
     @Expose
     private String retailerName;
@@ -38,6 +37,10 @@ public class UserUpdateBody {
     @SerializedName("retailer_dl_no")
     @Expose
     private String retailerDlNo;
+
+    @SerializedName("photo_path")
+    @Expose
+    private Object photoPath;
 
     public String getRetailerName() {
         return retailerName;
@@ -125,5 +128,12 @@ public class UserUpdateBody {
 
     public void setRetailerDlNo(String retailerDlNo) {
         this.retailerDlNo = retailerDlNo;
+    }
+    public Object getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(Object photoPath) {
+        this.photoPath = photoPath;
     }
 }

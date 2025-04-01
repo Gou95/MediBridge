@@ -3,8 +3,11 @@ package com.indosoft.medibridge.RetrofitServices;
 import com.indosoft.medibridge.Body.AddressUpdateBody;
 import com.indosoft.medibridge.Body.AddtoCartBody;
 import com.indosoft.medibridge.Body.ExitMobileBody;
+import com.indosoft.medibridge.Body.ExpiryRegisterBody;
 import com.indosoft.medibridge.Body.SignUpBody;
 import com.indosoft.medibridge.Body.StockistBody;
+import com.indosoft.medibridge.Body.UnlistedBody;
+import com.indosoft.medibridge.Body.UpdateStatusBody;
 import com.indosoft.medibridge.Body.UserUpdateBody;
 import com.indosoft.medibridge.Model.AddressUpdateResponse;
 import com.indosoft.medibridge.Model.AddtoCartResponse;
@@ -15,6 +18,7 @@ import com.indosoft.medibridge.Model.DealersResponse;
 import com.indosoft.medibridge.Model.DeleteCartResponse;
 import com.indosoft.medibridge.Model.DeliveryDayResponse;
 import com.indosoft.medibridge.Model.ExitMobileResponse;
+import com.indosoft.medibridge.Model.ExpiryListResponse;
 import com.indosoft.medibridge.Model.GetOtpResponse;
 import com.indosoft.medibridge.Model.GetSignUpUserResponse;
 import com.indosoft.medibridge.Model.GetUrgentCartResponse;
@@ -29,6 +33,7 @@ import com.indosoft.medibridge.Model.OrderListResponse;
 import com.indosoft.medibridge.Model.OrderRegisterResponse;
 import com.indosoft.medibridge.Model.OrderResponse;
 import com.indosoft.medibridge.Model.OtpResponse;
+import com.indosoft.medibridge.Model.PlansResponse;
 import com.indosoft.medibridge.Model.ProceedOrderResponse;
 import com.indosoft.medibridge.Model.QuantityChangeResponse;
 import com.indosoft.medibridge.Model.RecentStockitsResponse;
@@ -44,14 +49,17 @@ import com.indosoft.medibridge.Model.UserUpdateResponse;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface ApiInterface {
@@ -172,7 +180,24 @@ public interface ApiInterface {
 
     @POST("registerstockist.php")
     Call<SignUpResponse> stockistRegister(@Body StockistBody body);
-    @GET("cartcounter.php")
-    Call<CounterResponse> getCounter(@Query("retailer_id") String retailer_id);
+    @GET("expiryregister.php")
+    Call<List<ExpiryListResponse>> getExpiryList();
+    @POST("expiryregister.php")
+    Call<SignUpResponse> expiryRegister(@Body ExpiryRegisterBody body);
 
+    @POST("unlistedproducts.php")
+    Call<SignUpResponse> unlistedMedicine(@Body UnlistedBody body);
+    @GET("subscriptions.php")
+    Call<List<PlansResponse>> getPlans();
+
+    @PUT("subscriptions.php")
+    Call<SignUpResponse> getUpdate(@Query("retailer_id") String retailer_id, @Body UpdateStatusBody body);
+
+    @PUT("subscription-expiry.php")
+    Call<SignUpResponse> expiryStatus(@Query("retailer_id") String retailer_id);
+    @Multipart
+    @POST("retailerpics.php")
+    Call<SignUpResponse> updateRetailerImage(
+            @Part MultipartBody.Part image
+    );
 }

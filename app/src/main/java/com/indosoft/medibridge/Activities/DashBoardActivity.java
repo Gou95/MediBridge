@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,9 +37,11 @@ import com.indosoft.medibridge.databinding.ActivityDashBoardBinding;
 
 public class DashBoardActivity extends AppCompatActivity {
     ActivityDashBoardBinding binding;
+    private boolean isReceiverRegistered = false;
+    private int previousCartCount = -1;
     private int urgentBadgeCount = 0;
     private int cartCount = 0;
-    private boolean isReceiverRegistered = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,9 +49,8 @@ public class DashBoardActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         initClicks();
         bottomNavigation();
-        initializeBadge();
         logFCM();
-
+        userSession();
         if (!isNetworkConnected()) {
             showNoConnectionView();
         } else {
@@ -63,15 +63,27 @@ public class DashBoardActivity extends AppCompatActivity {
         }
 
     }
+    private void userSession() {
+        String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
+        if (retailerId == null || retailerId.isEmpty()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+    }
     private void initClicks() {
         binding.flotingBtn.setOnClickListener(v -> {
             new Handler().postDelayed(() -> binding.flotingBtn.setEnabled(true), 1000);
             resetBottomNavigationSelection();
+            updateBadgeCounter(0);
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new MyCartFragment(), "MY_CART_FRAGMENT")
                     .addToBackStack(null)
                     .commit();
+
         });
     }
     private void bottomNavigation() {
@@ -113,7 +125,7 @@ public class DashBoardActivity extends AppCompatActivity {
         }
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         transaction.commit();
-
+        updateBadgeCounter(0);
     }
     private void resetBottomNavigationSelection() {
         binding.bottomNavigation.clearFocus();
@@ -122,13 +134,13 @@ public class DashBoardActivity extends AppCompatActivity {
         binding.noConnectionLayout.setVisibility(View.VISIBLE);
         binding.fragmentContainer.setVisibility(View.GONE);
         binding.bottomNavigation.setVisibility(View.GONE);
-        binding.frameLayout.setVisibility(View.GONE); // Hide the floating button
+//        binding.frameLayout.setVisibility(View.GONE); // Hide the floating button
     }
     private void hideNoConnectionView() {
         binding.noConnectionLayout.setVisibility(View.GONE);
         binding.fragmentContainer.setVisibility(View.VISIBLE);
         binding.bottomNavigation.setVisibility(View.VISIBLE);
-        binding.frameLayout.setVisibility(View.VISIBLE);
+      // binding.frameLayout.setVisibility(View.VISIBLE);
     }
     @Override
     public void onBackPressed() {
@@ -157,31 +169,6 @@ public class DashBoardActivity extends AppCompatActivity {
             tabView.performClick(); // Simulate a click on the tab to trigger its selection
         }
     }
-    public int getUrgentBadgeCount() {
-        return urgentBadgeCount;
-    }
-    public void updateUrgentBadge(int count) {
-        urgentBadgeCount = count; // Update the count
-        AppSession.getInstance(this).setValue(Constants.URGENT_BADGE_COUNT, String.valueOf(count));
-        setBadge(urgentBadgeCount);
-    }
-    private void setBadge(int urgentBadgeCount) {
-        if (urgentBadgeCount <= 0) {
-            binding.bottomNavigation.removeBadge(R.id.urgent);  // Remove the badge if count is 0
-        } else {
-            BadgeDrawable badge = binding.bottomNavigation.getOrCreateBadge(R.id.urgent);
-            badge.setNumber(urgentBadgeCount);
-            badge.setBackgroundColor(getResources().getColor(R.color.red));
-            badge.setBadgeTextColor(getResources().getColor(R.color.white));
-        }
-    }
-    public void clearUrgentBadge() {
-        binding.bottomNavigation.removeBadge(R.id.urgent);
-        urgentBadgeCount = 0;
-        
-        AppSession.getInstance(this).setValue(Constants.URGENT_BADGE_COUNT, "0");
-    }
-
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) {
@@ -190,7 +177,6 @@ public class DashBoardActivity extends AppCompatActivity {
                 NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
                 return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
             } else {
-
                 return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
             }
         }
@@ -205,6 +191,7 @@ public class DashBoardActivity extends AppCompatActivity {
             } else {
                 showNoConnectionView();
             }
+
         }
     };
     @Override
@@ -215,9 +202,13 @@ public class DashBoardActivity extends AppCompatActivity {
             registerReceiver(networkReceiver, filter);
             isReceiverRegistered = true;
         }
-//        int cartCount = Integer.parseInt(AppSession.getInstance(this).getValue(Constants.CART_COUNT));
-//        updateCartBadge(cartCount);
+        String cartCount = AppSession.getInstance(this).getValue(Constants.CART_COUNT);
+        int count = (cartCount != null && !cartCount.isEmpty()) ? Integer.parseInt(cartCount) : 0;
 
+        if (count == 0) {
+            AppSession.getInstance(this).setValue(Constants.CART_COUNT, null);
+        }
+        updateBadgeCounter(count);
     }
 
     @Override
@@ -228,7 +219,6 @@ public class DashBoardActivity extends AppCompatActivity {
             isReceiverRegistered = false;
         }
     }
-
     private void reloadData() {
 
         new Handler().postDelayed(new Runnable() {
@@ -236,83 +226,6 @@ public class DashBoardActivity extends AppCompatActivity {
             public void run() {
             }
         }, 5000);
-    }
-    private void updateTxtBadge(int count) {
-        if (count < 0) {
-            count = 0;  // Ensure the count never goes negative
-        }
-        cartCount = count;
-        AppSession.getInstance(this).setValue(Constants.CART_COUNT, String.valueOf(cartCount));
-
-        if (binding.txtBadge != null) {
-            if (cartCount > 0) {
-                binding.txtBadge.setText(String.valueOf(cartCount));
-                binding.txtBadge.setVisibility(View.VISIBLE);
-            } else {
-                binding.txtBadge.setVisibility(View.GONE);
-            }
-        }
-    }
-
-
-    public void resetBadgeCount() {
-        AppSession.getInstance(this).setValue(Constants.CART_COUNT, "0");
-        updateTxtBadge(0);
-    }
-
-
-
-    public void updateCartBadge(int count) {
-        if (count == 0) {
-            binding.txtBadge.setVisibility(View.GONE);
-            binding.txtBadge.setText("");// ✅ Hide the badge when cart is empty
-        } else {
-            binding.txtBadge.setVisibility(View.VISIBLE);
-            binding.txtBadge.setText(String.valueOf(count));
-        }
-
-        AppSession.getInstance(this).setValue(Constants.CART_COUNT, String.valueOf(count));
-    }
-
-
-    private void initializeBadge() {
-        String savedBadgeCount = AppSession.getInstance(this).getValue(Constants.CART_COUNT);
-        int badgeCount = 0;
-        try {
-            badgeCount = Integer.parseInt(savedBadgeCount);
-        } catch (NumberFormatException e) {
-            badgeCount = 0;
-        }
-        updateTxtBadge(cartCount);
-//        this.cartCount = badgeCount;
-//        if (badgeCount <=0){
-//
-//        }
-
-
-        String savedUrgentCount = AppSession.getInstance(this).getValue(Constants.URGENT_BADGE_COUNT);
-        int urgentBadgeCount = 0;
-
-        try {
-            urgentBadgeCount = Integer.parseInt(savedUrgentCount);
-        } catch (NumberFormatException e) {
-            urgentBadgeCount = 0;
-        }
-
-        this.urgentBadgeCount = urgentBadgeCount;
-
-        if (urgentBadgeCount <= 0) {
-            binding.bottomNavigation.removeBadge(R.id.urgent);
-        } else {
-            setBadge(urgentBadgeCount);
-        }
-    }
-
-    public int getCartBadgeCount() {
-        return cartCount;
-    }
-    public int getUrgentBadge(){
-        return urgentBadgeCount;
     }
     private void logFCM(){
         FirebaseMessaging.getInstance().getToken()
@@ -329,6 +242,52 @@ public class DashBoardActivity extends AppCompatActivity {
                     }
                 });
 }
+    public void updateBadgeCounter(Integer count) {
+        Log.d("CartCount_Debug", "updateBadgeCounter called with: " + count);
+        previousCartCount = count != null ? count : 0;
+
+        if (previousCartCount > 0) {
+            binding.badgeCounter.setVisibility(View.VISIBLE);
+            binding.badgeCounter.setText(String.valueOf(previousCartCount));
+        } else {
+            binding.badgeCounter.setVisibility(View.GONE);
+        }
+    }
+
+
+    public void updateUrgentBadge(int count) {
+        urgentBadgeCount = count; // Update the count
+        AppSession.getInstance(this).setValue(Constants.URGENT_BADGE_COUNT, String.valueOf(count));
+        setBadge(urgentBadgeCount);
+    }
+    private void setBadge(int urgentBadgeCount) {
+        if (urgentBadgeCount <= 0) {
+            binding.bottomNavigation.removeBadge(R.id.urgent);  // Remove the badge if count is 0
+        } else {
+            BadgeDrawable badge = binding.bottomNavigation.getOrCreateBadge(R.id.urgent);
+            badge.setNumber(urgentBadgeCount);
+            badge.setBackgroundColor(getResources().getColor(R.color.red));
+            badge.setBadgeTextColor(getResources().getColor(R.color.white));
+        }
+    }
+    public void updateCartBadge(int count) {
+        if (binding.badgeCounter != null) {
+            binding.badgeCounter.setText(String.valueOf(count));
+            binding.badgeCounter.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+        }
+    }
+    public int getCartBadgeCount() {
+        return previousCartCount;
+    }
+    public int getUrgentBadgeCount() {
+        return urgentBadgeCount;}
+
+    public void clearUrgentBadge() {
+        binding.bottomNavigation.removeBadge(R.id.urgent);
+        urgentBadgeCount = 0;
+
+        AppSession.getInstance(this).setValue(Constants.URGENT_BADGE_COUNT, "0");
+    }
 
 }
 

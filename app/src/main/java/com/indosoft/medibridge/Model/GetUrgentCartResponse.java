@@ -24,10 +24,13 @@ public class GetUrgentCartResponse {
     private String productName;
     @SerializedName("qty")
     @Expose
-    private String qty;
+    private Object qty;
     @SerializedName("unit_name")
     @Expose
-    private String unitName;
+    private Object unitName;
+    @SerializedName("unlisted_medicines")
+    @Expose
+    private String unlistedMedicines;
 
     public String getCartId() {
         return cartId;
@@ -78,18 +81,26 @@ public class GetUrgentCartResponse {
     }
 
     public String getQty() {
-        return qty;
+        return (String) qty;
     }
 
-    public void setQty(String qty) {
+    public void setQty(Object qty) {
         this.qty = qty;
     }
 
-    public String getUnitName() {
-        return unitName;
+    public CharSequence getUnitName() {
+        return (CharSequence) unitName;
     }
 
-    public void setUnitName(String unitName) {
+    public void setUnitName(Object unitName) {
         this.unitName = unitName;
+    }
+
+    public String getUnlistedMedicines() {
+        return unlistedMedicines;
+    }
+
+    public void setUnlistedMedicines(String unlistedMedicines) {
+        this.unlistedMedicines = unlistedMedicines;
     }
 }

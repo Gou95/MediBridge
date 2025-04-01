@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,19 +24,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class UrgentCartAdapter extends RecyclerView.Adapter<UrgentCartAdapter.ViewHolder> {
     Context context;
-
     ArrayList<GetUrgentCartResponse> list;
     UrgentDeleteViewModel viewModel;
     QuantityChangeViewModel quantityChangeViewModel;
-
-
     public UrgentCartAdapter(Context context, ArrayList<GetUrgentCartResponse> list) {
         this.context = context;
         this.list = list;
-
     }
-
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -51,7 +46,17 @@ public class UrgentCartAdapter extends RecyclerView.Adapter<UrgentCartAdapter.Vi
          holder.unitName.setText(response.getUnitName());
          holder.quantity.setText(response.getQty());
 
-        AtomicInteger number = new AtomicInteger((int) Float.parseFloat(response.getQty()));
+        if ("1680".equals(response.getProductId())) {
+            holder.layout.setVisibility(View.GONE);
+            holder.unlisted.setVisibility(View.VISIBLE);
+            holder.unlisted.setText(response.getUnlistedMedicines() != null ? response.getUnlistedMedicines() : "N/A");
+        } else {
+            holder.layout.setVisibility(View.VISIBLE);
+            holder.unlisted.setVisibility(View.GONE);
+            holder.unitName.setText(response.getUnitName() != null ? response.getUnitName() : "N/A");
+        }
+
+        AtomicInteger number = new AtomicInteger(tryParseFloat(response.getQty(), 1));
         String cartId = response.getCartId();
         String productId = response.getProductId();
         updateVisibility(holder, number.get());
@@ -70,6 +75,13 @@ public class UrgentCartAdapter extends RecyclerView.Adapter<UrgentCartAdapter.Vi
         });
 
         holder.delete.setOnClickListener(v -> deleteCartItem(cartId, position));
+    }
+    private int tryParseFloat(String value, int defaultValue) {
+        try {
+            return value != null ? (int) Float.parseFloat(value.trim()) : defaultValue;
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 
     private void updateQuantity(String cartId, String productId, String newQty, ViewHolder holder, AtomicInteger number, int position) {
@@ -112,7 +124,7 @@ public class UrgentCartAdapter extends RecyclerView.Adapter<UrgentCartAdapter.Vi
 
                     if (context instanceof DashBoardActivity) {
                         DashBoardActivity dashboard = (DashBoardActivity) context;
-                        int urgentCount = dashboard.getUrgentBadge() - 1;
+                        int urgentCount = dashboard.getUrgentBadgeCount() - 1;
                         dashboard.updateUrgentBadge(urgentCount);
 
                         if (list.isEmpty()) {
@@ -154,8 +166,9 @@ public class UrgentCartAdapter extends RecyclerView.Adapter<UrgentCartAdapter.Vi
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView medicineName,stockitsName,unitName,quantity;
+        TextView medicineName,stockitsName,unitName,quantity,unlisted;
         ImageView delete,sub,add;
+        LinearLayout layout;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -166,6 +179,8 @@ public class UrgentCartAdapter extends RecyclerView.Adapter<UrgentCartAdapter.Vi
             delete = itemView.findViewById(R.id.img_delete);
             sub = itemView.findViewById(R.id.img_sub);
             add = itemView.findViewById(R.id.img_add);
+            layout = itemView.findViewById(R.id.linear_urgentUnit);
+            unlisted = itemView.findViewById(R.id.unlistedMedicine);
 
         }
     }

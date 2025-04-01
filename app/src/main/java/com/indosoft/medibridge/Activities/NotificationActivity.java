@@ -52,6 +52,7 @@ public class NotificationActivity extends AppCompatActivity {
         binding.recyclerviewNotification.setLayoutManager(new LinearLayoutManager(this));
 
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
+        binding.swipeRefreshLayout.setRefreshing(false);
 
         startNetworkService();
         notificationManagerCompat = NotificationManagerCompat.from(this);

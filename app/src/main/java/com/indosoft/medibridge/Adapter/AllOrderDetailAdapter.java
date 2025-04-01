@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -36,13 +37,21 @@ public class AllOrderDetailAdapter extends RecyclerView.Adapter<AllOrderDetailAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OrderDetailsResponse response = list.get(position);
         holder.productName.setText(response.getProductName());
-        holder.stockitsNm.setText(response.getDealerName());
         holder.unitNM.setText(response.getUnitName()+":");
         holder.unitNUmber.setText(response.getOrderQty() );
         holder.deliveryDay.setText(response.getDeliveryDay());
         holder.status.setText(response.getOrderStatus());
-
+        holder.unListed.setText(response.getUnlistedMedicines());
         holder.serialNumber.setText(String.valueOf(position+1)+".");
+
+        if ("UNLISTED MEDICINES".equals(response.getProductName())){
+            holder.layout.setVisibility(View.GONE);
+            holder.unListed.setVisibility(View.VISIBLE);
+        }else {
+            holder.layout.setVisibility(View.VISIBLE);
+            holder.unListed.setVisibility(View.GONE);
+        }
+
 
         int textColor;
         switch (response.getOrderStatus()) {
@@ -72,17 +81,19 @@ public class AllOrderDetailAdapter extends RecyclerView.Adapter<AllOrderDetailAd
     }
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView productName,stockitsNm,unitNM,unitNUmber,deliveryDay,status,serialNumber;
+        TextView productName,stockitsNm,unitNM,unitNUmber,deliveryDay,status,serialNumber,unListed;
+        LinearLayout layout;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             productName = itemView.findViewById(R.id.txt_MedicineNm);
-            stockitsNm = itemView.findViewById(R.id.txt_stockitName);
             unitNM = itemView.findViewById(R.id.txt_unitName);
             unitNUmber = itemView.findViewById(R.id.txt_unitNumber);
             deliveryDay = itemView.findViewById(R.id.txt_deliDay);
             status = itemView.findViewById(R.id.txt_orderStatus);
             serialNumber = itemView.findViewById(R.id.txt_serialNumber);
+            unListed = itemView.findViewById(R.id.unlistedMedicine);
+            layout = itemView.findViewById(R.id.linear_details);
         }
     }
 }

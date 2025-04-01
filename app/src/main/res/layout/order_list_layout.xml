@@ -13,8 +13,7 @@
         android:layout_marginTop="20dp"
         app:cardElevation="10dp"
         android:layout_marginHorizontal="10dp"
-        android:layout_marginBottom="10dp"
-        >
+        android:layout_marginBottom="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,15 +32,14 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/logo"/>
+                    android:src="@drawable/medione" />
 
                 <LinearLayout
                     android:layout_toRightOf="@id/img_logo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginStart="10dp"
-                    >
+                    android:layout_marginStart="10dp">
 
 
                     <TextView
@@ -50,51 +48,29 @@
                         android:layout_height="wrap_content"
                         android:text="date time"
                         android:textColor="@color/black"
-                        android:textSize="14sp"
+                        android:textSize="16.5sp"
                         android:fontFamily="@font/gotham_bold"
-                        android:layout_marginTop="5dp"/>
+                        android:layout_marginTop="5dp" />
 
 
-                    <!--                    <LinearLayout-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:orientation="horizontal">-->
-<!--                        <TextView-->
-<!--                            android:layout_width="wrap_content"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:text="Order ID"-->
-<!--                            android:textColor="@color/black"-->
-<!--                            android:fontFamily="@font/gotham_bold"-->
-<!--                            android:textSize="14sp"/>-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/txt_orderNo"-->
-<!--                            android:layout_width="wrap_content"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:text="#123456789"-->
-<!--                            android:textColor="@color/black"-->
-<!--                          android:fontFamily="@font/gotham_bold"-->
-<!--                            android:textSize="14sp"-->
-<!--                            android:layout_marginStart="10dp"/>-->
+                    <TextView
+                        android:id="@+id/txt_dealer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="15.5sp"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/gotham_bold" />
 
 
-<!--                    </LinearLayout>-->
-
-                                        <TextView
-                                            android:id="@+id/txt_dealer"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:textColor="@color/green"
-                                            android:textSize="14sp"
-                                            android:layout_marginTop="10dp"
-                                            android:fontFamily="@font/gotham_bold"/>
-
-
-
-
-
-
-
+                    <TextView
+                        android:id="@+id/txt_address"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/green"
+                        android:textSize="15.5sp"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/gotham_bold" />
 
 
                 </LinearLayout>
@@ -106,32 +82,22 @@
                     android:layout_height="30dp"
                     app:cardCornerRadius="15dp"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="10dp"
-                    >
+                    android:layout_marginEnd="10dp">
 
                     <TextView
                         android:id="@+id/txt_status"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
                         android:gravity="center"
                         android:textColor="@color/white"
-                        android:fontFamily="@font/gotham_bold"/>
+                        android:fontFamily="@font/gotham_bold" />
 
 
                 </androidx.cardview.widget.CardView>
 
 
-
-
-
-
             </RelativeLayout>
-
-
-
-
-
 
 
             <LinearLayout
@@ -140,22 +106,23 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total number of items : "
                     android:textColor="@color/black"
                     android:fontFamily="@font/gotham_bold"
-                    android:textSize="14sp"/>
+                    android:textSize="15.5sp" />
+
                 <TextView
                     android:id="@+id/txt_items"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                    android:textSize="14sp"
-                   android:fontFamily="@font/gotham_bold"
-                    android:layout_marginStart="5dp"/>
-
+                    android:textSize="15.5sp"
+                    android:fontFamily="@font/gotham_bold"
+                    android:layout_marginStart="5dp" />
 
 
                 <TextView
@@ -164,22 +131,15 @@
                     android:layout_height="wrap_content"
                     android:text="See All Details"
                     android:textColor="@color/green"
-                    android:textSize="14sp"
+                    android:textSize="15.5sp"
                     android:gravity="end"
-                    android:textStyle="bold"/>
+                    android:fontFamily="@font/gotham_bold" />
 
 
             </LinearLayout>
 
 
-
-
-
-
-
         </LinearLayout>
-
-
 
 
     </androidx.cardview.widget.CardView>
