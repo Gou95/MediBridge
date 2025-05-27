@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -16,6 +17,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,6 +103,15 @@ public class UpdateAddressActivity extends AppCompatActivity {
         binding.imgMap.setOnClickListener(v -> {
             checkLocationPermission();
         });
+        TextView title = binding.txtAddress;
+        SpannableString spannable = new SpannableString("Add Address");
+
+
+        int blue = ContextCompat.getColor(this, R.color.blue_light);
+        int red = ContextCompat.getColor(this, R.color.orange_dark);
+        spannable.setSpan(new ForegroundColorSpan(blue), 0, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 4, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(spannable);
     }
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
@@ -257,5 +270,12 @@ public class UpdateAddressActivity extends AppCompatActivity {
             dialog.dismiss();
         });
     }
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 }

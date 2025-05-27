@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".Activities.SeeAllOrderDetailsActivity">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -23,7 +24,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="10dp"
+                android:padding="10dp">
 
 
                 <ImageView
@@ -34,47 +36,23 @@
                     android:src="@drawable/backarrow" />
 
                 <TextView
+                    android:id="@+id/txt_details"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:fontFamily="@font/gotham_bold"
                     android:gravity="center"
+                    android:layout_centerInParent="true"
                     android:text="Order Deatils"
                     android:textColor="@color/black"
-                    android:textSize="18sp" />
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
 
-
-
-                <!--            <LinearLayout-->
-                <!--                android:layout_width="wrap_content"-->
-                <!--                android:layout_height="wrap_content"-->
-                <!--                android:orientation="vertical"-->
-                <!--                android:layout_alignParentEnd="true"-->
-                <!--                android:gravity="center_vertical"-->
-                <!--                >-->
-
-
-                <!--                <TextView-->
-                <!--                    android:layout_width="wrap_content"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:text="Total Medicine"-->
-                <!--                    android:textColor="@color/black"-->
-                <!--                 android:fontFamily="@font/gotham_bold"-->
-                <!--                    android:textSize="14sp"/>-->
-
-                <!--                <TextView-->
-                <!--                    android:layout_width="wrap_content"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:text=" 0.00"-->
-                <!--                    android:textColor="@color/black"-->
-                <!--                    android:layout_gravity="center"-->
-                <!--                    android:layout_alignParentEnd="true"-->
-                <!--                   android:fontFamily="@font/gotham_bold"-->
-                <!--                    android:textSize="14sp"/>-->
-
-
-                <!--            </LinearLayout>-->
 
             </RelativeLayout>
 
@@ -85,7 +63,12 @@
                 android:fontFamily="@font/gotham_bold"
                 android:gravity="center"
                 android:textColor="@color/green"
-                android:textSize="16sp" />
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -100,7 +83,12 @@
                     android:fontFamily="@font/gotham_bold"
                     android:text="Order ID"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
                 <TextView
                     android:id="@+id/txt_orderNo"
@@ -108,8 +96,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
+                    android:fontFamily="@font/gotham_bold"/>
 
 
             </LinearLayout>
@@ -123,7 +116,12 @@
                 android:fontFamily="@font/gotham_bold"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="16sp"
+                android:autoSizeMaxTextSize="18sp"
+                android:autoSizeStepGranularity="1sp"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
 
 
             <androidx.recyclerview.widget.RecyclerView
@@ -159,13 +157,18 @@
                     >
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
                         android:fontFamily="@font/gothambold"
                         android:text="Print Order"
                         android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
                 </androidx.cardview.widget.CardView>

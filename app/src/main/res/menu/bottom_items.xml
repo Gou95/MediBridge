@@ -17,7 +17,10 @@
         app:showAsAction="always"
 
         />
-    <item android:title=""/>
+    <item
+        android:id="@+id/myCart"
+        android:title="My Cart"
+        android:icon="@drawable/baseline_stroller"/>
 
     <item
         android:id="@+id/order"

@@ -23,7 +23,20 @@ public class SignUpBody {
     @SerializedName("fcm_id")
     @Expose
     private String fcmId;
+    @SerializedName("subs_expiry_date")
+    @Expose
+    private String subsExpiryDate;
+    @SerializedName("retailer_email")
+    @Expose
+    private String retailerEmail;
 
+    public String getRetailerEmail() {
+        return retailerEmail;
+    }
+
+    public void setRetailerEmail(String retailerEmail) {
+        this.retailerEmail = retailerEmail;
+    }
     public String getRetailerName() {
         return retailerName;
     }
@@ -69,5 +82,12 @@ public class SignUpBody {
 
     public void setFcmId(String fcmId) {
         this.fcmId = fcmId;
+    }
+    public String getSubsExpiryDate() {
+        return subsExpiryDate;
+    }
+
+    public void setSubsExpiryDate(String subsExpiryDate) {
+        this.subsExpiryDate = subsExpiryDate;
     }
 }

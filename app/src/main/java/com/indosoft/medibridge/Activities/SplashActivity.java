@@ -2,6 +2,7 @@ package com.indosoft.medibridge.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -167,4 +168,13 @@ public class SplashActivity extends AppCompatActivity {
 
         }
     };
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 }

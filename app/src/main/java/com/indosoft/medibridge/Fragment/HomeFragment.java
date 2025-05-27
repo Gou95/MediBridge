@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -13,13 +14,19 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Handler;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -35,16 +42,22 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.AnimationTypes;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.material.textfield.TextInputEditText;
+import com.indosoft.medibridge.Activities.AllOrdersActivity;
+import com.indosoft.medibridge.Activities.CartActivity;
 import com.indosoft.medibridge.Activities.DashBoardActivity;
 import com.indosoft.medibridge.Activities.ExpiryListActivity;
+import com.indosoft.medibridge.Activities.HelpActivity;
 import com.indosoft.medibridge.Activities.NotificationActivity;
 import com.indosoft.medibridge.Activities.OrderRegisterActivity;
 import com.indosoft.medibridge.Activities.ExpiryRegisterActivity;
+import com.indosoft.medibridge.Activities.StockistActivity;
 import com.indosoft.medibridge.Activities.SubscribeActivity;
 import com.indosoft.medibridge.Activities.UnlistedStockistActivity;
 import com.indosoft.medibridge.Activities.ViewAllStockistActivity;
@@ -101,6 +114,7 @@ public class HomeFragment extends Fragment {
     private HashMap<String, String> unitNameToIdMap = new HashMap<>();
     int notificationCount;
     private boolean isReceiverRegistered = false;
+    int cartCount = 0;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -120,7 +134,7 @@ public class HomeFragment extends Fragment {
         onAttachObservers();
         startNetworkCheckService();
         setUpImageSlider();
-        handleRetailerName();
+      //  handleRetailerName();
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
         binding.swipeRefreshLayout.setRefreshing(false);
         initCliks();
@@ -129,6 +143,14 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.horizontalRecyclerView.setLayoutManager(layoutManager);
         binding.horizontalRecyclerView.setAdapter(adapter);
+
+
+        AutoCompleteTextView autoSearch = binding.autoSearch;
+        SpannableString hint = new SpannableString("search medicines for demand");
+        hint.setSpan(new RelativeSizeSpan(0.9f), 0, hint.length(), 0);
+        autoSearch.setHint(hint);
+
+
         return binding.getRoot();
     }
 
@@ -170,15 +192,16 @@ public class HomeFragment extends Fragment {
             binding.swipeRefreshLayout.setRefreshing(false);
             if (responses != null && !responses.isEmpty()) {
                 notificationCount = responses.size();
-                updateNotificationBadge(notificationCount);
+               // updateNotificationBadge(notificationCount);
                 list.clear();
                 list.addAll(responses);
             } else {
-                updateNotificationBadge(0); // Hide the badge if no notifications
+              //  updateNotificationBadge(0); // Hide the badge if no notifications
             }
         });
         cartViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
             if (response != null) {
+                Toast.makeText(getContext(), response.getMessage(), Toast.LENGTH_SHORT).show();
                 String cartCountStr = AppSession.getInstance(getContext()).getValue(Constants.CART_COUNT);
                 int cartCount = (cartCountStr == null || cartCountStr.isEmpty()) ? 0 : Integer.parseInt(cartCountStr);
                cartCount++;
@@ -186,6 +209,7 @@ public class HomeFragment extends Fragment {
                 if (getActivity() instanceof DashBoardActivity) {
                     ((DashBoardActivity) getActivity()).updateBadgeCounter(cartCount);
                 }
+               // updateCartBadgeCount(cartCount);
 
             }
         });
@@ -198,10 +222,14 @@ public class HomeFragment extends Fragment {
                 if (getActivity() instanceof DashBoardActivity) {
                     ((DashBoardActivity) getActivity()).updateBadgeCounter(cartCount);
                 }
+               // updateCartBadgeCount(cartCount);
             }
         });
     }
 
+
+
+    @SuppressLint("ResourceAsColor")
     private void initCliks() {
         binding.autoSearch.setOnItemClickListener(this::onProductSelected);
         binding.autoSearch.addTextChangedListener(new TextWatcher() {
@@ -232,12 +260,59 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        binding.cardViewAll.setOnClickListener(v -> launchActivity(ViewAllStockistActivity.class));
-        binding.imgNotification.setOnClickListener(v -> launchActivity(NotificationActivity.class));
-        binding.cardOrderRegister.setOnClickListener(v -> launchActivity(OrderRegisterActivity.class));
+        binding.txtViewAll.setOnClickListener(v -> launchActivity(ViewAllStockistActivity.class));
+        binding.imgNotification.setOnClickListener(v -> launchActivity(HelpActivity.class));
+        binding.cardOrderRegister.setOnClickListener(v -> {
+            AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, "0");
+            AppSession.getInstance(getContext()).setValue(Constants.URGENT_BADGE_COUNT, "0");
+
+            if (getActivity() instanceof DashBoardActivity) {
+                DashBoardActivity activity = (DashBoardActivity) getActivity();
+                activity.updateBadgeCounter(0);
+                activity.updateUrgentBadge(0);
+            }
+            launchActivity(OrderRegisterActivity.class);
+        });
+
         binding.cardExpiryRegister.setOnClickListener(v -> launchActivity(ExpiryRegisterActivity.class));
         binding.cardUnlistedStockist.setOnClickListener(v -> launchActivity(UnlistedStockistActivity.class));
         binding.cardExpiryList.setOnClickListener(v -> launchActivity(ExpiryListActivity.class));
+        binding.cardStockistList.setOnClickListener(v -> launchActivity(StockistActivity.class));
+        binding.cardAllOrders.setOnClickListener(v -> launchActivity(AllOrdersActivity.class));
+        Glide.with(this)
+                .asGif()
+                .load(R.drawable.help) // or use a URL or File
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(binding.imgNotification);
+
+
+
+        TextView title = binding.txtTitle;
+        TextView title1 = binding.txtFeatures;
+        SpannableString spannable = new SpannableString("Recent Stockists");
+        SpannableString spannable1 = new SpannableString("Featured Items");
+
+        int blue = ContextCompat.getColor(getContext(), R.color.blue_light);
+        int red = ContextCompat.getColor(getContext(), R.color.orange_dark);
+        spannable.setSpan(new ForegroundColorSpan(blue), 0, 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 7, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable1.setSpan(new ForegroundColorSpan(blue), 0, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable1.setSpan(new ForegroundColorSpan(red), 9, spannable1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(spannable);
+        title1.setText(spannable1);
+        TextView title2 = binding.txtRetailerName;
+
+        String retailerName = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_NAME);
+        if (retailerName == null) {
+            retailerName = "Default Retailer";
+        }
+        String welcomeText = "Welcome " + retailerName;
+        SpannableString spannable2 = new SpannableString(welcomeText);
+        spannable2.setSpan(new ForegroundColorSpan(blue), 0, 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // "Welcome"
+        spannable2.setSpan(new ForegroundColorSpan(red), 8, welcomeText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Name
+
+        title2.setText(spannable2);
+
     }
     private void onProductSelected(AdapterView<?> parent, View view, int position, long id) {
         String selectedProductName = parent.getItemAtPosition(position).toString();
@@ -271,7 +346,17 @@ public class HomeFragment extends Fragment {
             }
         }
         return null;
+
     }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
+
     @SuppressLint("MissingInflatedId")
     private void unlistedShowPopup(String selectedProductName) {
         cityDealerViewModel = new ViewModelProvider(this).get(CityDealerViewModel.class);
@@ -450,16 +535,12 @@ public class HomeFragment extends Fragment {
                 });
             }
         });
-
         addCart.setOnClickListener(v -> {
             String product_id = AppSession.getInstance(requireContext()).getValue(Constants.PRODUCT_ID);
             String quantity = txtNumber.getText().toString();
-            String dealerId = selectDealerId;
+            String dealerId = selectDealerId; // ho sakta hai null
             String unitId = selectUnitId;
-            if (dealerId == null || dealerId.isEmpty()) {
-                Toast.makeText(requireContext(), "Please select a dealer", Toast.LENGTH_SHORT).show();
-                return;
-            }
+
             if (product_id == null || product_id.isEmpty()) {
                 Toast.makeText(requireContext(), "Please select a product", Toast.LENGTH_SHORT).show();
                 return;
@@ -472,18 +553,54 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(requireContext(), "Please select a valid quantity greater than 0", Toast.LENGTH_SHORT).show();
                 return;
             }
+
             AddtoCartBody body = new AddtoCartBody();
-            body.setDealerId(dealerId);
+            body.setDealerId(dealerId != null ? dealerId : ""); // null ki jagah blank string bhej rahe hain
             body.setUnit(unitId);
             body.setProductId(product_id);
             body.setQty(quantity);
             body.setRetailerId(AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID));
+
             cartViewModel.getAddToCardData(body);
+
             if (dialog != null && dialog.isShowing()) {
                 dialog.dismiss();
             }
-
         });
+
+//        addCart.setOnClickListener(v -> {
+//            String product_id = AppSession.getInstance(requireContext()).getValue(Constants.PRODUCT_ID);
+//            String quantity = txtNumber.getText().toString();
+//            String dealerId = selectDealerId;
+//            String unitId = selectUnitId;
+//            if (dealerId == null || dealerId.isEmpty()) {
+//                Toast.makeText(requireContext(), "Please select a dealer", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//            if (product_id == null || product_id.isEmpty()) {
+//                Toast.makeText(requireContext(), "Please select a product", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//            if (unitId == null || unitId.isEmpty()) {
+//                Toast.makeText(requireContext(), "Please select a unit", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//            if (quantity == null || quantity.isEmpty() || Integer.parseInt(quantity) <= 0) {
+//                Toast.makeText(requireContext(), "Please select a valid quantity greater than 0", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//            AddtoCartBody body = new AddtoCartBody();
+//            body.setDealerId(dealerId);
+//            body.setUnit(unitId);
+//            body.setProductId(product_id);
+//            body.setQty(quantity);
+//            body.setRetailerId(AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID));
+//            cartViewModel.getAddToCardData(body);
+//            if (dialog != null && dialog.isShowing()) {
+//                dialog.dismiss();
+//            }
+//
+//        });
         AtomicInteger number = new AtomicInteger();
         try {
             number.set(Integer.parseInt(txtNumber.getText().toString()));
@@ -547,7 +664,7 @@ public class HomeFragment extends Fragment {
             getActivity().registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
             isReceiverRegistered = true;
         }
-        binding.notificationBadge.setVisibility(View.GONE);
+
     }
     @Override
     public void onDestroy() {
@@ -564,35 +681,19 @@ public class HomeFragment extends Fragment {
             }
         }, 5000);
     }
-    private void updateNotificationBadge(int notificationCount) {
-        TextView notificationBadge = binding.notificationBadge;
-        if (notificationCount > 0) {
-            notificationBadge.setVisibility(View.VISIBLE);
-            notificationBadge.setText(String.valueOf(notificationCount));
-        } else {
-            notificationBadge.setVisibility(View.GONE);
-        }
-    }
+
     private void launchActivity(Class<?> activityClass) {
         Intent intent = new Intent(getContext(), activityClass);
         startActivity(intent);
     }
     private void setUpImageSlider() {
         ArrayList<SlideModel> imageList = new ArrayList<>();
-        imageList.add(new SlideModel(R.drawable.b1, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.b2, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.b3, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slide_1, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slide_2, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_3 , ScaleTypes.FIT));
         imageSlider.setImageList(imageList, ScaleTypes.CENTER_CROP);
         imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
     }
 
-    private void handleRetailerName() {
-        String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
-        if (retailerId != null) {
-        } else {
-            Log.d("Dashboard", "Retailer ID not available");
-        }
-        String updatedRetailerName = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_NAME);
-        binding.txtRetailerName.setText("Welcome " + (updatedRetailerName != null ? updatedRetailerName : "Default Retailer"));
-    }
+
 }

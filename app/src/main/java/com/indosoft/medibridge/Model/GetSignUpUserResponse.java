@@ -54,7 +54,7 @@ public class GetSignUpUserResponse {
     private String status;
     @SerializedName("subs_expiry_date")
     @Expose
-    private Object subsExpiryDate;
+    private String subsExpiryDate;
 
     public String getRetailerId() {
         return retailerId;
@@ -184,11 +184,11 @@ public class GetSignUpUserResponse {
         this.status = status;
     }
 
-    public CharSequence getSubsExpiryDate() {
-        return (CharSequence) subsExpiryDate;
+    public String getSubsExpiryDate() {
+        return subsExpiryDate;
     }
 
-    public void setSubsExpiryDate(Object subsExpiryDate) {
+    public void setSubsExpiryDate(String subsExpiryDate) {
         this.subsExpiryDate = subsExpiryDate;
     }
 

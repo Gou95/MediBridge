@@ -12,7 +12,11 @@
         android:text="Product Details"
         android:fontFamily="@font/gotham_bold"
         android:textColor="@color/black"
-        android:textSize="18sp" />
+        android:autoSizeTextType="uniform"
+        android:textSize="16sp"
+        android:autoSizeStepGranularity="1sp"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"/>
 
     <TextView
         android:id="@+id/popup_product_name"
@@ -21,15 +25,24 @@
         android:layout_marginTop="8dp"
         android:textColor="@color/black"
         android:fontFamily="@font/gotham_bold"
-        android:textSize="16sp" />
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeMaxTextSize="16sp"
+        android:autoSizeStepGranularity="1sp"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"/>
 
     <TextView
         android:id="@+id/popup_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Do you want to add this product to urgent cart?"
-        android:textSize="14sp" />
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeMaxTextSize="16sp"
+        android:autoSizeStepGranularity="1sp"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,11 +57,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="No"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="30dp"
+            android:autoSizeTextType="uniform"
             android:textSize="18sp"
+            android:autoSizeStepGranularity="1sp"
             android:fontFamily="@font/gotham_bold"
             android:textColor="@android:color/black"
-            android:clickable="true" />
+            android:clickable="true"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"/>
 
         <TextView
             android:id="@+id/popup_confirm"
@@ -56,9 +73,14 @@
             android:layout_height="wrap_content"
             android:text="Yes"
             android:fontFamily="@font/gotham_bold"
+            android:autoSizeTextType="uniform"
             android:textSize="18sp"
+            android:autoSizeStepGranularity="1sp"
             android:textColor="@android:color/black"
-            android:clickable="true" />
+            android:clickable="true"
+            android:layout_marginEnd="10dp"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"/>
     </LinearLayout>
 
 </LinearLayout>

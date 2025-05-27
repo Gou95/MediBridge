@@ -33,87 +33,89 @@
             android:layout_height="wrap_content"
             android:text="No internet connection"
             android:gravity="center"
-            android:textSize="16sp"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="16sp"
+            android:autoSizeMaxTextSize="18sp"
+            android:autoSizeStepGranularity="1sp"
             android:layout_below="@id/noConnectionImage"
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 
-    <!-- Cart Overlay Fragment (Initially Hidden) -->
-    <FrameLayout
-        android:id="@+id/cart_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:background="#80000000"/> <!-- Semi-transparent background -->
-
-    <!-- Bottom Navigation and BottomAppBar -->
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:id="@+id/bottomAppBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:backgroundTint="@color/white"
-        app:fabAlignmentMode="center"
-        app:fabCradleMargin="10dp"
-        app:fabCradleRoundedCornerRadius="30dp"
-        app:fabCradleVerticalOffset="10dp"
-        app:hideOnScroll="false">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginHorizontal="10dp"
-            android:weightSum="1">
-
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottomNavigation"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@color/white"
-                app:itemIconTint="@color/green"
-                app:itemTextColor="@color/green"
-                app:menu="@menu/bottom_items"
-                app:labelVisibilityMode="labeled"/>
-        </LinearLayout>
-
-    </com.google.android.material.bottomappbar.BottomAppBar>
 
 
-    <FrameLayout
-        android:id="@+id/fabContainer"
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|top"
-        app:layout_anchor="@id/bottomAppBar"
-        app:layout_anchorGravity="center">
+        android:background="@color/white"
+        app:itemIconTint="@color/green"
+        app:itemTextColor="@color/green"
+        app:menu="@menu/bottom_items"
+        app:labelVisibilityMode="labeled"
+        android:layout_gravity="bottom"/>
 
-        <!-- Floating Action Button -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/flotingBtn"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:src="@drawable/baseline_stroller"
-            android:tint="@color/white"
-            app:backgroundTint="@color/green"/>
+    <!-- Semi-transparent background -->
 
-        <!-- Badge Counter (FAB ke andar Top-Right me) -->
-        <TextView
-            android:id="@+id/badgeCounter"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:background="@drawable/badge_background"
-            android:textColor="@android:color/white"
-            android:gravity="center"
-            android:textSize="12sp"
-            android:visibility="gone"
-            android:elevation="10dp"
-            android:translationZ="10dp"
-            android:layout_gravity="top|end"
-            android:layout_marginEnd="6dp"
-            android:layout_marginTop="6dp"/>
-    </FrameLayout>
+    <!-- Bottom Navigation and BottomAppBar -->
+<!--    <com.google.android.material.bottomappbar.BottomAppBar-->
+<!--        android:id="@+id/bottomAppBar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="bottom"-->
+<!--        android:backgroundTint="@color/white"-->
+<!--        app:fabAlignmentMode="center"-->
+<!--        app:fabCradleMargin="10dp"-->
+<!--        app:fabCradleRoundedCornerRadius="30dp"-->
+<!--        app:fabCradleVerticalOffset="10dp"-->
+<!--        app:hideOnScroll="false">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:layout_marginHorizontal="10dp"-->
+<!--            android:weightSum="1">-->
+
+<!--          -->
+<!--        </LinearLayout>-->
+
+<!--    </com.google.android.material.bottomappbar.BottomAppBar>-->
+
+
+<!--    <FrameLayout-->
+<!--        android:id="@+id/fabContainer"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center|top"-->
+<!--        app:layout_anchor="@id/bottomAppBar"-->
+<!--        app:layout_anchorGravity="center">-->
+
+<!--        &lt;!&ndash; Floating Action Button &ndash;&gt;-->
+<!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--            android:id="@+id/flotingBtn"-->
+<!--            android:layout_width="56dp"-->
+<!--            android:layout_height="56dp"-->
+<!--            android:src="@drawable/baseline_stroller"-->
+<!--            android:tint="@color/white"-->
+<!--            app:backgroundTint="@color/green"/>-->
+
+<!--        &lt;!&ndash; Badge Counter (FAB ke andar Top-Right me) &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/badgeCounter"-->
+<!--            android:layout_width="22dp"-->
+<!--            android:layout_height="22dp"-->
+<!--            android:background="@drawable/badge_background"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:gravity="center"-->
+<!--            android:textSize="12sp"-->
+<!--            android:visibility="gone"-->
+<!--            android:elevation="10dp"-->
+<!--            android:translationZ="10dp"-->
+<!--            android:layout_gravity="top|end"-->
+<!--            android:layout_marginEnd="6dp"-->
+<!--            android:layout_marginTop="6dp"/>-->
+<!--    </FrameLayout>-->
 
 
 

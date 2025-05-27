@@ -62,10 +62,16 @@ public class OrderDetailsViewModel extends ViewModel {
             isFailed.setValue(error);
         }
     };
-    public void getOrderDetailsData(String retailer_id,String order_no,String dealer_id,String order_status) {
+    public void getOrderDetailsData(String retailer_id) {
         isConnecting.setValue(true);
         repository = OrderDetailsRepository.getInstance();
-        repository.orderDetailsData(context,retailer_id,order_no,dealer_id, order_status, listener);
+        repository.orderDetailsData(context,retailer_id, listener);
+
+    }
+    public void stockistDetailsData(String retailer_id,String order_no,String dealer_id,String order_status) {
+        isConnecting.setValue(true);
+        repository = OrderDetailsRepository.getInstance();
+        repository.stockistDetailsData(context,retailer_id,order_no,dealer_id, order_status, listener);
 
     }
 }

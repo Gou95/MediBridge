@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -13,12 +14,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.indosoft.medibridge.Body.UpdateStatusBody;
 import com.indosoft.medibridge.Model.GetSignUpUserResponse;
 import com.indosoft.medibridge.Model.LoginResponse;
 import com.indosoft.medibridge.R;
@@ -33,6 +36,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
 public class LoginActivity extends AppCompatActivity {
 ActivityLoginBinding binding;
     boolean isPasswordVisible = false;
@@ -40,59 +47,48 @@ ActivityLoginBinding binding;
     ArrayList<GetSignUpUserResponse> getAllUserList = new ArrayList<>();
     GetSignUpUserViewModel sign;
     private boolean isReceiverRegistered = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
-        String retailerStatus = AppSession.getInstance(this).getValue(Constants.RETAILER_STATUS); // Store this when user logs in
 
-        if (retailerId != null && !retailerId.isEmpty() && "Active".equalsIgnoreCase(retailerStatus)) {
-            navigateToDashboard();
-        } else {
-            loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-            loginViewModel.init(this);
-            sign = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
-            sign.init(this);
-            sign.getAllSignUPData();
-            initClicks();
-            attachObservers();
-            startNetworkService();
-            checkSubscriptionStatus();
-        }
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        loginViewModel.init(this);
+        sign = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
+        sign.init(this);
+        sign.getAllSignUPData();
+        initClicks();
+        attachObservers();
+        startNetworkService();
+        checkSubscriptionStatus();
 
     }
 
     private void checkSubscriptionStatus() {
         String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
-        boolean hasSelectedPlan = AppSession.getInstance(this).getBoolean(Constants.PLAN_SELECTED + "_" + retailerId, false);
-        Log.d("Subscription", hasSelectedPlan ? "Plan already selected, hiding Free Plan." : "No active plan found, allowing Free Plan.");
-    }
+        if (retailerId != null && !retailerId.isEmpty()) {
+            navigateToDashboard();
+        }
 
+    }
     private void attachObservers() {
         sign.getLiveData().observe(this, responses -> {
             if (responses != null) {
                 getAllUserList.clear();
                 getAllUserList.addAll(responses);
-
-                String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
-                for (GetSignUpUserResponse response : responses) {
-                    if (retailerId.equals(response.getRetailerId()) && "Active".equalsIgnoreCase(response.getStatus())) {
-                        navigateToDashboard();
-
-                         break;
-                    }
-                }
-            } else {
+            }
+            else {
                 Log.e("LoginActivity", "Sign-up response is null or empty");
             }
         });
 
         loginViewModel.getLiveData().observe(this, loginResponses -> {
-            if (loginResponses != null && !loginResponses.isEmpty()) {
-                String status = loginResponses.get(0).getStatus();
-                checkUserSubscription(status);
+            if (loginResponses != null) {
+                AppSession.getInstance(this).setValue(Constants.IS_FIRST_LOGIN, "true");
+
+                navigateToDashboard();
             } else {
                 Toast.makeText(this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();
             }
@@ -133,41 +129,6 @@ ActivityLoginBinding binding;
 
         binding.imgEye.setOnClickListener(v -> togglePasswordVisibility());
     }
-    private void validateCredentials(String mobile, String password) {
-        boolean isValidUser = false;
-
-        for (GetSignUpUserResponse user : getAllUserList) {
-            if (mobile.equals(user.getRetailerPhone()) && password.equals(user.getRetailerPassword())) {
-                isValidUser = true;
-
-                AppSession appSession = AppSession.getInstance(this);
-                appSession.setValue(Constants.RELAILER_ID, user.getRetailerId());
-                appSession.setValue(Constants.RELAILER_NAME, user.getRetailerName());
-                appSession.setValue(Constants.RELAILER_PASSWORD, user.getRetailerPassword());
-                appSession.setValue(Constants.RELAILER_PHONE, user.getRetailerPhone());
-                appSession.setValue(Constants.CITY_NAME, user.getCity());
-                appSession.setValue(Constants.STATE_NAME, user.getStateName());
-                appSession.setValue(Constants.STATE_ID, user.getStateId());
-                appSession.setValue(Constants.CITY_ID, user.getCityId());
-                appSession.setValue(Constants.RETAILER_STATUS, user.getStatus());
-           //     Toast.makeText(this, user.getFcmId(), Toast.LENGTH_SHORT).show();
-                Log.d("log", "validateCredentials: "+user.getFcmId());
-
-                Log.d("log", "validateCredentials: "+ user.getCity());
-                Log.d("log", "validateCredentials: "+ user.getStateName());
-
-                break;
-            }
-        }
-
-        if (isValidUser) {
-            loginViewModel.getLoginResData(mobile, password);
-
-        } else {
-            Toast.makeText(this, "Incorrect mobile number or password", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void togglePasswordVisibility() {
         isPasswordVisible = !isPasswordVisible;
 
@@ -179,6 +140,45 @@ ActivityLoginBinding binding;
             binding.imgEye.setImageResource(R.drawable.hide_eye);
         }
     }
+
+    private void validateCredentials(String mobile, String password) {
+        if (!isNetworkConnected()) {
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        binding.btnLogin.setEnabled(false);
+
+        loginViewModel.getLoginResData(mobile, password);
+
+        loginViewModel.getLiveData().observe(this, loginResponse -> {
+            binding.btnLogin.setEnabled(true);
+
+            if (loginResponse != null && loginResponse.getData() != null) {
+                String apiPhone = loginResponse.getData().getRetailerPhone();
+                String apiPassword = password; // Since decryption is handled by PHP and API already compares
+
+                if (mobile.equals(apiPhone)) {
+                    // Save session data
+                    AppSession appSession = AppSession.getInstance(this);
+                    appSession.setValue(Constants.RELAILER_ID, String.valueOf(loginResponse.getData().getRetailerId()));
+                    appSession.setValue(Constants.RELAILER_NAME, loginResponse.getData().getRetailerName());
+                    appSession.setValue(Constants.RELAILER_PASSWORD, password);
+                    appSession.setValue(Constants.RELAILER_PHONE, apiPhone);
+                    appSession.setValue(Constants.RETAILER_STATUS, loginResponse.getData().getStatus());
+                   // appSession.setValue(Constants.SUBSCRIPTION_EXPIRY, loginResponse.getData().getSubsExpiryDate());
+
+                    navigateToDashboard();
+                } else {
+                    Toast.makeText(this, "Incorrect mobile number or password", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 
 
     private boolean isNetworkConnected() {
@@ -233,13 +233,7 @@ ActivityLoginBinding binding;
             }
         }, 5000);
     }
-    private void checkUserSubscription(String status) {
-        if ("De-active".equalsIgnoreCase(status)) {
-            navigateToSubscription();
-        } else {
-            navigateToDashboard();
-        }
-    }
+
 
     private void navigateToDashboard() {
         Intent intent = new Intent(this, DashBoardActivity.class);
@@ -247,11 +241,14 @@ ActivityLoginBinding binding;
         startActivity(intent);
         finish();
     }
-    private void navigateToSubscription() {
-        Intent intent = new Intent(this, SubscribeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
-    }
 
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 }

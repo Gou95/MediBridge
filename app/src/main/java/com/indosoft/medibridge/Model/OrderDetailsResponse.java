@@ -18,10 +18,10 @@ public class OrderDetailsResponse {
     private String productName;
     @SerializedName("order_qty")
     @Expose
-    private Object orderQty;
+    private String orderQty;
     @SerializedName("unit_name")
     @Expose
-    private Object unitName;
+    private String unitName;
     @SerializedName("dealer_name")
     @Expose
     private String dealerName;
@@ -39,7 +39,35 @@ public class OrderDetailsResponse {
     private String orderStatus;
     @SerializedName("unlisted_medicines")
     @Expose
-    private String unlistedMedicines;
+    private Object unlistedMedicines;
+    @SerializedName("product_id")
+    @Expose
+    private String productId;
+    @SerializedName("order_items_id")
+    @Expose
+    private String orderItemsId;
+    @SerializedName("expiry_month")
+    @Expose
+    private String expiryMonth;
+
+    boolean isPed;
+    boolean isNotPed;
+
+    public boolean isPed() {
+        return isPed;
+    }
+
+    public void setPed(boolean ped) {
+        isPed = ped;
+    }
+
+    public boolean isNotPed() {
+        return isNotPed;
+    }
+
+    public void setNotPed(boolean notPed) {
+        isNotPed = notPed;
+    }
 
     public String getOrderNo() {
         return orderNo;
@@ -73,19 +101,19 @@ public class OrderDetailsResponse {
         this.productName = productName;
     }
 
-    public CharSequence getOrderQty() {
-        return (CharSequence) orderQty;
+    public String getOrderQty() {
+        return orderQty;
     }
 
-    public void setOrderQty(Object orderQty) {
+    public void setOrderQty(String orderQty) {
         this.orderQty = orderQty;
     }
 
     public String getUnitName() {
-        return (String) unitName;
+        return unitName;
     }
 
-    public void setUnitName(Object unitName) {
+    public void setUnitName(String unitName) {
         this.unitName = unitName;
     }
 
@@ -129,11 +157,35 @@ public class OrderDetailsResponse {
         this.orderStatus = orderStatus;
     }
 
-    public String getUnlistedMedicines() {
-        return unlistedMedicines;
+    public CharSequence getUnlistedMedicines() {
+        return (CharSequence) unlistedMedicines;
     }
 
-    public void setUnlistedMedicines(String unlistedMedicines) {
+    public void setUnlistedMedicines(Object unlistedMedicines) {
         this.unlistedMedicines = unlistedMedicines;
     }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public String getOrderItemsId() {
+        return orderItemsId;
+    }
+
+    public void setOrderItemsId(String orderItemsId) {
+        this.orderItemsId = orderItemsId;
+    }
+    public String getExpiryMonth() {
+        return expiryMonth;
+    }
+
+    public void setExpiryMonth(String expiryMonth) {
+        this.expiryMonth = expiryMonth;
+    }
+
 }

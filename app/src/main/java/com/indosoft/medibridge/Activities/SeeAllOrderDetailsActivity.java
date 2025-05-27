@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -25,11 +26,16 @@ import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentInfo;
 import android.print.PrintManager;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -42,18 +48,23 @@ import com.indosoft.medibridge.Model.OrderDetailsResponse;
 import com.indosoft.medibridge.R;
 import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.ViewModel.OrderDetailsViewModel;
+import com.indosoft.medibridge.ViewModel.SignUpViewModel;
 import com.indosoft.medibridge.databinding.ActivitySeeAllOrderDetailsBinding;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class SeeAllOrderDetailsActivity extends AppCompatActivity {
 
     ActivitySeeAllOrderDetailsBinding binding;
     OrderDetailsViewModel viewModel;
+    SignUpViewModel sign;
     ArrayList<OrderDetailsResponse> list = new ArrayList<>();
     AllOrderDetailAdapter adapter;
     private boolean isReceiverRegistered = false;
@@ -64,7 +75,8 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(OrderDetailsViewModel.class);
         viewModel.init(this);
-
+        sign = new ViewModelProvider(this).get(SignUpViewModel.class);
+        sign.init(this);
 
         onAttachObserver();
         initClicks();
@@ -77,12 +89,13 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
         String orderStatus = getIntent().getStringExtra("orderStatus");
         String dealer = getIntent().getStringExtra("name");
 
+
         binding.txtOrderNo.setText("#"+orderNo);
         binding.txtDateOftime.setText(dateTime);
         binding.txtStockist.setText(dealer);
 
-        viewModel.getOrderDetailsData(retailerId,orderNo,dealerId,orderStatus);
-        adapter = new AllOrderDetailAdapter(this,list);
+        viewModel.stockistDetailsData(retailerId,orderNo,dealerId,orderStatus);
+        adapter = new AllOrderDetailAdapter(this,list,sign);
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObserver);
@@ -95,44 +108,41 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
         binding.imgBack.setOnClickListener(v -> {
             onBackPressed();
         });
-        binding.btnPrintInvoice.setOnClickListener(v -> {
-            generateInvoicePdf();
-        });
+        TextView title = binding.txtDetails;
+        SpannableString spannable = new SpannableString("Order Details");
+
+
+        int blue = ContextCompat.getColor(this, R.color.blue_light);
+        int red = ContextCompat.getColor(this, R.color.orange_dark);
+        spannable.setSpan(new ForegroundColorSpan(blue), 0, 5, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 6, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(spannable);
 
     }
-
-    private void whatsappOpen() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setPackage("com.whatsapp");
-
-        // Check if WhatsApp is installed
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        } else {
-            // If WhatsApp is not installed, show a toast message
-            Toast.makeText(this, "WhatsApp is not installed on your device", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
 
     private void onAttachObserver() {
         binding.swipeRefreshLayout.setRefreshing(true);
-        viewModel.getLiveData().observe(this,orderDetailsResponses -> {
+        viewModel.getLiveData().observe(this, orderDetailsResponses -> {
             binding.swipeRefreshLayout.setRefreshing(false);
-            if (orderDetailsResponses !=null){
+            if (orderDetailsResponses != null) {
                 list.clear();
                 list.addAll(orderDetailsResponses);
                 adapter.notifyDataSetChanged();
 
-
+                // Enable or re-attach the click listener for generating PDF
+                binding.btnPrintInvoice.setOnClickListener(v -> {
+                    generateInvoicePdf();
+                });
             }
         });
     }
 
     private void generateInvoicePdf() {
         String dealer = getIntent().getStringExtra("name");
-        if (dealer == null) dealer = ""; // Prevent null pointer issues
+        if (dealer == null) dealer = "";
+
+        String orderDate = getIntent().getStringExtra("dot");
+        if (orderDate == null) orderDate = "";
 
         if (list == null || list.isEmpty()) {
             Toast.makeText(this, "No order details available", Toast.LENGTH_SHORT).show();
@@ -153,82 +163,80 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
         int pageHeight = 800;
         int marginTop = 50;
         int rowHeight = 40;
-        int availableHeight = pageHeight - 150;
-
-        int col1 = 150, col2 = 100, col3 = 100, col4 = 100, col5 = 80;
-
+        int pageNumber = 1;
         int itemIndex = 0;
 
+        int col1 = 140, col2 = 100, col3 = 100, col4 = 100, col5 = 80;
+        int startX = 50;
+        int endX = startX + col1 + col2 + col3 + col4 + col5;
+
         while (itemIndex < list.size()) {
-            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create();
+            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber++).create();
             PdfDocument.Page page = pdfDocument.startPage(pageInfo);
             Canvas canvas = page.getCanvas();
 
             titlePaint.setTextSize(20);
             titlePaint.setColor(Color.BLACK);
             titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            canvas.drawText("Purchase Order", 250, marginTop, titlePaint);
+            canvas.drawText("Purchase Order", 220, marginTop, titlePaint);
 
-            dealerPaint.setTextSize(16);
-            dealerPaint.setColor(Color.DKGRAY);
+            dealerPaint.setTextSize(18);
+            dealerPaint.setColor(Color.BLACK);
             dealerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            canvas.drawText("Stockist: " + dealer, 50, marginTop + 30, dealerPaint);
+            String dealerText = "Stockist: " + dealer;
+            String dateText = "Order Date: " + orderDate;
+
+            canvas.drawText(dealerText, 50, marginTop + 30, dealerPaint);
+            float dateTextWidth = dealerPaint.measureText(dateText);
+            canvas.drawText(dateText, pageWidth - dateTextWidth - 50, marginTop + 30, dealerPaint);
 
             int y = marginTop + 70;
             paint.setTextSize(14);
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
-            int startX = 50;
-            int endX = startX + col1 + col2 + col3 + col4 + col5;
             int headerBottom = y + rowHeight;
-
-            // **Header Row**
             canvas.drawText("Product Name", startX + 10, y + 25, paint);
-            canvas.drawText("Unit", startX + col1 + 10, y + 25, paint);
-            canvas.drawText("Delivery Day", startX + col1 + col2 + 10, y + 25, paint);
-            canvas.drawText("Status", startX + col1 + col2 + col3 + 10, y + 25, paint);
+            canvas.drawText("Quantity", startX + col1 + 10, y + 25, paint);
+            canvas.drawText("Unit", startX + col1 + col2 + 10, y + 25, paint);
+            canvas.drawText("Delivery Day", startX + col1 + col2 + col3 + 10, y + 25, paint);
             canvas.drawText("Remarks", startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
-
             canvas.drawRect(startX, y, endX, headerBottom, borderPaint);
+
             y += rowHeight;
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
 
-            // **Loop through list items**
-            while (itemIndex < list.size() && y + rowHeight < availableHeight) {
+            while (itemIndex < list.size() && y + rowHeight < pageHeight - 50) {
                 OrderDetailsResponse item = list.get(itemIndex);
 
-                String productName = (item.getProductName() != null) ? item.getProductName() : "";
-                String unitName = (item.getUnitName() != null) ? item.getUnitName() : "";
-                String deliveryDay = (item.getDeliveryDay() != null) ? item.getDeliveryDay() : "";
-                String orderStatus = (item.getOrderStatus() != null) ? item.getOrderStatus() : "";
+                String productName = item.getProductName() != null ? item.getProductName() : "";
+                String orderQty = item.getOrderQty() != null ? item.getOrderQty() : "-";
+                String unitName = item.getUnitName() != null ? item.getUnitName() : "-";
+                String deliveryDay = item.getDeliveryDay() != null ? item.getDeliveryDay() : "-";
                 String remarks = "";
 
                 int textY = y;
-                int rowLines = 1;  // Track total lines for row height
+                int rowLines = 1;
 
                 if (productName.equalsIgnoreCase("UNLISTED MEDICINES")) {
-                    String unlistedMedicines = (item.getUnlistedMedicines() != null) ? item.getUnlistedMedicines() : "";
-                    String[] medicineList = unlistedMedicines.split(",");
+                    String unlisted = item.getUnlistedMedicines() != null ? (String) item.getUnlistedMedicines() : "";
+                    String[] lines = unlisted.split(",");
 
-                    // Pehle title likh rahe hain
                     canvas.drawText("UNLISTED MEDICINES", startX + 10, textY + 20, paint);
                     textY += 20;
                     rowLines++;
 
                     paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
                     paint.setTextSize(12);
-
-                    for (String medicine : medicineList) {
-                        canvas.drawText(medicine.trim(), startX + 10, textY + 20, paint);
+                    for (String line : lines) {
+                        canvas.drawText(line.trim(), startX + 10, textY + 20, paint);
                         textY += 20;
                         rowLines++;
                     }
-
                     paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                    paint.setTextSize(14);
                 } else {
-                    // Agar normal product hai toh normal text wrapping use karein
-                    List<String> wrappedText = wrapText(productName, paint, col1 - 20);
-                    for (String line : wrappedText) {
+                    List<String> wrapped = wrapText(productName, paint, col1 - 20);
+                    for (String line : wrapped) {
                         canvas.drawText(line, startX + 10, textY + 20, paint);
                         textY += 20;
                         rowLines++;
@@ -237,13 +245,11 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
 
                 int actualRowHeight = Math.max(rowHeight, rowLines * 20 + 10);
 
-                // **Other columns**
-                canvas.drawText(!unitName.isEmpty() ? unitName : "-", startX + col1 + 10, y + 25, paint);
-                canvas.drawText(!deliveryDay.isEmpty() ? deliveryDay : "-", startX + col1 + col2 + 10, y + 25, paint);
-                canvas.drawText(!orderStatus.isEmpty() ? orderStatus : "-", startX + col1 + col2 + col3 + 10, y + 25, paint);
+                canvas.drawText(orderQty, startX + col1 + 10, y + 25, paint);
+                canvas.drawText(unitName, startX + col1 + col2 + 10, y + 25, paint);
+                canvas.drawText(deliveryDay, startX + col1 + col2 + col3 + 10, y + 25, paint);
                 canvas.drawText(remarks, startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
 
-                // **Border draw karna na bhoolen**
                 canvas.drawRect(startX, y, endX, y + actualRowHeight, borderPaint);
 
                 y += actualRowHeight;
@@ -253,7 +259,10 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
             pdfDocument.finishPage(page);
         }
 
-        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Purchase Invoice.pdf");
+        // ✅ Generate unique filename using timestamp
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String fileName = "Purchase_Invoice_" + timestamp + ".pdf";
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
 
         try {
             pdfDocument.writeTo(new FileOutputStream(file));
@@ -266,6 +275,7 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
         pdfDocument.close();
         openPdf(file);
     }
+
     private List<String> wrapText(String text, Paint paint, int maxWidth) {
         List<String> lines = new ArrayList<>();
         String[] words = text.split(" ");
@@ -301,7 +311,14 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 
 
 

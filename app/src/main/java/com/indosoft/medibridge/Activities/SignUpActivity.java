@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
@@ -20,6 +21,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.StyleSpan;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,9 +29,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.indosoft.medibridge.Body.SignUpBody;
 import com.indosoft.medibridge.Model.IndiaStateResponse;
 import com.indosoft.medibridge.Model.StateCityResponse;
@@ -43,7 +49,19 @@ import com.indosoft.medibridge.ViewModel.SignUpViewModel;
 import com.indosoft.medibridge.ViewModel.StatesViewModel;
 import com.indosoft.medibridge.databinding.ActivitySignUpBinding;
 
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -57,6 +75,10 @@ public class SignUpActivity extends AppCompatActivity {
     ExitMobileViewModel exitMobileViewModel;
     private boolean isReceiverRegistered = false;
     private boolean isPasswordVisible = false;
+    private static final String SECRET_KEY = "1234567890123456"; // 128-bit key
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,12 +94,11 @@ public class SignUpActivity extends AppCompatActivity {
         statesViewModel.getStateData();
 
         initClicks();
-
+        logFCM();
         onAttachObservers();
         startNetworkService();
-setupSpannableText();
-
-       // Toast.makeText(this, ""+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN), Toast.LENGTH_SHORT).show();
+        setupSpannableText();
+        Toast.makeText(this, ""+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN), Toast.LENGTH_SHORT).show();
     }
     private void setupSpannableText() {
         String text = "I accept and agree to the Terms & Conditions and privacy policy";
@@ -178,7 +199,14 @@ setupSpannableText();
 
 
     }
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 
     private void initClicks() {
         binding.txtLogin.setPaintFlags(binding.txtLogin.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -186,6 +214,7 @@ setupSpannableText();
 
         binding.btnSignin.setOnClickListener(v -> {
             String shopName = binding.edtShopName.getText().toString().trim();
+            String email = binding.edtEmail.getText().toString().trim();
             String mobileNumber = binding.edtMobileNo.getText().toString().trim();
             String password = binding.edtPassword.getText().toString().trim();
             String stateName = binding.edtState.getText().toString().trim();
@@ -199,9 +228,16 @@ setupSpannableText();
                 Toast.makeText(this, "Enter shop name", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (email.isEmpty() || !email.contains("@")) {
+                Toast.makeText(this, "Enter a valid email ID", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (mobileNumber.isEmpty()) {
                 Toast.makeText(this, "Enter mobile number", Toast.LENGTH_SHORT).show();
                 return;
+            }
+             if (mobileNumber.length() < 10) {
+                Toast.makeText(this, "Mobile number must be 10 digits", Toast.LENGTH_SHORT).show();
             }
             if (password.isEmpty()) {
                 Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show();
@@ -222,11 +258,18 @@ setupSpannableText();
 
             SignUpBody signbody = new SignUpBody();
             signbody.setRetailerName(shopName);
+            signbody.setRetailerEmail(email);
             signbody.setRetailerPhone(mobileNumber);
             signbody.setRetailerPassword(password);
             signbody.setStateId(Integer.parseInt(stateId));
             signbody.setCityId(Integer.parseInt(cityId));
             signbody.setFcmId(AppSession.getInstance(this).getValue(Constants.FCM_TOKEN));
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, 60);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            String expiryDate = dateFormat.format(calendar.getTime());
+            signbody.setSubsExpiryDate(expiryDate);
             Log.d("token", "initClicks: "+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN));
 
             signUpViewModel.getSignData(signbody);
@@ -393,5 +436,22 @@ setupSpannableText();
             public void run() {
             }
         }, 5000);
+    }
+    private void logFCM(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.i("##########FCM_TOKEN##########", "Fetching FCM token failed", task.getException());
+                            return;
+                        }
+                        String token = task.getResult();
+                        Log.i("##########FCM_TOKEN##########", "FCM Token: " + token);
+                        AppSession.getInstance(SignUpActivity.this).setValue(Constants.FCM_TOKEN,token);
+                    }
+                });
+
+
     }
 }

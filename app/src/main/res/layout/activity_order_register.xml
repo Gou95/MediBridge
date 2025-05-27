@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".Activities.OrderRegisterActivity">
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
@@ -23,7 +24,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:padding="10dp">
 
 
                 <ImageView
@@ -34,16 +36,19 @@
                     android:layout_centerVertical="true"/>
 
                 <TextView
+                    android:id="@+id/txt_today"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Today's Order Register"
                     android:textColor="@color/black"
                     android:layout_marginStart="20dp"
                     android:fontFamily="@font/gotham_bold"
                     android:gravity="center"
-                    android:textSize="18sp"/>
-
-
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
             </RelativeLayout>
 
@@ -55,7 +60,7 @@
                 android:layout_marginTop="10dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="11dp"
-                android:backgroundTint="@color/white"
+
                 >
 
                 <AutoCompleteTextView
@@ -68,52 +73,81 @@
                     android:textColorHint="@color/green"
                     android:fontFamily="@font/gothambold"
                     android:paddingStart="20dp"
-                    android:textSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="16sp"
+                    android:autoSizeMaxTextSize="18sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:drawablePadding="10dp"
+                    android:completionThreshold="1"
 
                     />
 
 
             </androidx.cardview.widget.CardView>
+<!--            <androidx.cardview.widget.CardView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                app:cardCornerRadius="20dp"-->
+<!--                app:cardElevation="11dp"-->
+<!--                app:cardBackgroundColor="@color/white"-->
+<!--                android:layout_marginHorizontal="10dp"-->
 
-            <!--            <LinearLayout-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:orientation="horizontal"-->
-            <!--                android:layout_gravity="center"-->
-            <!--                android:layout_marginTop="5dp">-->
-            <!--                <TextView-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:text="Order ID"-->
-            <!--                    android:textColor="@color/light_white"-->
-            <!--                    android:fontFamily="@font/gothambold"-->
-            <!--                    android:textSize="16sp"/>-->
+<!--                >-->
 
-            <!--                <TextView-->
-            <!--                    android:id="@+id/txt_orderNo"-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:textColor="@color/black"-->
-            <!--                    android:textStyle="bold"-->
-            <!--                    android:textSize="16sp"-->
-            <!--                    android:layout_marginStart="10dp"/>-->
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:layout_marginHorizontal="10dp"-->
+<!--                    android:layout_gravity="center_vertical"-->
+<!--                    android:layout_marginBottom="10dp">-->
+
+<!--                    <ImageView-->
+<!--                        android:layout_width="30dp"-->
+<!--                        android:layout_height="30dp"-->
+<!--                        android:src="@drawable/calendr"-->
+<!--                        android:scaleType="fitXY"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/txt_startDate"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Start Date"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:autoSizeTextType="uniform"-->
+<!--                        android:autoSizeMinTextSize="14sp"-->
+<!--                        android:autoSizeMaxTextSize="16sp"-->
+<!--                        android:autoSizeStepGranularity="1sp"-->
+<!--                        android:fontFamily="@font/gothambook"-->
+<!--                        android:layout_gravity="center_vertical"-->
+<!--                        android:layout_marginStart="20dp"/>-->
 
 
-            <!--            </LinearLayout>-->
+<!--                    <TextView-->
+<!--                        android:id="@+id/txt_lastDate"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Last date"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:gravity="end"-->
+<!--                        android:autoSizeTextType="uniform"-->
+<!--                        android:autoSizeMinTextSize="14sp"-->
+<!--                        android:autoSizeMaxTextSize="16sp"-->
+<!--                        android:autoSizeStepGranularity="1sp"-->
+<!--                        android:fontFamily="@font/gothambook"-->
+<!--                        android:layout_gravity="center_vertical"-->
+<!--                        android:layout_marginEnd="10dp"/>-->
+
+<!--                </LinearLayout>-->
 
 
-            <!--            <TextView-->
-            <!--                android:id="@+id/txt_dateOftime"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:text="date time"-->
-            <!--                android:textColor="@color/green"-->
-            <!--                android:textSize="16sp"-->
-            <!--                android:fontFamily="@font/gothambook"-->
-            <!--                android:layout_marginTop="5dp"-->
-            <!--                android:gravity="center"/>-->
 
+
+
+<!--            </androidx.cardview.widget.CardView>-->
 
 
             <androidx.recyclerview.widget.RecyclerView
@@ -154,13 +188,16 @@
                     >
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:text="Print Order"
                         android:textColor="@color/white"
-                        android:textSize="15sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gothambold"
-                        android:layout_gravity="center"/>
+                        android:gravity="center"/>
 
 
                 </androidx.cardview.widget.CardView>

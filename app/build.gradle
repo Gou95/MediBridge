@@ -14,7 +14,7 @@ android {
         applicationId "com.indosoft.medibridge"
         minSdk 24
         targetSdk 35
-        versionCode 1
+        versionCode 4
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -78,8 +78,10 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.ertugrulkaragoz:SuperBottomBar:0.4'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
-    implementation 'com.razorpay:checkout:1.6.26'
+    implementation 'com.razorpay:checkout:1.6.41'
     implementation 'com.itextpdf:itext7-core:7.1.15'
+    implementation 'androidx.webkit:webkit:1.6.1'
+    implementation 'com.android.volley:volley:1.2.1'
 
 
 

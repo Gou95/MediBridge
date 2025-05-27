@@ -197,6 +197,7 @@ public class UrgentCartFragment extends Fragment {
             }
         });
     }
+
     private void updateCartUI(boolean isCartNotEmpty) {
         if (isCartNotEmpty) {
             binding.recyclerView.setVisibility(View.VISIBLE);

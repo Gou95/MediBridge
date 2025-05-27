@@ -7,13 +7,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:fitsSystemWindows="true"
     tools:context=".Activities.SignUpActivity">
 
 
     <ImageView
         android:layout_width="160dp"
         android:layout_height="160dp"
-        android:src="@drawable/medione"
+        android:src="@drawable/logomedi"
         android:scaleType="centerCrop"
         android:layout_marginTop="10dp"
         />
@@ -23,8 +24,13 @@
         android:layout_height="wrap_content"
         android:text="Welcome to "
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="16sp"
+        android:autoSizeMaxTextSize="18sp"
+        android:autoSizeStepGranularity="1sp"
         android:layout_margin="20dp"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"
         />
 
     <ScrollView
@@ -56,18 +62,53 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="Enter shopname"
-                    android:textSize="16sp"
                     android:paddingLeft="10dp"
                     android:background="@null"
                     android:layout_gravity="center"
                     android:inputType="text"
                     android:fontFamily="@font/gothambook"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     />
-
-
-
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:background="@color/grey"
+                android:layout_marginHorizontal="20dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="20dp"
+                android:layout_gravity="center_vertical"
+                >
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/mail"/>
+
+
+                <EditText
+                    android:id="@+id/edt_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="enter email"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:paddingLeft="10dp"
+                    android:background="@null"
+                    android:inputType="textEmailAddress"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/gothambook"
+                   />
+
+            </LinearLayout>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1.5dp"
@@ -91,24 +132,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="Mobile No"
-                    android:textSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:paddingLeft="10dp"
                     android:background="@null"
                     android:inputType="number"
                     android:layout_gravity="center"
                     android:fontFamily="@font/gothambook"
                     android:maxLength="10"/>
-
-
-
-
-
-
-
-
-
-
-
 
             </LinearLayout>
 
@@ -137,7 +170,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="Password"
-                    android:textSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:paddingLeft="10dp"
                     android:background="@null"
                     android:inputType="textPassword"
@@ -150,19 +186,8 @@
                     android:id="@+id/img_eye"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/eye"
+                    android:src="@drawable/hide_eye"
                     android:layout_alignParentEnd="true"/>
-
-
-
-
-
-
-
-
-
-
-
 
             </RelativeLayout>
 
@@ -196,7 +221,10 @@
                     android:id="@+id/edt_state"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:paddingLeft="10dp"
                     android:background="@null"
                     android:layout_gravity="center"
@@ -204,18 +232,6 @@
                     android:inputType="text"
                     android:fontFamily="@font/gothambook"
                     />
-
-
-
-
-
-
-
-
-
-
-
-
             </LinearLayout>
 
             <View
@@ -241,7 +257,10 @@
                     android:id="@+id/edt_city"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:paddingLeft="10dp"
                     android:background="@null"
                     android:layout_gravity="center"
@@ -249,18 +268,6 @@
                     android:hint="Select City"
                     android:fontFamily="@font/gothambook"
                     />
-
-
-
-
-
-
-
-
-
-
-
-
             </LinearLayout>
 
             <View
@@ -297,9 +304,14 @@
                         android:layout_height="match_parent"
                         android:text="sign in"
                         android:textColor="@color/white"
-                        android:textSize="18sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:gravity="center"
-                        android:fontFamily="@font/gothambook"/>
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
+                        android:fontFamily="@font/gotham_bold"/>
 
 
                 </androidx.cardview.widget.CardView>
@@ -316,9 +328,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Already have an login?"
-                        android:textSize="16sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="10dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
                         />
 
 
@@ -327,11 +344,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Login"
-                        android:textSize="18sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:textColor="@color/green"
-                        android:textStyle="bold"
+                        android:fontFamily="@font/gotham_bold"
                         android:layout_marginStart="5dp"
                         android:layout_marginBottom="10dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
                         />
 
                 </LinearLayout>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".Fragment.HomeFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -19,12 +20,16 @@
             <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp">
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="10dp"
+                >
 
                 <ImageView
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:src="@drawable/medione" />
+                    android:src="@drawable/logomedi"
+
+                    />
 
                 <TextView
                     android:id="@+id/txt_retailerName"
@@ -34,32 +39,27 @@
                     android:layout_marginStart="10dp"
                     android:fontFamily="@font/gotham_bold"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
+                    />
 
 
                 <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end">
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="10dp">
 
                     <ImageView
                         android:id="@+id/img_notification"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
                         android:layout_gravity="center_vertical"
-                        android:src="@drawable/notification" />
-
-                    <TextView
-                        android:id="@+id/notification_badge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="top|end"
-                        android:background="@drawable/badge_background"
-                        android:padding="4dp"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp"
-                        android:visibility="gone" />
+                     />
                 </FrameLayout>
 
 
@@ -70,8 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="@color/white"
+                android:layout_marginTop="15dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="11dp">
 
@@ -83,19 +82,17 @@
                     android:drawableStart="@drawable/baseline_search"
                     android:drawablePadding="10dp"
                     android:fontFamily="@font/gothambold"
-                    android:hint="search medicines for order"
                     android:paddingStart="20dp"
                     android:textColorHint="@color/green"
-                    android:textSize="16sp"
-
-                    />
+                    android:completionThreshold="1"
+                    android:hint="" />
 
 
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
+                android:layout_height="160dp"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
                 app:cardCornerRadius="20dp">
@@ -117,70 +114,96 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="70dp"
-                android:layout_weight="1"
+                android:layout_marginBottom="10dp"
                 android:fillViewport="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="60dp">
 
-                    <RelativeLayout
+                    <LinearLayout
+
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginHorizontal="10dp"
+                        android:orientation="horizontal"
                         android:layout_marginTop="20dp">
 
                         <TextView
+                            android:id="@+id/txt_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/gotham_bold"
-                            android:text="Recent Stockists"
                             android:textColor="@color/black"
-                            android:textSize="18sp" />
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@+id/txt_viewAll"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:layout_weight="1"
+                            android:textAllCaps="false"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="15sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"/>
 
-
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/card_viewAll"
-                            android:layout_width="80dp"
-                            android:layout_height="30dp"
+                        <TextView
+                            android:id="@+id/txt_viewAll"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            app:cardBackgroundColor="@color/grey"
-                            app:cardCornerRadius="20dp">
+                            android:layout_alignParentTop="true"
+                            android:text="View All"
+                            android:layout_marginStart="10dp"
+                            android:fontFamily="@font/gothambold"
+                            android:textColor="@color/blue_light"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="15sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:gravity="end"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="5dp"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"/>
+                    </LinearLayout>
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:fontFamily="@font/gothambold"
-                                android:gravity="center"
-                                android:text="View All"
-                                android:textColor="@color/green"
-                                android:textSize="16sp" />
 
 
-                        </androidx.cardview.widget.CardView>
-
-                    </RelativeLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/horizontalRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:orientation="horizontal" />
+                        android:layout_marginHorizontal="10dp"
+                        android:orientation="horizontal"
+                        android:nestedScrollingEnabled="false"
+                        android:layout_marginTop="10dp"/>
 
 
                     <TextView
+                        android:id="@+id/txt_features"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="20dp"
                         android:fontFamily="@font/gotham_bold"
-                        android:text="Featured Items"
                         android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:layout_alignParentStart="true"
+                        android:layout_toStartOf="@+id/txt_viewAll"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:layout_weight="1"
+                        android:textAllCaps="false"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="15sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"/>
 
                     <GridLayout
                         android:layout_width="match_parent"
@@ -194,10 +217,9 @@
                         <androidx.cardview.widget.CardView
                             android:id="@+id/card_orderRegister"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="120dp"
                             android:layout_columnWeight="1"
                             android:layout_margin="10dp"
-                            app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="10dp"
                             app:cardElevation="11dp">
 
@@ -209,10 +231,9 @@
                                 android:orientation="vertical">
 
                                 <androidx.cardview.widget.CardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="80dp"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
                                     android:layout_margin="10dp"
-                                    app:cardBackgroundColor="@color/white"
                                     app:cardCornerRadius="40dp"
                                     app:cardElevation="11dp">
 
@@ -221,37 +242,37 @@
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/expirylist" />
+                                        android:src="@drawable/todaysregister" />
 
                                 </androidx.cardview.widget.CardView>
 
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginBottom="10dp"
-                                    android:fontFamily="@font/gotham_bold"
-                                    android:text="Today's Register"
+                                    android:text="Today's Demand"
                                     android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
                             </LinearLayout>
 
                         </androidx.cardview.widget.CardView>
 
-
                         <androidx.cardview.widget.CardView
-                            android:id="@+id/card_unlistedStockist"
+                            android:id="@+id/card_allOrders"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="120dp"
                             android:layout_columnWeight="1"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_weight="1"
-                            app:cardBackgroundColor="@color/white"
+                            android:layout_margin="10dp"
                             app:cardCornerRadius="10dp"
                             app:cardElevation="11dp">
 
@@ -263,10 +284,9 @@
                                 android:orientation="vertical">
 
                                 <androidx.cardview.widget.CardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="80dp"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
                                     android:layout_margin="10dp"
-                                    app:cardBackgroundColor="@color/white"
                                     app:cardCornerRadius="40dp"
                                     app:cardElevation="11dp">
 
@@ -275,43 +295,38 @@
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/expiry" />
+                                        android:src="@drawable/unlisted_stockist" />
 
                                 </androidx.cardview.widget.CardView>
 
-                                <LinearLayout
+                                <TextView
+
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:text="All Demands "
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
                                     android:gravity="center"
-                                    android:orientation="horizontal">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_gravity="center"
-                                        android:layout_marginTop="5dp"
-                                        android:layout_marginBottom="10dp"
-                                        android:fontFamily="@font/gotham_bold"
-                                        android:text="Unlisted Stockist"
-                                        android:textColor="@color/black"
-                                        android:textSize="15sp" />
-
-
-                                </LinearLayout>
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
+
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/card_expiryRegister"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="120dp"
                             android:layout_columnWeight="1"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_weight="1"
-                            app:cardBackgroundColor="@color/white"
+                            android:layout_margin="10dp"
                             app:cardCornerRadius="10dp"
                             app:cardElevation="11dp">
 
@@ -323,10 +338,9 @@
                                 android:orientation="vertical">
 
                                 <androidx.cardview.widget.CardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="80dp"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
                                     android:layout_margin="10dp"
-                                    app:cardBackgroundColor="@color/white"
                                     app:cardCornerRadius="40dp"
                                     app:cardElevation="11dp">
 
@@ -335,39 +349,92 @@
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/expirylist" />
+                                        android:src="@drawable/received" />
 
                                 </androidx.cardview.widget.CardView>
 
-                                <LinearLayout
+                                <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:text="Product Received"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
                                     android:gravity="center"
-                                    android:orientation="horizontal">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_gravity="center"
-                                        android:layout_marginTop="5dp"
-                                        android:layout_marginBottom="10dp"
-                                        android:fontFamily="@font/gotham_bold"
-                                        android:text="Expiry Register"
-                                        android:textColor="@color/black"
-                                        android:textSize="15sp" />
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
 
 
-                                </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/card_expiryList"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="120dp"
                             android:layout_columnWeight="1"
                             android:layout_margin="10dp"
-                            app:cardBackgroundColor="@color/white"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                               android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+                                    <ImageView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/expiry_list" />
+
+                                </androidx.cardview.widget.CardView>
+
+                                <TextView
+
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Expiry List"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_unlistedStockist"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_weight="1"
                             app:cardCornerRadius="10dp"
                             app:cardElevation="11dp">
 
@@ -379,10 +446,9 @@
                                 android:orientation="vertical">
 
                                 <androidx.cardview.widget.CardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="80dp"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
                                     android:layout_margin="10dp"
-                                    app:cardBackgroundColor="@color/white"
                                     app:cardCornerRadius="40dp"
                                     app:cardElevation="11dp">
 
@@ -391,38 +457,88 @@
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/expiry" />
+                                        android:src="@drawable/unlisted_stockist" />
+
+                                </androidx.cardview.widget.CardView>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Unlisted Stockist"
+                                        android:autoSizeTextType="uniform"
+                                        android:autoSizeMinTextSize="13sp"
+                                        android:autoSizeMaxTextSize="15sp"
+                                        android:autoSizeStepGranularity="1sp"
+                                        android:textColor="@color/black"
+                                        android:layout_marginTop="8dp"
+                                        android:layout_marginBottom="8dp"
+                                        android:fontFamily="@font/gotham_bold"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:importantForAccessibility="no"
+                                        android:includeFontPadding="false"/>
+
+
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_stockistList"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="10dp"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+                                    <ImageView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/stockist_list" />
 
                                 </androidx.cardview.widget.CardView>
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginBottom="10dp"
+                                    android:text="Stockists List "
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
                                     android:fontFamily="@font/gotham_bold"
                                     android:gravity="center"
-                                    android:text="Expiry List"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
-
-
                     </GridLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
-
-
-                    </LinearLayout>
-
-
                 </LinearLayout>
 
             </androidx.core.widget.NestedScrollView>
@@ -431,4 +547,4 @@
         </LinearLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

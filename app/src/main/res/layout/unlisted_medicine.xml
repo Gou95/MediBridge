@@ -27,7 +27,7 @@
                     android:id="@+id/img_logo"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/medione"
+                    android:src="@drawable/logomedi"
                     android:layout_centerVertical="true"/>
 
                 <LinearLayout
@@ -44,7 +44,12 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"
                         android:fontFamily="@font/gotham_bold"
-                        android:textSize="14sp" />
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
 
@@ -55,10 +60,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/light_white"
-                        android:textSize="14sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
                         />
 
 
@@ -102,9 +112,13 @@
                     android:drawableStart="@drawable/baseline_search"
                     android:drawablePadding="16dp"
                     android:hint="Search stockist for medicine"
-                    android:textSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:inputType="text"
                     android:fontFamily="@font/gothambook"
+                    android:completionThreshold="1"
                     />
 
             </LinearLayout>
@@ -155,7 +169,10 @@
                     android:layout_height="match_parent"
                     android:text="Add To Cart"
                     android:textColor="@color/white"
-                    android:textSize="15sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:fontFamily="@font/gotham_bold"
                     android:gravity="center" />
 

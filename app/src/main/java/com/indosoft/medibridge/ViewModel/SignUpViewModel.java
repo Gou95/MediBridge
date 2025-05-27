@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
+import com.indosoft.medibridge.Body.RegisterExpiryBody;
+import com.indosoft.medibridge.Body.SendEmailBody;
 import com.indosoft.medibridge.Body.SignUpBody;
 import com.indosoft.medibridge.Body.StockistBody;
 import com.indosoft.medibridge.Body.UnlistedBody;
@@ -69,6 +71,13 @@ public class SignUpViewModel extends ViewModel {
             isFailed.setValue(error);
         }
     };
+
+    public void sendEmail(SendEmailBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.sendEmail(context,body, listener);
+
+    }
     public void getSignData(SignUpBody body) {
         isConnecting.setValue(true);  // Show loading state
         repository = SignUpRepository.getInstance();
@@ -112,4 +121,29 @@ public class SignUpViewModel extends ViewModel {
         repository.expiryStatus(context,retailer_id, listener);
 
     }
+    public void deleteOrder(String order_items_id) {
+        isConnecting.setValue(true);  // Show loading state
+        repository = SignUpRepository.getInstance();
+        repository.deleteOrder(context,order_items_id, listener);
+
+    }
+    public void orderStatus(String order_items_id, String order_status) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.orderStatus(context,order_items_id,order_status, listener);
+
+    }
+    public void resetPassword(String retailer_id, String retailer_password) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.resetPassword(context,retailer_id,retailer_password, listener);
+
+    }
+    public void registerexpiry(RegisterExpiryBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.registerExpiry(context,body, listener);
+
+    }
+
 }

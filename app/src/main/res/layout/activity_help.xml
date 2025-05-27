@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    tools:context=".Activities.HelpActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/img_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/backarrow"
+            />
+
+        <TextView
+            android:id="@+id/txt_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MediBro Help"
+            android:fontFamily="@font/gotham_bold"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/black"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeStepGranularity="1sp"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"/>
+
+
+
+
+    </androidx.appcompat.widget.Toolbar>
+    <FrameLayout
+        android:id="@+id/webViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp" />
+
+
+</LinearLayout>

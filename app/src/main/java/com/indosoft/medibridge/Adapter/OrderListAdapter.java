@@ -74,6 +74,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.View
             String dot = response.getAddtime();
             String status =response.getOrderStatus();
             String name =response.getDealerName();
+            String qty =response.getTotalmeds();
 
            Intent intent = new Intent(context, SeeAllOrderDetailsActivity.class);
             intent.putExtra("retailerId", retailerId);
@@ -82,6 +83,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.View
             intent.putExtra("orderStatus", status);
             intent.putExtra("dot", dot);
             intent.putExtra("name", name);
+            intent.putExtra("qty", qty);
             context.startActivity(intent);
         });
 

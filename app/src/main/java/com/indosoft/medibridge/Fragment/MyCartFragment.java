@@ -52,9 +52,10 @@ public class MyCartFragment extends Fragment {
     ArrayList<ShowCartResponse> list = new ArrayList<>();
     private static final String CHANNEL_ID = "myFirebaseChannel";
     int counter = 0;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding= FragmentMyCartBinding.inflate(inflater, container, false);
+        binding = FragmentMyCartBinding.inflate(inflater, container, false);
         showCartViewModel = new ViewModelProvider(this).get(ShowCartViewModel.class);
         showCartViewModel.init(getContext());
         deleteCartViewModel = new ViewModelProvider(this).get(DeleteCartViewModel.class);
@@ -71,21 +72,22 @@ public class MyCartFragment extends Fragment {
         handleBackPress();
 
         startNetworkCheckService();
-        adapter = new CardListAdapter(getContext(), dayViewModel, list, showCartViewModel );
+     //   adapter = new CardListAdapter(getContext(), dayViewModel, list, showCartViewModel);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setVisibility(View.GONE);
-        binding.btnAddCart.setVisibility(View.GONE);
+       // binding.btnAddCart.setVisibility(View.GONE);
         binding.linearHide.setVisibility(View.VISIBLE);
         binding.swipeRefreshLayout.setRefreshing(false);
         String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
         showCartViewModel.getShowPostCartData(retailerId);
         return binding.getRoot();
     }
+
     private void initClicks() {
-        binding.btnAddCart.setOnClickListener(v -> {
-            showPopup();
-        });
+//        binding.btnAddCart.setOnClickListener(v -> {
+//            showPopup();
+//        });
         binding.imgBack.setOnClickListener(v -> {
             if (getFragmentManager() != null) {
                 getFragmentManager()
@@ -95,6 +97,7 @@ public class MyCartFragment extends Fragment {
             }
         });
     }
+
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
         showCartViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
@@ -104,10 +107,10 @@ public class MyCartFragment extends Fragment {
                 list.addAll(response);
                 adapter.notifyDataSetChanged();
                 updateCartUI(true);
-                updateBadgeCount(list.size());
+
             } else {
                 updateCartUI(false);
-                updateBadgeCount(0);
+
             }
         });
         deleteCartViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
@@ -126,6 +129,7 @@ public class MyCartFragment extends Fragment {
             }
         });
     }
+
     private void showPopup() {
         View popupView = LayoutInflater.from(getContext()).inflate(R.layout.popup_layout, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -141,8 +145,9 @@ public class MyCartFragment extends Fragment {
                 updateCartUI(false);
             } else {
                 fetchLastOrderAndPlaceOrder();
+                dialog.dismiss();
             }
-            dialog.dismiss();
+
         });
         cancel.setOnClickListener(v -> {
             dialog.dismiss();
@@ -158,24 +163,15 @@ public class MyCartFragment extends Fragment {
             Log.d("CartActivity", "Attempting to place order for retailer: " + retailerId);
             orderViewModel.getProccedOrder(retailerId);
 
-            orderViewModel.getLiveData().removeObservers(getViewLifecycleOwner());
+           // orderViewModel.getLiveData().removeObservers(getViewLifecycleOwner());
             orderViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
                 if (response != null) {
                     sendNotification("Order Confirmation", "Your order has been successfully placed!");
-                    AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, "0");
-
-
-                    if (getActivity() instanceof DashBoardActivity) {
-                        ((DashBoardActivity) getActivity()).updateBadgeCounter(0);
-                    }
-
-                    showCartViewModel.getLiveData().observe(getViewLifecycleOwner(),showCartResponses -> {
-                       if (showCartResponses!=null){
-                           list.clear();
-                           list.addAll(showCartResponses);
-
-                       }
-                    });
+                    list.clear();
+                    adapter.notifyDataSetChanged();
+//                    if (getActivity() instanceof DashBoardActivity) {
+//                        ((DashBoardActivity) getActivity()).clearMycartBadge();  // Clear the badge on the floating button
+//                    }
 
                     refreshCartData();
                     navigateToOrderFragment();
@@ -187,6 +183,7 @@ public class MyCartFragment extends Fragment {
             Log.e("CartActivity", "orderViewModel is not initialized.");
         }
     }
+
     private void navigateToOrderFragment() {
         if (isAdded() && getActivity() != null) {
             OrderFragment orderFragment = new OrderFragment();
@@ -199,31 +196,29 @@ public class MyCartFragment extends Fragment {
             Log.e("UrgentFragment", "Fragment is not attached to the activity. Navigation failed.");
         }
     }
+
     public void refreshCartData() {
         String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
-
-        if (!retailerId.isEmpty() && !AppSession.getInstance(getContext()).getValue(Constants.CART_COUNT).equals("0")) {
-            showCartViewModel.getShowPostCartData(retailerId);
-        }
-        binding.btnAddCart.setEnabled(true);
-        binding.btnAddCart.setAlpha(1.0f);
+        showCartViewModel.getShowPostCartData(retailerId);
     }
 
     private void startNetworkCheckService() {
         Intent serviceIntent = new Intent(getContext(), NetworkCheckService.class);
         requireActivity().startService(serviceIntent);
     }
+
     private void updateCartUI(boolean isCartNotEmpty) {
         if (isCartNotEmpty) {
             binding.recyclerView.setVisibility(View.VISIBLE);
             binding.linearHide.setVisibility(View.GONE);
-            binding.btnAddCart.setVisibility(View.VISIBLE);
+           // binding.btnAddCart.setVisibility(View.VISIBLE);
         } else {
             binding.recyclerView.setVisibility(View.GONE);
             binding.linearHide.setVisibility(View.VISIBLE);
-            binding.btnAddCart.setVisibility(View.GONE);
+           // binding.btnAddCart.setVisibility(View.GONE);
         }
     }
+
     private void handleBackPress() {
         requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), new OnBackPressedCallback(true) {
             @Override
@@ -231,21 +226,6 @@ public class MyCartFragment extends Fragment {
                 navigateToOrderFragment();
             }
         });
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        String cartCount = AppSession.getInstance(getContext()).getValue(Constants.CART_COUNT);
-
-        Log.d("MyCartFragment", "Cart count on resume: " + cartCount);
-
-        int count = (cartCount == null || cartCount.isEmpty()) ? 0 : Integer.parseInt(cartCount);
-
-        if (list.isEmpty()) {
-            count = 0;
-            AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, "0");
-        }
-        updateBadgeCount(count);
     }
     private void sendNotification(String title, String message) {
         createNotificationChannel();
@@ -271,6 +251,7 @@ public class MyCartFragment extends Fragment {
             managerCompat.notify(101, builder.build());
         }
     }
+
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
@@ -287,18 +268,9 @@ public class MyCartFragment extends Fragment {
         }
 
     }
-    private void updateBadgeCount(int count) {
-        String cartValue = count > 0 ? String.valueOf(count) : "0";
-        AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, cartValue);
 
-        if (getActivity() instanceof DashBoardActivity) {
-            DashBoardActivity dashBoardActivity = (DashBoardActivity) getActivity();
-            dashBoardActivity.updateBadgeCounter(count);  // Ensure this method is properly called
-        }
-    }
 
-    }
-
+}
 
 
 

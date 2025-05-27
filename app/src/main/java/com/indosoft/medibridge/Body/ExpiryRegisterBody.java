@@ -10,9 +10,6 @@ public class ExpiryRegisterBody {
     @SerializedName("product_id")
     @Expose
     private String productId;
-    @SerializedName("batch_no")
-    @Expose
-    private String batchNo;
     @SerializedName("expiry_month")
     @Expose
     private String expiryMonth;
@@ -37,14 +34,6 @@ public class ExpiryRegisterBody {
 
     public void setProductId(String productId) {
         this.productId = productId;
-    }
-
-    public String getBatchNo() {
-        return batchNo;
-    }
-
-    public void setBatchNo(String batchNo) {
-        this.batchNo = batchNo;
     }
 
     public String getExpiryMonth() {

@@ -38,11 +38,13 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
     DeliveryDayViewModel dayViewModel;
     ShowCartViewModel showCartViewModel;
     QuantityChangeViewModel quantityChangeViewModel;
-    public CardListAdapter(Context context, DeliveryDayViewModel dayViewModel, ArrayList<ShowCartResponse> list, ShowCartViewModel showCartViewModel) {
+    OnUrgentMovedListener urgentMovedListener;
+    public CardListAdapter(Context context, DeliveryDayViewModel dayViewModel, ArrayList<ShowCartResponse> list, ShowCartViewModel showCartViewModel, OnUrgentMovedListener listener) {
         this.context = context;
         this.dayViewModel = dayViewModel;
         this.list = list;
         this.showCartViewModel = showCartViewModel;
+        this.urgentMovedListener = listener;
     }
     @NonNull
     @Override
@@ -156,25 +158,36 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
 
                 if (context instanceof DashBoardActivity) {
                     DashBoardActivity dashboard = (DashBoardActivity) context;
-                    int newbadgeCount = dashboard.getCartBadgeCount() - 1;
-                    dashboard.updateCartBadge(Math.max(newbadgeCount, 0)); // Count kabhi negative na ho
+                    int cartCount = dashboard.getCartBadgeCount();
+                    cartCount = Math.max(cartCount - 1, 0);
+                    dashboard.updateBadgeCounter(cartCount);
                 }
-
                 if (context instanceof DashBoardActivity) {
                     DashBoardActivity dashboard = (DashBoardActivity) context;
                     int currentUrgentCount = dashboard.getUrgentBadgeCount();
-                    dashboard.updateUrgentBadge(currentUrgentCount + 1); // Increase count
+                    dashboard.updateUrgentBadge(currentUrgentCount + 1);
+
                 }
+
+
+                if (urgentMovedListener != null) {
+                    urgentMovedListener.onUrgentItemMoved();
+                }
+
+
+
                 for (ShowCartResponse response : list) {
                     if ("1680".equals(response.getProductId()) || "UNLISTED MEDICINES".equalsIgnoreCase(response.getProductName())) {
                         if (context instanceof DashBoardActivity) {
                             DashBoardActivity dashboard = (DashBoardActivity) context;
-                            int currentUrgentCount = dashboard.getUrgentBadgeCount();
-                            dashboard.updateUrgentBadge(currentUrgentCount + 1); // Increase count
+                            int cartCount = list.size() - 1; // Instead of getCartBadgeCount() - 1
+                            dashboard.updateBadgeCounter(cartCount);
                         }
-                        break; // No need to continue loop
+                        break;
                     }
                 }
+
+
                 dialog.dismiss();
 
             });
@@ -241,14 +254,25 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, list.size());
 
+//                if (context instanceof DashBoardActivity) {
+//                    DashBoardActivity dashboard = (DashBoardActivity) context;
+//                    int cartCount = dashboard.getCartBadgeCount() - 1;
+//                    dashboard.updateBadgeCounter(Math.max(cartCount, 0));
+//                }
+//                if (context instanceof CartActivity) {
+//                    ((CartActivity) context).returnToDashboard();
+//                }
+
+
                 if (context instanceof DashBoardActivity) {
                     DashBoardActivity dashboard = (DashBoardActivity) context;
-                    int newBadgeCount = dashboard.getCartBadgeCount() - 1;
-                    dashboard.updateCartBadge(Math.max(newBadgeCount, 0));
+                    int cartCount = dashboard.getCartBadgeCount() - 1;
+                    dashboard.updateBadgeCounter(cartCount);
+
+                    if (list.isEmpty()) {
+                        dashboard.updateBadgeCounter(0);
+                    }
                 }
-
-
-
 
             } else {
                 Toast.makeText(context, "Failed to delete item: " + response.getMessage(), Toast.LENGTH_SHORT).show();
@@ -293,6 +317,9 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
             linearLayout = itemView.findViewById(R.id.linearUnit);
             unlisted = itemView.findViewById(R.id.unlistedMedicine);
         }
+    }
+    public interface OnUrgentMovedListener {
+        void onUrgentItemMoved();
     }
 
 }

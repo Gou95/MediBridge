@@ -1,5 +1,6 @@
 package com.indosoft.medibridge.Activities;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,10 +20,19 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +40,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.indosoft.medibridge.Adapter.OrderRegisterAdapter;
 import com.indosoft.medibridge.Model.OrderDetailsResponse;
 import com.indosoft.medibridge.Model.OrderRegisterResponse;
+import com.indosoft.medibridge.R;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.OrderRegisterViewModel;
@@ -41,6 +52,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -50,8 +62,9 @@ ActivityOrderRegisterBinding binding;
     OrderRegisterViewModel viewModel;
     ArrayList<OrderRegisterResponse> list = new ArrayList<>();
     OrderRegisterAdapter adapter;
-    private String startDateSelected = null;
-    private String lastDateSelected = null;
+    private String orderDate = null;
+
+
     private boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +103,16 @@ ActivityOrderRegisterBinding binding;
        binding.btnPrintOrder.setOnClickListener(v -> {
            generateInvoicePdf();
        });
+
+        TextView title = binding.txtToday;
+        SpannableString spannable = new SpannableString("Today's Order Demand");
+
+
+        int blue = ContextCompat.getColor(this, R.color.blue_light);
+        int red = ContextCompat.getColor(this, R.color.orange_dark);
+        spannable.setSpan(new ForegroundColorSpan(blue), 0, 11, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 11, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(spannable);
     }
     private void filterByProductName(String product) {
         if (product.isEmpty()){
@@ -111,27 +134,35 @@ ActivityOrderRegisterBinding binding;
             if (orderDetailsResponses != null) {
                 list.clear();
                 for (OrderRegisterResponse response : orderDetailsResponses) {
-                    if (isWithinLast24Hours(response.getAddtime())) {
+                    // Filter by status AND time
+                    if (isToday(response.getAddtime())) {
                         list.add(response);
                     }
+
                 }
+
                 adapter.notifyDataSetChanged();
             }
         });
     }
-    private boolean isWithinLast24Hours(String addtime) {
+
+    private boolean isToday(String addtime) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
             Date orderDate = sdf.parse(addtime);
             if (orderDate == null) return false;
-            long currentTime = System.currentTimeMillis();
-            long twentyFourHoursAgo = currentTime - (24 * 60 * 60 * 1000);
-            return orderDate.getTime() >= twentyFourHoursAgo;
+
+            String today = sdf.format(new Date());
+            String orderDay = sdf.format(orderDate);
+
+            return today.equals(orderDay);
         } catch (ParseException e) {
             e.printStackTrace();
             return false;
         }
     }
+
+
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) {
@@ -184,11 +215,17 @@ ActivityOrderRegisterBinding binding;
             Toast.makeText(this, "No order details available", Toast.LENGTH_SHORT).show();
             return;
         }
+        orderDate = list.get(0).getAddtime();  // <-- Correct date from API
+        String timestamp = new SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(new Date());
+
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Todays_Order_" + timestamp + ".pdf");
 
         PdfDocument pdfDocument = new PdfDocument();
         Paint paint = new Paint();
         Paint titlePaint = new Paint();
+        Paint dealerPaint = new Paint();
         Paint borderPaint = new Paint();
+
 
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setColor(Color.BLACK);
@@ -200,19 +237,27 @@ ActivityOrderRegisterBinding binding;
         int rowHeight = 40;
         int availableHeight = pageHeight - 150;
 
-        int col1 = 140, col2 = 100, col3 = 100, col4 = 100, col5 = 80;
+        int col1 = 140, col2 = 100, col3 = 100, col4 = 80, col5 = 100;
         int itemIndex = 0;
+        int pageNumber = 1;
 
         while (itemIndex < list.size()) {
-            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create();
+            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber++).create();
             PdfDocument.Page page = pdfDocument.startPage(pageInfo);
             Canvas canvas = page.getCanvas();
 
-            // **Title: "Purchase Order"**
+            // Title
             titlePaint.setTextSize(20);
             titlePaint.setColor(Color.BLACK);
             titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             canvas.drawText("Purchase Order", 220, marginTop, titlePaint);
+
+            dealerPaint.setTextSize(18);
+            dealerPaint.setColor(Color.BLACK);
+            dealerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            String dateText = "Order Date: " + orderDate;
+            float dateTextWidth = dealerPaint.measureText(dateText);
+            canvas.drawText(dateText, pageWidth - dateTextWidth - 50, marginTop + 30, dealerPaint);
 
             int y = marginTop + 50;
             paint.setTextSize(14);
@@ -222,79 +267,64 @@ ActivityOrderRegisterBinding binding;
             int endX = startX + col1 + col2 + col3 + col4 + col5;
             int headerBottom = y + rowHeight;
 
-            // **Header Row**
+            // Header row
             canvas.drawText("Product Name", startX + 10, y + 25, paint);
-            canvas.drawText("Unit", startX + col1 + 10, y + 25, paint);
-            canvas.drawText("Delivery Day", startX + col1 + col2 + 10, y + 25, paint);
-            canvas.drawText("Status", startX + col1 + col2 + col3 + 10, y + 25, paint);
+            canvas.drawText("Quantity", startX + col1 + 10, y + 25, paint);
+            canvas.drawText("Unit", startX + col1 + col2 + 10, y + 25, paint);
+            canvas.drawText("Delivery", startX + col1 + col2 + col3 + 10, y + 25, paint);
             canvas.drawText("Stockist", startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
 
             canvas.drawRect(startX, y, endX, headerBottom, borderPaint);
             y += rowHeight;
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
 
-            // **Loop through list items**
-            while (itemIndex < list.size() && y + rowHeight < availableHeight) {
+            while (itemIndex < list.size() && y + rowHeight < pageHeight - 50) {
                 OrderRegisterResponse item = list.get(itemIndex);
 
-                String productName = (item.getProductName() != null) ? item.getProductName() : "";
-                String unitName = (item.getUnitName() != null) ? item.getUnitName() : "";
-                String deliveryDay = (item.getDeliveryDay() != null) ? item.getDeliveryDay() : "";
-                String orderStatus = (item.getOrderStatus() != null) ? item.getOrderStatus() : "";
-                String stockistName = (item.getDealerName() != null) ? item.getDealerName() : "Unknown";
-                String unlistedMedicines = (item.getUnlistedMedicines() != null) ? (String) item.getUnlistedMedicines() : "";
+                String productName = safe(item.getProductName());
+                String quantity = safe(item.getOrderQty());
+                String unitName = safe(item.getUnitName());
+                String deliveryDay = safe(item.getDeliveryDay(), "-");
+                String stockistName = safe(item.getDealerName(), "Unknown");
+                String unlistedMedicines = safe((String) item.getUnlistedMedicines());
 
+                int rowHeightAdjusted = rowHeight;
                 int textY = y + 20;
-                int rowHeightAdjusted = 40; // Default row height
 
-                // **Handle UNLISTED MEDICINES case**
                 if ("UNLISTED MEDICINES".equals(productName)) {
-                    List<String> wrappedUnlistedMedicines = wrapText(unlistedMedicines, paint, col1 - 20);
-
-                    // **Draw "UNLISTED MEDICINES" in bold**
                     paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                     canvas.drawText(productName, startX + 10, textY, paint);
                     textY += 20;
-
                     paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-                    for (String line : wrappedUnlistedMedicines) {
+                    List<String> wrapped = wrapText(unlistedMedicines, paint, col1 - 20);
+                    for (String line : wrapped) {
                         canvas.drawText(line, startX + 10, textY, paint);
                         textY += 20;
                     }
-
-                    rowHeightAdjusted = wrappedUnlistedMedicines.size() * 20 + 20;
+                    rowHeightAdjusted = wrapped.size() * 20 + 20;
                 } else {
-                    // **Wrap Product Name Properly**
-                    List<String> wrappedProductName = wrapText(productName, paint, col1 - 20);
-                    for (String line : wrappedProductName) {
+                    List<String> wrappedName = wrapText(productName, paint, col1 - 20);
+                    for (String line : wrappedName) {
                         canvas.drawText(line, startX + 10, textY, paint);
                         textY += 20;
                     }
 
-                    // **Unit Column (Separate)**
-                    canvas.drawText(!unitName.isEmpty() ? unitName : "-", startX + col1 + 10, y + 25, paint);
-
-                    // **Calculate row height**
-                    rowHeightAdjusted = wrappedProductName.size() * 20;
+                    canvas.drawText(!quantity.isEmpty() ? quantity : "-", startX + col1 + 10, y + 25, paint);
+                    canvas.drawText(!unitName.isEmpty() ? unitName : "-", startX + col1 + col2 + 10, y + 25, paint);
+                    canvas.drawText(deliveryDay, startX + col1 + col2 + col3 + 10, y + 25, paint);
+                    rowHeightAdjusted = wrappedName.size() * 20;
                 }
 
-                // **Wrap Stockist Name (2-line support)**
-                String[] stockistWords = stockistName.split(" ", 2);
-                String stockistFirstLine = stockistWords[0];
-                String stockistSecondLine = (stockistWords.length > 1) ? stockistWords[1] : "";
-
-                canvas.drawText(stockistFirstLine, startX + col1 + col2 + col3 + col4 + 10, y + 20, paint);
-                if (!stockistSecondLine.isEmpty()) {
-                    canvas.drawText(stockistSecondLine, startX + col1 + col2 + col3 + col4 + 10, y + 40, paint);
+                // Stockist name (wrapped to 2 lines max)
+                String[] stockistLines = stockistName.split(" ", 2);
+                canvas.drawText(stockistLines[0], startX + col1 + col2 + col3 + col4 + 10, y + 20, paint);
+                if (stockistLines.length > 1) {
+                    canvas.drawText(stockistLines[1], startX + col1 + col2 + col3 + col4 + 10, y + 40, paint);
+                    rowHeightAdjusted = Math.max(rowHeightAdjusted, 60);
+                } else {
+                    rowHeightAdjusted = Math.max(rowHeightAdjusted, 40);
                 }
 
-                rowHeightAdjusted = Math.max(rowHeightAdjusted, (!stockistSecondLine.isEmpty()) ? 60 : 40);
-
-                // **Other Columns**
-                canvas.drawText(!deliveryDay.isEmpty() ? deliveryDay : "-", startX + col1 + col2 + 10, y + 25, paint);
-                canvas.drawText(!orderStatus.isEmpty() ? orderStatus : "-", startX + col1 + col2 + col3 + 10, y + 25, paint);
-
-                // **Draw Border**
                 canvas.drawRect(startX, y, endX, y + rowHeightAdjusted, borderPaint);
                 y += rowHeightAdjusted;
                 itemIndex++;
@@ -303,19 +333,29 @@ ActivityOrderRegisterBinding binding;
             pdfDocument.finishPage(page);
         }
 
-        // **Save PDF**
-        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Purchase_Invoice.pdf");
         try {
             pdfDocument.writeTo(new FileOutputStream(file));
             Toast.makeText(this, "PDF Saved Successfully", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Failed to Save PDF", Toast.LENGTH_SHORT).show();
+        } finally {
+            pdfDocument.close();
         }
 
-        pdfDocument.close();
         openPdf(file);
     }
+
+    // Utility method to handle nulls
+    private String safe(String val) {
+        return val != null ? val : "";
+    }
+
+    private String safe(String val, String defaultVal) {
+        return val != null ? val : defaultVal;
+    }
+
+
     private List<String> wrapText(String text, Paint paint, int width) {
         List<String> lines = new ArrayList<>();
         if (text == null || text.isEmpty()) {

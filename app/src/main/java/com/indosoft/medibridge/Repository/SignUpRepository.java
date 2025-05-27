@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
+import com.indosoft.medibridge.Body.RegisterExpiryBody;
+import com.indosoft.medibridge.Body.SendEmailBody;
 import com.indosoft.medibridge.Body.SignUpBody;
 import com.indosoft.medibridge.Body.StockistBody;
 import com.indosoft.medibridge.Body.UnlistedBody;
@@ -44,6 +46,26 @@ public class SignUpRepository {
         apiInterface = RetrofitService.userService(ApiInterface.class);
     }
 
+    public MutableLiveData<SignUpResponse> sendEmail(Context context, SendEmailBody body, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.sendEmail(body);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
     public MutableLiveData<SignUpResponse> getSignUpData(Context context,SignUpBody body, SignUpListener listener) {
         Call<SignUpResponse> call = apiInterface.getRegisterRes(body);
         call.enqueue(new Callback<SignUpResponse>() {
@@ -141,7 +163,6 @@ public class SignUpRepository {
             public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     listener.onSuccess(response.body());
-                    mutableLiveData.setValue(response.body());
                 } else {
                     listener.onError("Response not successful.");
                 }
@@ -200,4 +221,94 @@ public class SignUpRepository {
         return mutableLiveData;
     }
 
+    public MutableLiveData<SignUpResponse> deleteOrder(Context context, String order_items_id, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.deleteOrder(order_items_id);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    listener.onSuccess(response.body());
+                    mutableLiveData.setValue(response.body());
+                } else {
+                    listener.onError("Response not successful.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+            }
+        });
+
+        return mutableLiveData;
+    }
+
+    public MutableLiveData<SignUpResponse> orderStatus(Context context, String order_items_id, String order_status, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.getOrderStatus(order_items_id,order_status);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                } else {
+                    listener.onError("Failed to fetch data. Response is empty or null.");
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
+
+    public MutableLiveData<SignUpResponse> resetPassword(Context context, String retailer_id, String retailer_password, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.resetPassword(retailer_id,retailer_password);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                } else {
+                    listener.onError("Failed to fetch data. Response is empty or null.");
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
+
+    public MutableLiveData<SignUpResponse> registerExpiry(Context context, RegisterExpiryBody registerBody, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.registerExpiry(registerBody);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
 }

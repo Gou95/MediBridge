@@ -12,7 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitService {
 
-   private static final String BASE_URL = "https://mediapp.indosoftservices.net/v2/api/";
+   private static final String BASE_URL = "https://medibro.in/v2/api/";
   //  private static final String BASE_URL = "http://103.212.120.177/mediapp/v2/api/";
 
     private static HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);

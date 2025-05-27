@@ -28,10 +28,11 @@ public class AppSession {
         sharedPreferences.edit().clear().apply();
     }
 
-    public void setValue(String key, String value) {
+    public String setValue(String key, String value) {
         if (key != null && value != null) {
             sharedPreferences.edit().putString(key, value).apply();
         }
+        return key;
     }
 
     public String getValue(String key) {
@@ -79,4 +80,8 @@ public class AppSession {
     public long getLong(String key, long defaultValue) {
         return key != null ? sharedPreferences.getLong(key, defaultValue) : defaultValue;
     }
+
+
+
+
 }

@@ -1,18 +1,25 @@
 package com.indosoft.medibridge.Activities;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
+import android.widget.DatePicker;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -31,7 +38,8 @@ import com.indosoft.medibridge.databinding.ActivityExpiryListBinding;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class ExpiryListActivity extends AppCompatActivity {
+public class
+ExpiryListActivity extends AppCompatActivity {
 
     ActivityExpiryListBinding binding;
     ArrayList<ExpiryListResponse> list = new ArrayList<>();
@@ -71,7 +79,8 @@ public class ExpiryListActivity extends AppCompatActivity {
                 binding.autoMonth.setText(currentMonthYear);
 
                 filterByRetailerId();  // ✅ Retailer filtering first
-                filterByMonth(currentMonthYear);  // ✅ Then apply month filter
+                //filterByMonth(currentMonthYear);
+           applyAllFilters();
             } else {
                 Log.e("DEBUG", "API Response is NULL");
             }
@@ -105,7 +114,7 @@ public class ExpiryListActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterByMedicine( s.toString());
+                applyAllFilters();
             }
 
             @Override
@@ -121,7 +130,7 @@ public class ExpiryListActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterByStockist(s.toString());
+                applyAllFilters();
             }
 
             @Override
@@ -130,6 +139,15 @@ public class ExpiryListActivity extends AppCompatActivity {
             }
         });
         binding.autoMonth.setOnClickListener(v -> showCalendarDialog() );
+        TextView title = binding.txtExpiryList;
+        SpannableString spannable = new SpannableString("Expiry List");
+
+
+        int blue = ContextCompat.getColor(this, R.color.blue_light);
+        int red = ContextCompat.getColor(this, R.color.orange_dark);
+        spannable.setSpan(new ForegroundColorSpan(blue), 0, 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 7, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(spannable);
 
     }
     private String getCurrentMonthYear() {
@@ -141,82 +159,78 @@ public class ExpiryListActivity extends AppCompatActivity {
     }
 
 
-    private void filterByStockist(String stockist) {
-        if (stockist.isEmpty()){
-            adapter.updateList(list);
-            return;
-        }
-        ArrayList<ExpiryListResponse> filterList = new ArrayList<>();
-        for (ExpiryListResponse response : list){
-            if (response.getDealerName() !=null && response.getDealerName().toLowerCase().contains(stockist.toLowerCase())){
-                filterList.add(response);
-            }
-        }
-        adapter.updateList(filterList);
-    }
-
-
-    private void filterByMedicine(String product) {
-        if (product.isEmpty()){
-            adapter.updateList(list);
-            return;
-        }
-        ArrayList<ExpiryListResponse> filterList = new ArrayList<>();
-        for (ExpiryListResponse response : list){
-            if (response.getProductName() !=null && response.getProductName().toLowerCase().contains(product.toLowerCase())){
-                filterList.add(response);
-            }
-        }
-        adapter.updateList(filterList);
-    }
-    private void showCalendarDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = getLayoutInflater().inflate(R.layout.calendar_view, null);
-        builder.setView(dialogView);
-
-        CalendarView calendarView = dialogView.findViewById(R.id.calendarView);
-        TextView btnCancel = dialogView.findViewById(R.id.txt_cancel);
-        TextView btnOk = dialogView.findViewById(R.id.txt_ok);
-
-        final Calendar selectedDate = Calendar.getInstance();
-
-        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            selectedDate.set(year, month, dayOfMonth);
-        });
-
-        AlertDialog dialog = builder.create();
-
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
-
-        btnOk.setOnClickListener(v -> {
-            int selectedMonth = selectedDate.get(Calendar.MONTH) + 1;
-            int selectedYear = selectedDate.get(Calendar.YEAR);
-
-            String selectedMonthYear = selectedMonth + "/" + selectedYear;
-            binding.autoMonth.setText(selectedMonthYear);
-
-            filterByMonth(selectedMonthYear);
-            dialog.dismiss();
-        });
-
-        dialog.show();
-    }
-
-    private void filterByMonth(String monthYear) {
-        if (monthYear.isEmpty()) {
-            adapter.updateList(originalList);
-            return;
-        }
+    private void applyAllFilters() {
+        String medicineFilter = binding.autoMedicine.getText().toString().toLowerCase().trim();
+        String stockistFilter = binding.autoStockist.getText().toString().toLowerCase().trim();
+        String monthFilter = binding.autoMonth.getText().toString().trim();
 
         ArrayList<ExpiryListResponse> filteredList = new ArrayList<>();
         for (ExpiryListResponse response : originalList) {
-            if (response.getExpiryMonth() != null && response.getExpiryMonth().trim().equalsIgnoreCase(monthYear)) {
+            boolean matchesMedicine = response.getProductName() != null &&
+                    response.getProductName().toLowerCase().contains(medicineFilter);
+
+            boolean matchesStockist = response.getDealerName() != null &&
+                    response.getDealerName().toLowerCase().contains(stockistFilter);
+
+            boolean matchesMonth = response.getExpiryMonth() != null &&
+                    response.getExpiryMonth().trim().equalsIgnoreCase(monthFilter);
+
+            if ((medicineFilter.isEmpty() || matchesMedicine) &&
+                    (stockistFilter.isEmpty() || matchesStockist) &&
+                    (monthFilter.isEmpty() || matchesMonth)) {
                 filteredList.add(response);
             }
         }
 
         adapter.updateList(filteredList);
     }
+
+    private void showCalendarDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.calendar_view, null);
+        builder.setView(dialogView);
+
+        final DatePicker datePicker = dialogView.findViewById(R.id.datePicker);
+        // Hide the day spinner to allow only month/year selection
+        int daySpinnerId = getResources().getIdentifier("android:id/day", null, null);
+        if (daySpinnerId != 0) {
+            View daySpinner = datePicker.findViewById(daySpinnerId);
+            if(daySpinner != null){
+                daySpinner.setVisibility(View.GONE);
+            }
+        }
+
+        TextView btnCancel = dialogView.findViewById(R.id.txt_cancel);
+        TextView btnOk = dialogView.findViewById(R.id.txt_ok);
+        final AlertDialog dialog = builder.create();
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnOk.setOnClickListener(v -> {
+            // Get month (0-indexed) and year from the DatePicker
+            int month = datePicker.getMonth() + 1;
+            int year = datePicker.getYear();
+
+            String selectedMonthYear = month + "/" + year;
+            binding.autoMonth.setText(selectedMonthYear);
+//            filterByMonth(selectedMonthYear);
+            applyAllFilters();
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
+
+
 
 
 }

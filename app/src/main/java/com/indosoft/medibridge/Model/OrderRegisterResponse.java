@@ -41,6 +41,25 @@ public class OrderRegisterResponse {
     @Expose
     private Object unlistedMedicines;
 
+    boolean isPed;
+    boolean isNotPed;
+
+    public boolean isPed() {
+        return isPed;
+    }
+
+    public void setPed(boolean ped) {
+        isPed = ped;
+    }
+
+    public boolean isNotPed() {
+        return isNotPed;
+    }
+
+    public void setNotPed(boolean notPed) {
+        isNotPed = notPed;
+    }
+
     public String getOrderNo() {
         return orderNo;
     }

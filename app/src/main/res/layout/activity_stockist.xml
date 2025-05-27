@@ -1,10 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".Activities.StockistActivity">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="10dp"
+        >
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/img_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/backarrow"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:id="@+id/txt_stockist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stockists List"
+            android:textColor="@color/black"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeStepGranularity="1sp"
+            android:fontFamily="@font/gotham_bold"
+            android:layout_centerVertical="true"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+
+            />
+
+
+
+    </RelativeLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="11dp"
+
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/auto_stockist"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@null"
+            android:drawableStart="@drawable/baseline_search"
+            android:hint="search by stockist "
+            android:textColorHint="@color/green"
+            android:fontFamily="@font/gothambold"
+            android:paddingStart="20dp"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="16sp"
+            android:autoSizeMaxTextSize="18sp"
+            android:autoSizeStepGranularity="1sp"
+            android:drawablePadding="10dp"
+            android:completionThreshold="1"
+
+            />
+
+
+    </androidx.cardview.widget.CardView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/recyclerView"
+        android:layout_marginTop="10dp"/>
+
+</LinearLayout>

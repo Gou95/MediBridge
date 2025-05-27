@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -59,6 +60,7 @@ public class RecentStockistActivity extends AppCompatActivity {
     StockitsViewModel stockitsViewModel;
     StockitsListAdapter adapter;
     ArrayList<StockitsResponse> list = new ArrayList<>();
+    ArrayList<StockitsResponse> allResponses = new ArrayList<>();
     private String startDateSelected = null;
     private String lastDateSelected = null;
     private boolean isReceiverRegistered = false;
@@ -96,9 +98,7 @@ public class RecentStockistActivity extends AppCompatActivity {
         binding.imgBack.setOnClickListener(v -> {
             onBackPressed();
         });
-        binding.btnPrintInvoice.setOnClickListener(v -> {
-          generateInvoicePdf();
-        });
+
         binding.txtStartDate.setOnClickListener(v -> {
             openCalendarDialog("start");
         });
@@ -126,39 +126,26 @@ public class RecentStockistActivity extends AppCompatActivity {
 
 
     }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
         stockitsViewModel.getLiveData().observe(this, responses -> {
             binding.swipeRefreshLayout.setRefreshing(false);
             if (responses != null) {
-                list.clear();
-                SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()); // ✅ API DATE FORMAT FIX
-                SimpleDateFormat filterFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                allResponses.clear();   // ✅ Save master list
+                allResponses.addAll(responses);
 
-                try {
-                    Date start = filterFormat.parse(startDateSelected);
-                    Date end = filterFormat.parse(lastDateSelected);
-
-                    // ✅ Last date ka time 23:59:59 set karein taaki end date bhi include ho
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(end);
-                    cal.set(Calendar.HOUR_OF_DAY, 23);
-                    cal.set(Calendar.MINUTE, 59);
-                    cal.set(Calendar.SECOND, 59);
-                    end = cal.getTime();
-
-                    for (StockitsResponse response : responses) {
-                        Date orderDate = apiFormat.parse(response.getAddtime()); // ✅ Correct API date parsing
-
-                        if (orderDate != null && !orderDate.before(start) && !orderDate.after(end)) {
-                            list.add(response);
-                        }
-                    }
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                filterListByDateRange(); // ✅ Filter based on selected dates
                 adapter.notifyDataSetChanged();
+
+                binding.btnPrintInvoice.setOnClickListener(v -> generateInvoicePdf());
             }
         });
     }
@@ -175,38 +162,34 @@ public class RecentStockistActivity extends AppCompatActivity {
                 .create();
         dialog.show();
         calendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, (month + 1), dayOfMonth);
-            String formattedDate = dayOfMonth + "." + getMonthName(month) + "." + year;
+            String selectedDate = String.format(Locale.getDefault(), "%02d-%02d-%04d", dayOfMonth, (month + 1), year);
+
             if ("start".equals(dateType)) {
                 startDateSelected = selectedDate;
-                binding.txtStartDate.setText(formattedDate);
+                binding.txtStartDate.setText(selectedDate);
             } else if ("last".equals(dateType)) {
                 lastDateSelected = selectedDate;
-                binding.txtLastDate.setText(formattedDate);
+                binding.txtLastDate.setText(selectedDate);
             }
-
-           // Toast.makeText(this, "Start: " + startDateSelected + " End: " + lastDateSelected, Toast.LENGTH_SHORT).show();
-            filterListByDateRange();
             dialog.dismiss();
+            filterListByDateRange();
+
         });
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
     }
-    private String getMonthName(int month) {
-        String[] monthNames = {
-                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        };
-        return monthNames[month]; // Month is 0-based, so this is correct
-    }
+
     private void filterListByDateRange() {
         if (startDateSelected == null || lastDateSelected == null) {
-            onAttachObservers();
+            // Show full list if dates not selected
+            list.clear();
+            list.addAll(allResponses);
+            adapter.updateList(list);
             return;
         }
 
         ArrayList<StockitsResponse> filteredList = new ArrayList<>();
-        SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy ", Locale.getDefault());
+        SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         SimpleDateFormat filterFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
         try {
@@ -220,9 +203,8 @@ public class RecentStockistActivity extends AppCompatActivity {
             cal.set(Calendar.SECOND, 59);
             end = cal.getTime();
 
-            for (StockitsResponse response : list) {
+            for (StockitsResponse response : allResponses) {
                 Date targetDate = apiFormat.parse(response.getAddtime());
-
                 if (targetDate != null && !targetDate.before(start) && !targetDate.after(end)) {
                     filteredList.add(response);
                 }
@@ -232,10 +214,10 @@ public class RecentStockistActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        adapter.updateList(filteredList); // Filtered list update karein
+        list.clear();
+        list.addAll(filteredList);
+        adapter.updateList(list);
     }
-
-
     private void filterListByProductName(String productName) {
         if (productName.isEmpty()) {
             adapter.updateList(list); // Show the full list if input is empty
@@ -321,13 +303,22 @@ public class RecentStockistActivity extends AppCompatActivity {
         binding.txtStartDate.setText(startDateSelected);
     }
     private void generateInvoicePdf() {
-        String dealer = getIntent().getStringExtra("name");
-        if (dealer == null) dealer = ""; // Prevent null pointer issues
+        String dealer = getIntent().getStringExtra("dealerName");
+        if (dealer == null) dealer = "Unknown_Stockist";
 
         if (list == null || list.isEmpty()) {
             Toast.makeText(this, "No order details available", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // Clean the dealer name to make it filename-safe
+        dealer = dealer.replaceAll("[^a-zA-Z0-9\\-_ ]", "").replaceAll(" +", "_");
+
+        // Create timestamp for filename
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+
+        // Final filename
+        String fileName = dealer + "_Invoice_" + timeStamp + ".pdf";
 
         PdfDocument pdfDocument = new PdfDocument();
         Paint paint = new Paint();
@@ -346,7 +337,6 @@ public class RecentStockistActivity extends AppCompatActivity {
         int availableHeight = pageHeight - 150;
 
         int col1 = 150, col2 = 100, col3 = 100, col4 = 100, col5 = 80;
-
         int itemIndex = 0;
 
         while (itemIndex < list.size()) {
@@ -354,11 +344,13 @@ public class RecentStockistActivity extends AppCompatActivity {
             PdfDocument.Page page = pdfDocument.startPage(pageInfo);
             Canvas canvas = page.getCanvas();
 
+            // Title
             titlePaint.setTextSize(20);
             titlePaint.setColor(Color.BLACK);
             titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             canvas.drawText("Purchase Order", 250, marginTop, titlePaint);
 
+            // Dealer Info
             dealerPaint.setTextSize(16);
             dealerPaint.setColor(Color.DKGRAY);
             dealerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
@@ -370,37 +362,34 @@ public class RecentStockistActivity extends AppCompatActivity {
 
             int startX = 50;
             int endX = startX + col1 + col2 + col3 + col4 + col5;
-            int headerBottom = y + rowHeight;
 
-            // **Header Row**
+            // Table headers
             canvas.drawText("Product Name", startX + 10, y + 25, paint);
-            canvas.drawText("Unit", startX + col1 + 10, y + 25, paint);
-            canvas.drawText("Delivery Day", startX + col1 + col2 + 10, y + 25, paint);
-            canvas.drawText("OrderNo", startX + col1 + col2 + col3 + 10, y + 25, paint);
+            canvas.drawText("Quantity", startX + col1 + 10, y + 25, paint);
+            canvas.drawText("Unit", startX + col1 + col2 + 10, y + 25, paint);
+            canvas.drawText("Delivery Day", startX + col1 + col2 + col3 + 10, y + 25, paint);
             canvas.drawText("Remarks", startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
 
-            canvas.drawRect(startX, y, endX, headerBottom, borderPaint);
+            canvas.drawRect(startX, y, endX, y + rowHeight, borderPaint);
             y += rowHeight;
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
 
-            // **Loop through list items**
             while (itemIndex < list.size() && y + rowHeight < availableHeight) {
                 StockitsResponse item = list.get(itemIndex);
 
-                String productName = (item.getProductName() != null) ? item.getProductName() : "";
-                String unitName = (item.getUnitName() != null) ? item.getUnitName() : "";
-                String deliveryDay = (item.getDeliveryDay() != null) ? item.getDeliveryDay() : "";
-               String orderNumber = (item.getOrderNo() != null) ? item.getOrderNo() : "";
+                String productName = item.getProductName() != null ? item.getProductName() : "";
+                String quantity = item.getOrderQty() != null ? item.getOrderQty() : "-";
+                String unit = item.getUnitName() != null ? item.getUnitName() : "-";
+                String deliveryDay = item.getDeliveryDay() != null ? item.getDeliveryDay() : "-";
                 String remarks = "";
 
                 int textY = y;
-                int rowLines = 1;  // Track total lines for row height
+                int rowLines = 1;
 
                 if (productName.equalsIgnoreCase("UNLISTED MEDICINES")) {
-                    String unlistedMedicines = (item.getUnlistedMedicines() != null) ? (String) item.getUnlistedMedicines() : "";
-                    String[] medicineList = unlistedMedicines.split(",");
+                    String unlisted = item.getUnlistedMedicines() != null ? (String) item.getUnlistedMedicines() : "";
+                    String[] lines = unlisted.split(",");
 
-                    // Pehle title likh rahe hain
                     canvas.drawText("UNLISTED MEDICINES", startX + 10, textY + 20, paint);
                     textY += 20;
                     rowLines++;
@@ -408,17 +397,17 @@ public class RecentStockistActivity extends AppCompatActivity {
                     paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
                     paint.setTextSize(12);
 
-                    for (String medicine : medicineList) {
-                        canvas.drawText(medicine.trim(), startX + 10, textY + 20, paint);
+                    for (String line : lines) {
+                        canvas.drawText(line.trim(), startX + 10, textY + 20, paint);
                         textY += 20;
                         rowLines++;
                     }
 
                     paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                    paint.setTextSize(14);
                 } else {
-                    // Agar normal product hai toh normal text wrapping use karein
-                    List<String> wrappedText = wrapText(productName, paint, col1 - 20);
-                    for (String line : wrappedText) {
+                    List<String> wrapped = wrapText(productName, paint, col1 - 20);
+                    for (String line : wrapped) {
                         canvas.drawText(line, startX + 10, textY + 20, paint);
                         textY += 20;
                         rowLines++;
@@ -427,13 +416,11 @@ public class RecentStockistActivity extends AppCompatActivity {
 
                 int actualRowHeight = Math.max(rowHeight, rowLines * 20 + 10);
 
-                // **Other columns**
-                canvas.drawText(!unitName.isEmpty() ? unitName : "-", startX + col1 + 10, y + 25, paint);
-                canvas.drawText(!deliveryDay.isEmpty() ? deliveryDay : "-", startX + col1 + col2 + 10, y + 25, paint);
-                canvas.drawText(!orderNumber.isEmpty() ? orderNumber : "-", startX + col1 + col2 + col3 + 10, y + 25, paint);
+                canvas.drawText(quantity, startX + col1 + 10, y + 25, paint);
+                canvas.drawText(unit, startX + col1 + col2 + 10, y + 25, paint);
+                canvas.drawText(deliveryDay, startX + col1 + col2 + col3 + 10, y + 25, paint);
                 canvas.drawText(remarks, startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
 
-                // **Border draw karna na bhoolen**
                 canvas.drawRect(startX, y, endX, y + actualRowHeight, borderPaint);
 
                 y += actualRowHeight;
@@ -443,19 +430,20 @@ public class RecentStockistActivity extends AppCompatActivity {
             pdfDocument.finishPage(page);
         }
 
-        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Purchase Invoice.pdf");
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
 
         try {
             pdfDocument.writeTo(new FileOutputStream(file));
-            Toast.makeText(this, "PDF Saved Successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "PDF saved as " + fileName, Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Failed to Save PDF", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to save PDF", Toast.LENGTH_SHORT).show();
         }
 
         pdfDocument.close();
         openPdf(file);
     }
+
 
 
 

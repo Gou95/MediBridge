@@ -13,7 +13,7 @@
         android:layout_weight="1"
         android:contentDescription="@string/logo"
         android:padding="20dp"
-        app:srcCompat="@drawable/medibro" />
+        app:srcCompat="@drawable/logomedi" />
 
     <TextView
         android:id="@+id/heading"
@@ -25,7 +25,12 @@
         android:fontFamily="@font/gotham_bold"
         android:text="@string/heading"
         android:textColor="@color/black"
-        android:textSize="20sp" />
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="16sp"
+        android:autoSizeMaxTextSize="18sp"
+        android:autoSizeStepGranularity="1sp"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"/>
 
     <TextView
         android:id="@+id/textPage"
@@ -41,6 +46,11 @@
         android:text="@string/text"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="16sp" />
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeMaxTextSize="18sp"
+        android:autoSizeStepGranularity="1sp"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"/>
 
 </LinearLayout>

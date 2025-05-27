@@ -4,6 +4,8 @@ import com.indosoft.medibridge.Body.AddressUpdateBody;
 import com.indosoft.medibridge.Body.AddtoCartBody;
 import com.indosoft.medibridge.Body.ExitMobileBody;
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
+import com.indosoft.medibridge.Body.RegisterExpiryBody;
+import com.indosoft.medibridge.Body.SendEmailBody;
 import com.indosoft.medibridge.Body.SignUpBody;
 import com.indosoft.medibridge.Body.StockistBody;
 import com.indosoft.medibridge.Body.UnlistedBody;
@@ -13,7 +15,6 @@ import com.indosoft.medibridge.Model.AddressUpdateResponse;
 import com.indosoft.medibridge.Model.AddtoCartResponse;
 import com.indosoft.medibridge.Model.CardListResponse;
 import com.indosoft.medibridge.Model.CityDealerResponse;
-import com.indosoft.medibridge.Model.CounterResponse;
 import com.indosoft.medibridge.Model.DealersResponse;
 import com.indosoft.medibridge.Model.DeleteCartResponse;
 import com.indosoft.medibridge.Model.DeliveryDayResponse;
@@ -37,9 +38,11 @@ import com.indosoft.medibridge.Model.PlansResponse;
 import com.indosoft.medibridge.Model.ProceedOrderResponse;
 import com.indosoft.medibridge.Model.QuantityChangeResponse;
 import com.indosoft.medibridge.Model.RecentStockitsResponse;
+import com.indosoft.medibridge.Model.RecievedOrderResponse;
 import com.indosoft.medibridge.Model.ShowCartResponse;
 import com.indosoft.medibridge.Model.SignUpResponse;
 import com.indosoft.medibridge.Model.StateCityResponse;
+import com.indosoft.medibridge.Model.StockistListResponse;
 import com.indosoft.medibridge.Model.StockitsResponse;
 import com.indosoft.medibridge.Model.UnitResponse;
 import com.indosoft.medibridge.Model.UrgentCartResponse;
@@ -93,8 +96,8 @@ public interface ApiInterface {
     Call<List<ShowCartResponse>> showCartList(@Query("retailer_id") String retailer_id);
 
 
-    @POST("login.php")
-    Call<List<LoginResponse>> loginRes(@Query("retailer_phone") String retailer_phone, @Query("retailer_password") String retailer_password);
+    @POST("login_verify.php")
+    Call<LoginResponse> loginRes(@Query("retailer_phone") String retailer_phone, @Query("retailer_password") String retailer_password);
 
     @POST("users.php")
     Call<SignUpResponse> getRegisterRes(@Body SignUpBody body);
@@ -141,9 +144,13 @@ public interface ApiInterface {
     @POST("orders.php")
     Call<OrderResponse> orderRes(@Query("retailer_id") String retailer_id, @Query("order_no") String order_no);
 
-    @POST("orderdetails.php")
-    Call<List<OrderDetailsResponse>> getOrderDetails(@Query("retailer_id") String retailer_id, @Query("order_no") String order_no,
+    @POST("orderdetails_stockist.php")
+    Call<List<OrderDetailsResponse>> stockisOrderDetails(@Query("retailer_id") String retailer_id, @Query("order_no") String order_no,
                                                      @Query("dealer_id") String dealer_id, @Query("order_status") String order_status);
+    @POST("orderdetails.php")
+    Call<List<OrderDetailsResponse>> getOrderDetails(@Query("retailer_id") String retailer_id);
+    @DELETE("orderdetails.php")
+    Call<SignUpResponse> deleteOrder(@Query("order_items_id") String order_items_id );
 
     @DELETE("urgentcart.php")
     Call<UrgentDeleteResponse> deleteUrgentCart(@Query("cart_id") String cart_id);
@@ -155,7 +162,7 @@ public interface ApiInterface {
     Call<List<RecentStockitsResponse>> recentStockits(@Query("retailer_id") String retailer_id);
 
     @POST("stockistorderdetails.php")
-    Call<List<StockitsResponse>> stockitsList(@Query("retailer_id") String retailer_id, @Query("dealer_id") String dealer_id);
+    Call<List<StockitsResponse>>stockitsList(@Query("retailer_id") String retailer_id, @Query("dealer_id") String dealer_id);
 
     @PUT("showcart.php")
     Call<DeliveryDayResponse> deliveryDay(@Query("cart_id") String cart_id, @Query("delivery_day") String delivery_day);
@@ -184,6 +191,8 @@ public interface ApiInterface {
     Call<List<ExpiryListResponse>> getExpiryList();
     @POST("expiryregister.php")
     Call<SignUpResponse> expiryRegister(@Body ExpiryRegisterBody body);
+    @PUT("expiryregister.php")
+    Call<SignUpResponse> registerExpiry(@Body RegisterExpiryBody body);
 
     @POST("unlistedproducts.php")
     Call<SignUpResponse> unlistedMedicine(@Body UnlistedBody body);
@@ -200,4 +209,18 @@ public interface ApiInterface {
     Call<SignUpResponse> updateRetailerImage(
             @Part MultipartBody.Part image
     );
+    @POST("stockistlist.php")
+    Call<List<StockistListResponse>> stockistList(@Query("city_id") String city_id);
+    @PUT("retailerorderdetails.php")
+    Call<SignUpResponse> getOrderStatus(@Query("order_items_id") String order_items_id, @Query("order_status") String order_status);
+
+    @POST("receivedorderdetails.php")
+    Call<List<RecievedOrderResponse>> getRecievedProduct(@Query("retailer_id") String retailer_id);
+    @POST("send_email.php")
+    Call<SignUpResponse> sendEmail(@Body SendEmailBody body);
+
+    @PUT("reset_password.php")
+    Call<SignUpResponse> resetPassword(@Query("retailer_id") String retailer_id,@Query("retailer_password") String retailer_password);
+
+
 }

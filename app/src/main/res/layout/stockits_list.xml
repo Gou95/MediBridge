@@ -24,19 +24,29 @@
                 android:id="@+id/txt_serialNo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
                 android:fontFamily="@font/gotham_bold"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
 
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
                 android:fontFamily="@font/gotham_bold"
                 android:text="Product Name :"
                 android:layout_marginStart="5dp"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"
                 />
 
             <TextView
@@ -46,7 +56,12 @@
                 android:textColor="@color/black"
                 android:layout_marginStart="5dp"
                 android:fontFamily="@font/gotham_bold"
-                android:textSize="14sp"/>
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
 
         </LinearLayout>
 
@@ -64,8 +79,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/purple_700"
-                android:textSize="14sp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
                 android:fontFamily="@font/gotham_bold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"
                 />
 
             <TextView
@@ -73,9 +93,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
                 android:layout_marginStart="10dp"
                 android:fontFamily="@font/gotham_bold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"
                 />
 
         </LinearLayout>
@@ -84,9 +109,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:textSize="14sp"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeStepGranularity="1sp"
             android:fontFamily="@font/gotham_bold"
             android:visibility="gone"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
             />
         <LinearLayout
             android:layout_width="wrap_content"
@@ -99,9 +129,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
                 android:text="OrderNo:"
                 android:fontFamily="@font/gotham_bold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"
                 />
 
             <TextView
@@ -109,9 +144,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
                 android:layout_marginStart="10dp"
                 android:fontFamily="@font/gotham_bold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"
                 />
 
         </LinearLayout>
@@ -127,9 +167,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
                 android:fontFamily="@font/gotham_bold"
                 android:text="Delivery Day :"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"
                 />
 
             <TextView
@@ -137,9 +182,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
                 android:fontFamily="@font/gotham_bold"
                 android:layout_marginStart="5dp"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"
                 />
 
         </LinearLayout>
@@ -156,6 +206,9 @@
             android:textSize="14sp"
             android:fontFamily="@font/gotham_light"
             android:layout_marginTop="5dp"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+
             />
 
 

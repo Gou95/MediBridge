@@ -2,21 +2,28 @@ package com.indosoft.medibridge.Fragment;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.indosoft.medibridge.Activities.DashBoardActivity;
 import com.indosoft.medibridge.Adapter.OrderListAdapter;
 import com.indosoft.medibridge.Model.OrderListResponse;
 import com.indosoft.medibridge.R;
@@ -40,6 +47,8 @@ FragmentOrderBinding binding;
     OrderListViewModel viewModel;
     OrderListAdapter adapter;
     ArrayList<OrderListResponse> list = new ArrayList<>();
+    ArrayList<OrderListResponse> fullList = new ArrayList<>();
+
     private String startDateSelected = null;
     private String lastDateSelected = null;
     private boolean isReceiverRegistered = false;
@@ -47,7 +56,7 @@ FragmentOrderBinding binding;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         binding= FragmentOrderBinding.inflate(inflater, container, false);
         viewModel = new ViewModelProvider(this).get(OrderListViewModel.class);
         viewModel.init(requireContext());
@@ -56,20 +65,17 @@ FragmentOrderBinding binding;
 
         viewModel.orderList(retailerId);
 
-
         startNetworkCheckService();
         handleBackPress();
         setDefaultDates();
-
-        binding.swipeRefreshLayout.setOnRefreshListener(this::refreshOrderList);
-        binding.swipeRefreshLayout.setRefreshing(false);
         refreshOrderList();
-
-
+        initClicks();
         adapter = new OrderListAdapter(requireContext(), list);
         binding.orderRecyclerview.setAdapter(adapter);
         binding.orderRecyclerview.setLayoutManager(new LinearLayoutManager(requireContext()));
-        initClicks();
+        binding.swipeRefreshLayout.setOnRefreshListener(this::refreshOrderList);
+        binding.swipeRefreshLayout.setRefreshing(false);
+
         return binding.getRoot();
     }
 
@@ -86,6 +92,15 @@ FragmentOrderBinding binding;
         binding.txtStartDate.setOnClickListener(v -> openCalendarDialog("start"));
         binding.txtLastDate.setOnClickListener(v -> openCalendarDialog("last"));
 
+        TextView title = binding.txtActive;
+        SpannableString spannable = new SpannableString("Active Orders");
+
+
+        int blue = ContextCompat.getColor(getContext(), R.color.blue_light);
+        int red = ContextCompat.getColor(getContext(), R.color.orange_dark);
+        spannable.setSpan(new ForegroundColorSpan(blue), 0, 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 7, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(spannable);
     }
 
     private void refreshOrderList() {
@@ -95,43 +110,18 @@ FragmentOrderBinding binding;
 
         viewModel.getLiveData().observe(getViewLifecycleOwner(), responses -> {
             binding.swipeRefreshLayout.setRefreshing(false);
+            fullList.clear();   // clear old data
+            list.clear();       // clear old data
             if (responses != null) {
-                list.clear();
-                SimpleDateFormat apiFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-                SimpleDateFormat filterFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-
-                try {
-                    Date start = filterFormat.parse(startDateSelected);
-                    Date end = filterFormat.parse(lastDateSelected);
-
-                    // Ensure end date covers entire day
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(end);
-                    cal.set(Calendar.HOUR_OF_DAY, 23);
-                    cal.set(Calendar.MINUTE, 59);
-                    cal.set(Calendar.SECOND, 59);
-                    end = cal.getTime();
-
-                    for (OrderListResponse response : responses) {
-                        Date orderDate = apiFormat.parse(response.getAddtime());
-                        if (orderDate != null && !orderDate.before(start) && !orderDate.after(end)) {
-                            list.add(response);
-                        }
-                    }
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                adapter.updateList(list);
+                fullList.addAll(responses); // save full list from API
+                filterListByDateRange();    // do initial filtering using selected dates
             } else {
                 Toast.makeText(getContext(), "Failed to load data", Toast.LENGTH_SHORT).show();
             }
         });
+
+
     }
-
-
-
     private void openCalendarDialog(String dateType) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View calendarView = inflater.inflate(R.layout.custom_calendar, null);
@@ -162,7 +152,7 @@ FragmentOrderBinding binding;
     }
     private void filterListByDateRange() {
         if (startDateSelected == null || lastDateSelected == null) {
-            refreshOrderList();
+            adapter.updateList(fullList); // fallback to full list
             return;
         }
 
@@ -182,7 +172,8 @@ FragmentOrderBinding binding;
             cal.set(Calendar.SECOND, 59);
             end = cal.getTime();
 
-            for (OrderListResponse response : list) {
+            // 🔴 Filter from fullList instead of already filtered 'list'
+            for (OrderListResponse response : fullList) {
                 Date orderDate = apiFormat.parse(response.getAddtime());
                 if (orderDate != null && !orderDate.before(start) && !orderDate.after(end)) {
                     filteredList.add(response);
@@ -193,8 +184,12 @@ FragmentOrderBinding binding;
             e.printStackTrace();
         }
 
-        adapter.updateList(filteredList);
+        list.clear();
+        list.addAll(filteredList);  // update current list
+        adapter.updateList(list);
     }
+
+
 
     private void startNetworkCheckService() {
         Intent serviceIntent = new Intent(getContext(), NetworkCheckService.class);
@@ -207,11 +202,14 @@ FragmentOrderBinding binding;
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+
                 if (isAdded()) {
                     FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_container, new HomeFragment(), "HomeFragment");
+
                     transaction.commit();
-                } else {
+                }
+                else {
 
                     System.out.println("Fragment is not attached to an activity.");
                 }
@@ -228,5 +226,12 @@ FragmentOrderBinding binding;
         startDateSelected = sdf.format(calendar.getTime());
         binding.txtStartDate.setText(startDateSelected);
     }
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 }

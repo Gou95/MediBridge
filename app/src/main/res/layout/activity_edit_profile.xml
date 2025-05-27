@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".Activities.EditProfileActivity">
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
@@ -21,8 +22,10 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="10dp">
+               >
 
 
                 <ImageView
@@ -33,17 +36,23 @@
                     android:layout_centerVertical="true"/>
 
                 <TextView
+                    android:id="@+id/txt_profile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Profile"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:fontFamily="@font/gotham_bold"
-                    android:layout_marginHorizontal="20dp"
                     android:layout_centerVertical="true"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
+                    android:layout_centerInParent="true"
                     android:gravity="center"
-                    android:textStyle="bold"
-                    android:layout_marginTop="20dp"/>
+
+                   />
 
 
 
@@ -69,10 +78,15 @@
                         android:layout_height="wrap_content"
                         android:text="Shop Name"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
                         android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="20dp"/>
+                        android:layout_marginTop="20dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
                     <EditText
@@ -83,7 +97,10 @@
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="20dp"
                         android:textColor="@color/black"
-                        android:textSize="16sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:paddingLeft="10dp"
                         android:fontFamily="@font/gotham_bold"
                         android:gravity="center_vertical"
@@ -94,10 +111,15 @@
                         android:layout_height="wrap_content"
                         android:text="Contact Person"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
                         android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="20dp"/>
+                        android:layout_marginTop="20dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
                     <EditText
@@ -111,6 +133,10 @@
                         android:imeOptions="actionNext"
                         android:fontFamily="@font/gotham_bold"
                         android:paddingLeft="10dp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:layout_marginBottom="10dp"/>
 
 
@@ -119,10 +145,15 @@
                         android:layout_height="wrap_content"
                         android:text="Email"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
                         android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
                     <EditText
@@ -136,7 +167,11 @@
                         android:imeOptions="actionNext"
                         android:fontFamily="@font/gotham_bold"
                         android:inputType="textEmailAddress"
-                        android:layout_marginBottom="10dp"/>
+                        android:layout_marginBottom="10dp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"/>
 
 
                     <TextView
@@ -144,10 +179,15 @@
                         android:layout_height="wrap_content"
                         android:text="Phone No."
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
                         android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
                     <TextView
@@ -159,10 +199,15 @@
                         android:layout_marginTop="20dp"
                         android:textColor="@color/black"
                         android:gravity="center_vertical"
-                        android:textSize="16sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
                         android:paddingLeft="10dp"
-                        android:layout_marginBottom="10dp"/>
+                        android:layout_marginBottom="10dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
 
@@ -173,10 +218,15 @@
                         android:layout_height="wrap_content"
                         android:text="DL No."
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
                         android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
                     <EditText
@@ -189,7 +239,11 @@
                         android:paddingLeft="10dp"
                         android:fontFamily="@font/gotham_bold"
                         android:imeOptions="actionNext"
-                        android:layout_marginBottom="10dp"/>
+                        android:layout_marginBottom="10dp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"/>
 
 
                     <TextView
@@ -197,10 +251,15 @@
                         android:layout_height="wrap_content"
                         android:text="GST No."
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
                         android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
                     <EditText
@@ -213,7 +272,11 @@
                         android:paddingLeft="10dp"
                         android:fontFamily="@font/gotham_bold"
                         android:imeOptions="actionNext"
-                        android:layout_marginBottom="10dp"/>
+                        android:layout_marginBottom="10dp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"/>
 
 
                     <RelativeLayout
@@ -221,6 +284,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="20dp"
+                        android:visibility="gone"
                      >
                         <LinearLayout
                             android:layout_width="200dp"
@@ -286,10 +350,14 @@
                             android:layout_height="match_parent"
                             android:text="Submit"
                             android:textColor="@color/white"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="16sp"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeStepGranularity="1sp"
                             android:fontFamily="@font/gotham_bold"
-                            android:gravity="center"/>
+                            android:gravity="center"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"/>
 
 
                     </androidx.cardview.widget.CardView>

@@ -10,6 +10,9 @@ public class UpdateStatusBody {
     @SerializedName("subscription_plan")
     @Expose
     private String subscriptionPlan;
+    @SerializedName("subscription_id")
+    @Expose
+    private String subscriptionId;
 
     public String getSubsExpiryDate() {
         return subsExpiryDate;
@@ -27,4 +30,11 @@ public class UpdateStatusBody {
         this.subscriptionPlan = subscriptionPlan;
     }
 
+    public String getSubscriptionId() {
+        return subscriptionId;
+    }
+
+    public void setSubscriptionId(String subscriptionId) {
+        this.subscriptionId = subscriptionId;
+    }
 }

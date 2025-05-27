@@ -18,7 +18,7 @@ import retrofit2.Response;
 public class LoginRepository {
     public static LoginRepository repository;
 
-    private final MutableLiveData<List<LoginResponse>> mutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<LoginResponse> mutableLiveData = new MutableLiveData<>();
 
 
     // Singleton pattern
@@ -36,11 +36,11 @@ public class LoginRepository {
         apiInterface = RetrofitService.userService(ApiInterface.class);
     }
 
-    public MutableLiveData<List<LoginResponse>> getLoginData(Context context,String retailer_phone,String retailer_password, LoginListener listener) {
-        Call<List<LoginResponse>> call = apiInterface.loginRes(retailer_phone,retailer_password);
-        call.enqueue(new Callback<List<LoginResponse>>() {
+    public MutableLiveData<LoginResponse> getLoginData(Context context,String retailer_phone,String retailer_password, LoginListener listener) {
+        Call<LoginResponse> call = apiInterface.loginRes(retailer_phone,retailer_password);
+        call.enqueue(new Callback<LoginResponse>() {
             @Override
-            public void onResponse(Call<List<LoginResponse>> call, Response<List<LoginResponse>> response) {
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     listener.onSuccess(response.body());
 
@@ -53,7 +53,7 @@ public class LoginRepository {
             }
 
             @Override
-            public void onFailure(Call<List<LoginResponse>> call, Throwable t) {
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
                 listener.onError("Something went wrong: " + t.getMessage());
 
             }

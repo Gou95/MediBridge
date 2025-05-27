@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".Activities.UnlistedStockistActivity">
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
@@ -21,7 +22,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:padding="10dp">
 
 
                 <ImageView
@@ -32,17 +34,22 @@
                     android:layout_centerVertical="true"/>
 
                 <TextView
+                    android:id="@+id/txt_unlisted"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Unlisted Stockist"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:fontFamily="@font/gotham_bold"
                     android:layout_marginHorizontal="20dp"
                     android:layout_centerVertical="true"
                     android:gravity="center"
-                    android:textStyle="bold"
-                    android:layout_marginTop="20dp"/>
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
+                    />
 
 
 
@@ -63,80 +70,103 @@
 
 
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="GST No"
-                        android:textColor="@color/black"
-                        android:textSize="17sp"
-                        android:fontFamily="@font/gotham_bold"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="20dp"/>
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="GST No"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:autoSizeTextType="uniform"-->
+<!--                        android:autoSizeMinTextSize="16sp"-->
+<!--                        android:autoSizeMaxTextSize="18sp"-->
+<!--                        android:autoSizeStepGranularity="1sp"-->
+<!--                        android:fontFamily="@font/gotham_bold"-->
+<!--                        android:layout_marginHorizontal="20dp"-->
+<!--                        android:layout_marginTop="20dp"/>-->
 
 
-                    <EditText
-                        android:id="@+id/edt_gstNo"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/edit_background"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="20dp"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:paddingLeft="10dp"
-                        android:fontFamily="@font/gotham_bold"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="10dp"/>
+<!--                    <EditText-->
+<!--                        android:id="@+id/edt_gstNo"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="40dp"-->
+<!--                        android:background="@drawable/edit_background"-->
+<!--                        android:layout_marginHorizontal="20dp"-->
+<!--                        android:layout_marginTop="20dp"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:autoSizeTextType="uniform"-->
+<!--                        android:autoSizeMinTextSize="14sp"-->
+<!--                        android:autoSizeMaxTextSize="16sp"-->
+<!--                        android:autoSizeStepGranularity="1sp"-->
+<!--                        android:paddingLeft="10dp"-->
+<!--                        android:fontFamily="@font/gotham_bold"-->
+<!--                        android:gravity="center_vertical"-->
+<!--                        android:layout_marginBottom="10dp"/>-->
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Stockist Name"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
                         android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="20dp"/>
+                        android:layout_marginTop="20dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
-                    <EditText
-                        android:id="@+id/edt_stockist"
+                    <AutoCompleteTextView
+                        android:id="@+id/auto_stockist"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/edit_background"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="20dp"
-                        android:inputType="text"
-                        android:imeOptions="actionNext"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/gothambook"
                         android:paddingLeft="10dp"
-                        android:layout_marginBottom="10dp"/>
+                        android:hint="enter stockist name"
+                        android:layout_marginBottom="10dp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:completionThreshold="1"
+                     />
 
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Mobile Number"
-                        android:textColor="@color/black"
-                        android:textSize="17sp"
-                        android:fontFamily="@font/gotham_bold"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="10dp"/>
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Mobile Number"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:autoSizeTextType="uniform"-->
+<!--                        android:autoSizeMinTextSize="16sp"-->
+<!--                        android:autoSizeMaxTextSize="18sp"-->
+<!--                        android:autoSizeStepGranularity="1sp"-->
+<!--                        android:fontFamily="@font/gotham_bold"-->
+<!--                        android:layout_marginHorizontal="20dp"-->
+<!--                        android:layout_marginTop="10dp"/>-->
 
 
-                    <EditText
-                        android:id="@+id/edt_mobileNum"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/edit_background"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="20dp"
-                        android:paddingLeft="10dp"
-                        android:imeOptions="actionNext"
-                        android:fontFamily="@font/gotham_bold"
-                        android:inputType="number"
-                        android:maxLength="10"
-                        android:layout_marginBottom="10dp"/>
+<!--                    <EditText-->
+<!--                        android:id="@+id/edt_mobileNum"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="40dp"-->
+<!--                        android:background="@drawable/edit_background"-->
+<!--                        android:layout_marginHorizontal="20dp"-->
+<!--                        android:layout_marginTop="20dp"-->
+<!--                        android:paddingLeft="10dp"-->
+<!--                        android:imeOptions="actionNext"-->
+<!--                        android:fontFamily="@font/gotham_bold"-->
+<!--                        android:inputType="number"-->
+<!--                        android:maxLength="10"-->
+<!--                        android:autoSizeTextType="uniform"-->
+<!--                        android:autoSizeMinTextSize="14sp"-->
+<!--                        android:autoSizeMaxTextSize="16sp"-->
+<!--                        android:autoSizeStepGranularity="1sp"-->
+<!--                        android:layout_marginBottom="10dp"/>-->
 
 
                     <LinearLayout
@@ -160,13 +190,17 @@
                             android:id="@+id/edt_state"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="16sp"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
                             android:paddingLeft="10dp"
                             android:background="@null"
                             android:layout_gravity="center"
                             android:hint="select State"
                             android:inputType="text"
                             android:fontFamily="@font/gothambook"
+                            android:textColorHint="@color/black"
                             />
                     </LinearLayout>
 
@@ -190,18 +224,42 @@
                             android:id="@+id/edt_city"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="16sp"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
                             android:paddingLeft="10dp"
                             android:background="@null"
                             android:layout_gravity="center"
                             android:hint="select city"
                             android:inputType="text"
                             android:fontFamily="@font/gothambook"
+                            android:textColorHint="@color/black"
                             />
+
+
 
 
                     </LinearLayout>
 
+                    <EditText
+                        android:id="@+id/edt_stockistAdd"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@drawable/edit_background"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="20dp"
+                        android:inputType="text"
+                        android:imeOptions="actionNext"
+                        android:fontFamily="@font/gothambook"
+                        android:paddingLeft="10dp"
+                        android:hint="enter address"
+                        android:layout_marginBottom="10dp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                       />
 
 
                     <androidx.cardview.widget.CardView
@@ -220,8 +278,12 @@
                             android:layout_height="match_parent"
                             android:text="Submit"
                             android:textColor="@color/white"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="16sp"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"
                             android:fontFamily="@font/gotham_bold"
                             android:gravity="center"/>
 
