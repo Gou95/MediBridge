@@ -227,7 +227,19 @@ public class HomeFragment extends Fragment {
         });
     }
 
-
+    private void setUpImageSlider() {
+        ArrayList<SlideModel> imageList = new ArrayList<>();
+        imageList.add(new SlideModel(R.drawable.slides_4, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_5, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_6, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_7 , ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_8 , ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slide_1, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slide_2, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_3 , ScaleTypes.FIT));
+        imageSlider.setImageList(imageList, ScaleTypes.CENTER_CROP);
+        imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
+    }
 
     @SuppressLint("ResourceAsColor")
     private void initCliks() {
@@ -686,14 +698,7 @@ public class HomeFragment extends Fragment {
         Intent intent = new Intent(getContext(), activityClass);
         startActivity(intent);
     }
-    private void setUpImageSlider() {
-        ArrayList<SlideModel> imageList = new ArrayList<>();
-        imageList.add(new SlideModel(R.drawable.slide_1, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slide_2, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_3 , ScaleTypes.FIT));
-        imageSlider.setImageList(imageList, ScaleTypes.CENTER_CROP);
-        imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
-    }
+
 
 
 }

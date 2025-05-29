@@ -9,7 +9,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView_plans"
         android:layout_width="match_parent"
-        android:layout_height="135dp"
+        android:layout_height="200dp"
         app:cardCornerRadius="10dp"
         app:cardElevation="11dp"
         android:layout_margin="10dp"
@@ -24,10 +24,11 @@
             >
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/logomedi"
-                android:layout_gravity="center"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/slide_subscription"
+                android:scaleType="fitXY"
+               />
 
             <TextView
                 android:id="@+id/txt_subsName"
@@ -59,6 +60,7 @@
                 android:includeFontPadding="false"/>
 
         </LinearLayout>
+
 
 
     </androidx.cardview.widget.CardView>

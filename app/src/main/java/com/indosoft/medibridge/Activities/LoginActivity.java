@@ -47,7 +47,6 @@ ActivityLoginBinding binding;
     ArrayList<GetSignUpUserResponse> getAllUserList = new ArrayList<>();
     GetSignUpUserViewModel sign;
     private boolean isReceiverRegistered = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

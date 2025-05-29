@@ -82,6 +82,7 @@ dependencies {
     implementation 'com.itextpdf:itext7-core:7.1.15'
     implementation 'androidx.webkit:webkit:1.6.1'
     implementation 'com.android.volley:volley:1.2.1'
+    implementation 'com.caverock:androidsvg:1.4'
 
 
 

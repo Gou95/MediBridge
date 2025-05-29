@@ -238,11 +238,11 @@
                                     app:cardElevation="11dp">
 
                                     <ImageView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/todaysregister" />
+                                        android:src="@drawable/icon_today" />
 
                                 </androidx.cardview.widget.CardView>
 
@@ -291,11 +291,11 @@
                                     app:cardElevation="11dp">
 
                                     <ImageView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/unlisted_stockist" />
+                                        android:src="@drawable/icon_all__demands" />
 
                                 </androidx.cardview.widget.CardView>
 
@@ -345,11 +345,11 @@
                                     app:cardElevation="11dp">
 
                                     <ImageView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/received" />
+                                        android:src="@drawable/icon_recieved" />
 
                                 </androidx.cardview.widget.CardView>
 
@@ -398,11 +398,11 @@
                                     app:cardElevation="11dp">
 
                                     <ImageView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/expiry_list" />
+                                        android:src="@drawable/icon_expiry_list" />
 
                                 </androidx.cardview.widget.CardView>
 
@@ -453,11 +453,11 @@
                                     app:cardElevation="11dp">
 
                                     <ImageView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/unlisted_stockist" />
+                                        android:src="@drawable/icon_unlisted_stockist" />
 
                                 </androidx.cardview.widget.CardView>
 
@@ -512,11 +512,11 @@
                                     app:cardElevation="11dp">
 
                                     <ImageView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/stockist_list" />
+                                        android:src="@drawable/icon_stockist_list" />
 
                                 </androidx.cardview.widget.CardView>
 

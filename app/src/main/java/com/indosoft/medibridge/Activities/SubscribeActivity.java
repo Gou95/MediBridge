@@ -56,7 +56,9 @@ public class SubscribeActivity extends AppCompatActivity implements PaymentResul
         onAttachObservers();
         adapter = new SubsCriptionAdapter(this,list);
         binding.recyclerViewPlan.setAdapter(adapter);
-        binding.recyclerViewPlan.setLayoutManager(new GridLayoutManager(this,2));
+        binding.recyclerViewPlan.setLayoutManager(new LinearLayoutManager(this
+        ));
+      //  binding.recyclerViewPlan.setLayoutManager(new GridLayoutManager(this,2));
 
         if (getIntent().hasExtra("amount") && getIntent().hasExtra("planId")) {
             int amount = getIntent().getIntExtra("amount", 0);

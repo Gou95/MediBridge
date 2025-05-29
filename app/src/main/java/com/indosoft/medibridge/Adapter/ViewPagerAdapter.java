@@ -25,9 +25,9 @@ public class ViewPagerAdapter extends PagerAdapter {
     };
 
     private int[] imageResources = {
-            R.drawable.slide_1,
-            R.drawable.slide_2,
-            R.drawable.slides_3
+            R.drawable.slides_one,
+            R.drawable.slides_two,
+            R.drawable.slides_three
     };
 
     public ViewPagerAdapter(Context context) {

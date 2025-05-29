@@ -28,12 +28,9 @@
         android:fontFamily="@font/gotham_bold"
         android:text="Subscribe Now"
         android:textColor="@color/black"
-        android:autoSizeTextType="uniform"
-        android:autoSizeMinTextSize="16sp"
-        android:autoSizeMaxTextSize="18sp"
-        android:autoSizeStepGranularity="1sp"
-        android:importantForAccessibility="no"
-        android:includeFontPadding="false"/>
+        android:textSize="18sp"
+
+   />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewPlan"
