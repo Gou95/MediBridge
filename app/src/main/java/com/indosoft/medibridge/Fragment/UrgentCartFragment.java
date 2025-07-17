@@ -54,7 +54,7 @@ public class UrgentCartFragment extends Fragment {
         urgentDeleteViewModel.init(getContext());
 
         String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
-        Toast.makeText(getContext(), retailerId, Toast.LENGTH_SHORT).show();
+
         viewModel.getRemoveAllCartData(retailerId);
         onAttachobservers();
         initClicks();
@@ -99,7 +99,6 @@ public class UrgentCartFragment extends Fragment {
                 list.clear();
                 list.addAll(responses);
                 urgentCartAdapter.notifyDataSetChanged();
-
                 updateCartUI(true);
 
             } else {
@@ -153,7 +152,6 @@ public class UrgentCartFragment extends Fragment {
                 list.clear();
                 urgentCartAdapter.notifyDataSetChanged();
 
-
                 if (getActivity() instanceof DashBoardActivity) {
                     ((DashBoardActivity) getActivity()).clearUrgentBadge();  // Clear the badge on the floating button
                 }
@@ -189,8 +187,6 @@ public class UrgentCartFragment extends Fragment {
         requireActivity().startService(serviceIntent);
 
     }
-
-
     private void handleBackPress() {
         requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), new OnBackPressedCallback(true) {
             @Override
@@ -202,9 +198,6 @@ public class UrgentCartFragment extends Fragment {
         });
     }
 
-
-
-
     private void updateCartUI(boolean isCartNotEmpty) {
         if (isCartNotEmpty) {
             binding.recyclerView.setVisibility(View.VISIBLE);
@@ -215,14 +208,6 @@ public class UrgentCartFragment extends Fragment {
             binding.linearHide.setVisibility(View.VISIBLE);
             binding.btnAddCart.setVisibility(View.GONE);
         }
-//        int cartCount = list.size();  // Get the count of items in the list
-//        if (getActivity() instanceof DashBoardActivity) {
-//            ((DashBoardActivity) getActivity()).updateUrgentBadge(cartCount);
-//        }
-    }
 
-    private void saveCartCountToStorage(int count) {
-        AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, String.valueOf(count));
     }
-
 }

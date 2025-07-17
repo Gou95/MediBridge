@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragment.OrderFragment">
 
@@ -16,59 +17,50 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             >
-            <LinearLayout
-                android:id="@+id/linear_unActive"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:visibility="gone">
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="horizontal"
+             android:layout_marginHorizontal="10dp"
+             android:layout_marginTop="10dp">
+
+             <ImageView
+                 android:id="@+id/img_back"
+                 android:layout_width="30dp"
+                 android:layout_height="30dp"
+                 android:src="@drawable/backarrow"
+                 android:layout_centerVertical="true"
+                 />
 
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/inactiveorder"
-                    />
+             <TextView
+                 android:id="@+id/txt_active"
+                 android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 android:text="Active Orders"
+                 android:autoSizeTextType="uniform"
+                 android:autoSizeMinTextSize="14sp"
+                 android:autoSizeMaxTextSize="16sp"
+                 android:autoSizeStepGranularity="1sp"
+                 android:fontFamily="@font/gotham_bold"
+                 android:gravity="center"
+                 android:importantForAccessibility="no"
+                 android:includeFontPadding="false"/>
 
 
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/linear_active"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                >
 
-                <ImageView
-                    android:id="@+id/img_back"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/backarrow"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"/>
+         </LinearLayout>
 
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Active Orders"
-                    android:textColor="@color/green"
-                    android:textSize="20sp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="10dp"
-                    android:textStyle="bold"/>
 
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="15dp"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="11dp"
-                    app:cardBackgroundColor="@color/white"
                     android:layout_marginHorizontal="5dp"
                     >
 
@@ -76,16 +68,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="10dp"
                         android:layout_marginHorizontal="10dp"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginBottom="5dp">
+                        android:layout_marginBottom="10dp">
 
                         <ImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/calendr"
-                            android:scaleType="fitXY"/>
+                            android:scaleType="fitXY"
+                            />
 
                         <TextView
                             android:id="@+id/txt_startDate"
@@ -93,10 +86,15 @@
                             android:layout_height="wrap_content"
                             android:text="Start Date"
                             android:textColor="@color/black"
-                            android:textSize="16sp"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
                             android:fontFamily="@font/gothambook"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginStart="20dp"/>
+                            android:layout_marginStart="20dp"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"/>
 
 
                         <TextView
@@ -106,10 +104,15 @@
                             android:text="Last date"
                             android:textColor="@color/black"
                             android:gravity="end"
-                            android:textSize="16sp"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
                             android:fontFamily="@font/gothambook"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginStart="20dp"/>
+                            android:layout_marginStart="20dp"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"/>
 
 
 
@@ -140,7 +143,7 @@
 
             </LinearLayout>
 
-        </LinearLayout>
+
 
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

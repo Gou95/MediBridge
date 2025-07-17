@@ -6,11 +6,20 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.indosoft.medibridge.Body.ExpiryRegisterBody;
+import com.indosoft.medibridge.Body.PosAddBody;
+import com.indosoft.medibridge.Body.PosUpdateBody;
+import com.indosoft.medibridge.Body.RegisterExpiryBody;
+import com.indosoft.medibridge.Body.SendEmailBody;
 import com.indosoft.medibridge.Body.SignUpBody;
 import com.indosoft.medibridge.Body.StockistBody;
+import com.indosoft.medibridge.Body.UnlistedBody;
+import com.indosoft.medibridge.Body.UpdateStatusBody;
 import com.indosoft.medibridge.Listener.SignUpListener;
 import com.indosoft.medibridge.Model.SignUpResponse;
 import com.indosoft.medibridge.Repository.SignUpRepository;
+
+import java.io.File;
 
 public class SignUpViewModel extends ViewModel {
 
@@ -54,7 +63,9 @@ public class SignUpViewModel extends ViewModel {
 
         @Override
         public void onSuccess(SignUpResponse response) {
-            responseMutableLiveData.setValue(response);
+            if (responseMutableLiveData != null) {  // ✅ Added null check
+                responseMutableLiveData.postValue(response);
+            }
         }
 
         @Override
@@ -62,6 +73,13 @@ public class SignUpViewModel extends ViewModel {
             isFailed.setValue(error);
         }
     };
+
+    public void sendEmail(SendEmailBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.sendEmail(context,body, listener);
+
+    }
     public void getSignData(SignUpBody body) {
         isConnecting.setValue(true);  // Show loading state
         repository = SignUpRepository.getInstance();
@@ -70,9 +88,75 @@ public class SignUpViewModel extends ViewModel {
     }
 
     public void registerStockist(StockistBody body) {
-        isConnecting.setValue(true);  // Show loading state
+        isConnecting.setValue(true);
         repository = SignUpRepository.getInstance();
         repository.getRegisterStockist(context,body, listener);
+
+    }
+    public void expiryRegister(ExpiryRegisterBody body) {
+        isConnecting.setValue(true);  // Show loading state
+        repository = SignUpRepository.getInstance();
+        repository.getExpiryRegister(context,body, listener);
+
+    }
+    public void unlistedMedicine(UnlistedBody body) {
+        isConnecting.setValue(true);  // Show loading state
+        repository = SignUpRepository.getInstance();
+        repository.getUnlisted(context,body, listener);
+
+    }
+    public void uploadImage(File imageFile) {
+        isConnecting.setValue(true);  // Show loading state
+        repository = SignUpRepository.getInstance();
+        repository.uploadRetailerImage(context,imageFile, listener);
+
+    }
+    public void updateStatus(String retailer_id, UpdateStatusBody body) {
+        isConnecting.setValue(true);  // Show loading state
+        repository = SignUpRepository.getInstance();
+        repository.updateStatus(context,retailer_id,body, listener);
+
+    }
+    public void expiryStatus(String retailer_id) {
+        isConnecting.setValue(true);  // Show loading state
+        repository = SignUpRepository.getInstance();
+        repository.expiryStatus(context,retailer_id, listener);
+
+    }
+    public void deleteOrder(String order_items_id) {
+        isConnecting.setValue(true);  // Show loading state
+        repository = SignUpRepository.getInstance();
+        repository.deleteOrder(context,order_items_id, listener);
+
+    }
+    public void orderStatus(String order_items_id, String order_status) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.orderStatus(context,order_items_id,order_status, listener);
+
+    }
+    public void resetPassword(String retailer_id, String retailer_password) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.resetPassword(context,retailer_id,retailer_password, listener);
+
+    }
+    public void registerexpiry(RegisterExpiryBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.registerExpiry(context,body, listener);
+
+    }
+    public void posAdd(String retailer_id, PosAddBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.posAdd(context,retailer_id,body, listener);
+
+    }
+    public void posUpdate(String id, PosUpdateBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.posUpdate(context,id,body, listener);
 
     }
 

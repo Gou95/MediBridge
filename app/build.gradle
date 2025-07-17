@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+//    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -13,7 +14,7 @@ android {
         applicationId "com.indosoft.medibridge"
         minSdk 24
         targetSdk 35
-        versionCode 1
+        versionCode 6
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -76,4 +77,17 @@ dependencies {
     implementation 'com.github.denzcoskun:ImageSlideshow:0.1.2'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.ertugrulkaragoz:SuperBottomBar:0.4'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.razorpay:checkout:1.6.41'
+    implementation 'com.itextpdf:itext7-core:7.1.15'
+    implementation 'androidx.webkit:webkit:1.6.1'
+    implementation 'com.android.volley:volley:1.2.1'
+    implementation 'com.caverock:androidsvg:1.4'
+
+
+
+//    implementation 'com.google.firebase:firebase-messaging:24.1.0'
+//    implementation 'com.google.firebase:firebase-core:21.1.1'  // Optional
+//    implementation 'com.google.auth:google-auth-library-oauth2-http:1.18.0'
+   // implementation 'com.google.firebase:firebase-firestore:24.9.1'
 }

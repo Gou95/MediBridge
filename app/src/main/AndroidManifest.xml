@@ -3,21 +3,63 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_BASIC_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/logo"
+        android:icon="@drawable/logomedi"
+        android:installLocation="auto"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/logo"
+        android:roundIcon="@drawable/logomedi"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".Activities.PosDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.PosActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.AllOrdersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.ExpireActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.HelpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.UrgentCartActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".Activities.CartActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".Activities.SubscribeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.TermsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.ExpiryListActivity"
+            android:exported="false" />
         <activity
             android:name=".Activities.RecentStockistActivity"
             android:exported="false" />
@@ -25,8 +67,9 @@
             android:name=".Activities.UnlistedStockistActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.UnlistedMedicineActivity"
-            android:exported="false" />
+            android:name=".Activities.ExpiryRegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".Activities.OrderRegisterActivity"
             android:exported="false" />
@@ -38,12 +81,10 @@
             android:exported="false" />
         <activity
             android:name=".Activities.ChangePasswordActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".Activities.PrivacyPolicyActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.TermsConditionActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.SeeAllOrderDetailsActivity"
@@ -55,14 +96,12 @@
             android:name=".Activities.StockistActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.AddressUpdateActivity"
-            android:exported="false" />
-        <activity
             android:name=".Activities.EditProfileActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.DashBoardActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".Activities.ForgetPasswordActivity"
             android:exported="false" />
@@ -86,6 +125,28 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MediBridge" />
+
+        <service
+            android:name=".Services.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCsum9JmFSxokkjB1itUPTrsa4UwX0yLYY" />
     </application>
 
 </manifest>

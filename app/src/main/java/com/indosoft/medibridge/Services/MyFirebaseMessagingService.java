@@ -15,11 +15,24 @@ import androidx.core.app.NotificationManagerCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.Session.AppSession;
+import com.indosoft.medibridge.Session.Constants;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "FCM";
     private static final String CHANNEL_ID = "myFirebaseChannel";
+
+    @Override
+    public void onNewToken(@NonNull String token) {
+        super.onNewToken(token);
+        Log.d(TAG, "New FCM Token: " + token);
+        storeToken(token);
+    }
+
+    private void storeToken(String token) {
+        AppSession.getInstance(getApplicationContext()).setValue(Constants.FCM_TOKEN, token);
+    }
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {

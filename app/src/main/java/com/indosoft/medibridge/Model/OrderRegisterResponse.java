@@ -37,6 +37,28 @@ public class OrderRegisterResponse {
     @SerializedName("order_status")
     @Expose
     private String orderStatus;
+    @SerializedName("unlisted_medicines")
+    @Expose
+    private Object unlistedMedicines;
+
+    boolean isPed;
+    boolean isNotPed;
+
+    public boolean isPed() {
+        return isPed;
+    }
+
+    public void setPed(boolean ped) {
+        isPed = ped;
+    }
+
+    public boolean isNotPed() {
+        return isNotPed;
+    }
+
+    public void setNotPed(boolean notPed) {
+        isNotPed = notPed;
+    }
 
     public String getOrderNo() {
         return orderNo;
@@ -125,4 +147,13 @@ public class OrderRegisterResponse {
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
+
+    public CharSequence getUnlistedMedicines() {
+        return (CharSequence) unlistedMedicines;
+    }
+
+    public void setUnlistedMedicines(Object unlistedMedicines) {
+        this.unlistedMedicines = unlistedMedicines;
+    }
+
 }

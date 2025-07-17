@@ -1,13 +1,27 @@
 package com.indosoft.medibridge.Activities;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.StyleSpan;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,9 +29,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.indosoft.medibridge.Body.SignUpBody;
 import com.indosoft.medibridge.Model.IndiaStateResponse;
 import com.indosoft.medibridge.Model.StateCityResponse;
@@ -31,7 +49,19 @@ import com.indosoft.medibridge.ViewModel.SignUpViewModel;
 import com.indosoft.medibridge.ViewModel.StatesViewModel;
 import com.indosoft.medibridge.databinding.ActivitySignUpBinding;
 
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -39,11 +69,16 @@ public class SignUpActivity extends AppCompatActivity {
     StatesViewModel statesViewModel;
     SignUpViewModel signUpViewModel;
     CityViewModel cityViewModel;
-    String text = "I accept and agree to the Terms & Conditions and privacy policy";
-    SpannableString spannableString = new SpannableString(text);
+
     ArrayList<IndiaStateResponse> stateList = new ArrayList<>();
     ArrayList<StateCityResponse> cityList = new ArrayList<>();
     ExitMobileViewModel exitMobileViewModel;
+    private boolean isReceiverRegistered = false;
+    private boolean isPasswordVisible = false;
+    private static final String SECRET_KEY = "1234567890123456"; // 128-bit key
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,19 +94,38 @@ public class SignUpActivity extends AppCompatActivity {
         statesViewModel.getStateData();
 
         initClicks();
-
+        logFCM();
         onAttachObservers();
         startNetworkService();
-
+        setupSpannableText();
+        Toast.makeText(this, ""+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN), Toast.LENGTH_SHORT).show();
+    }
+    private void setupSpannableText() {
+        String text = "I accept and agree to the Terms & Conditions and privacy policy";
+        SpannableString spannableString = new SpannableString(text);
         int termsStart = text.indexOf("Terms & Conditions");
         int termsEnd = termsStart + "Terms & Conditions".length();
         int privacyStart = text.indexOf("privacy policy");
         int privacyEnd = privacyStart + "privacy policy".length();
-
+        ClickableSpan termsClick = new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                startActivity(new Intent(SignUpActivity.this, TermsActivity.class));
+            }
+        };
+        ClickableSpan privacyClick = new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                startActivity(new Intent(SignUpActivity.this, PrivacyPolicyActivity.class));
+            }
+        };
+        spannableString.setSpan(termsClick, termsStart, termsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(privacyClick, privacyStart, privacyEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableString.setSpan(new StyleSpan(Typeface.BOLD), termsStart, termsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableString.setSpan(new StyleSpan(Typeface.BOLD), privacyStart, privacyEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
         binding.checkbox.setText(spannableString);
+        binding.checkbox.setMovementMethod(LinkMovementMethod.getInstance());
+
     }
 
     private void onAttachObservers() {
@@ -145,7 +199,14 @@ public class SignUpActivity extends AppCompatActivity {
 
 
     }
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 
     private void initClicks() {
         binding.txtLogin.setPaintFlags(binding.txtLogin.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -153,6 +214,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         binding.btnSignin.setOnClickListener(v -> {
             String shopName = binding.edtShopName.getText().toString().trim();
+            String email = binding.edtEmail.getText().toString().trim();
             String mobileNumber = binding.edtMobileNo.getText().toString().trim();
             String password = binding.edtPassword.getText().toString().trim();
             String stateName = binding.edtState.getText().toString().trim();
@@ -166,9 +228,16 @@ public class SignUpActivity extends AppCompatActivity {
                 Toast.makeText(this, "Enter shop name", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (email.isEmpty() || !email.contains("@")) {
+                Toast.makeText(this, "Enter a valid email ID", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (mobileNumber.isEmpty()) {
                 Toast.makeText(this, "Enter mobile number", Toast.LENGTH_SHORT).show();
                 return;
+            }
+             if (mobileNumber.length() < 10) {
+                Toast.makeText(this, "Mobile number must be 10 digits", Toast.LENGTH_SHORT).show();
             }
             if (password.isEmpty()) {
                 Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show();
@@ -189,10 +258,19 @@ public class SignUpActivity extends AppCompatActivity {
 
             SignUpBody signbody = new SignUpBody();
             signbody.setRetailerName(shopName);
+            signbody.setRetailerEmail(email);
             signbody.setRetailerPhone(mobileNumber);
             signbody.setRetailerPassword(password);
             signbody.setStateId(Integer.parseInt(stateId));
             signbody.setCityId(Integer.parseInt(cityId));
+            signbody.setFcmId(AppSession.getInstance(this).getValue(Constants.FCM_TOKEN));
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, 60);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            String expiryDate = dateFormat.format(calendar.getTime());
+            signbody.setSubsExpiryDate(expiryDate);
+            Log.d("token", "initClicks: "+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN));
 
             signUpViewModel.getSignData(signbody);
 
@@ -202,13 +280,14 @@ public class SignUpActivity extends AppCompatActivity {
                     if ("Mobile No. already registered!".equals(message)) {
                         Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
                     } else if ("User added successfully".equals(message)) {
-                       // Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
 
                         AppSession.getInstance(this).setValue(Constants.RELAILER_NAME, shopName);
                         AppSession.getInstance(this).setValue(Constants.RELAILER_PHONE, mobileNumber);
                         AppSession.getInstance(this).setValue(Constants.RELAILER_PASSWORD, password);
                         AppSession.getInstance(this).setValue(Constants.STATE_NAME, stateName);
                         AppSession.getInstance(this).setValue(Constants.CITY_NAME, cityName);
+
 
 
                         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
@@ -234,10 +313,22 @@ public class SignUpActivity extends AppCompatActivity {
 
             }
         });
+
+        binding.imgEye.setOnClickListener(v -> togglePasswordVisibility());
     }
 
 
+    private void togglePasswordVisibility() {
+        isPasswordVisible = !isPasswordVisible;
 
+        if (isPasswordVisible) {
+            binding.edtPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            binding.imgEye.setImageResource(R.drawable.eye);
+        } else {
+            binding.edtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            binding.imgEye.setImageResource(R.drawable.hide_eye);
+        }
+    }
     private void showTermsConditionsPopup() {
         View view = getLayoutInflater().inflate(R.layout.popup_layout, null);
 
@@ -294,5 +385,73 @@ public class SignUpActivity extends AppCompatActivity {
         startService(networkServiceIntent);
         Log.d("LoginActivity", "NetworkCheckService started");
     }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
 
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+
+                reloadData();
+            } else {
+
+            }
+        }
+    };
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, filter);
+            isReceiverRegistered = true;
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+    private void reloadData() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 5000);
+    }
+    private void logFCM(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.i("##########FCM_TOKEN##########", "Fetching FCM token failed", task.getException());
+                            return;
+                        }
+                        String token = task.getResult();
+                        Log.i("##########FCM_TOKEN##########", "FCM Token: " + token);
+                        AppSession.getInstance(SignUpActivity.this).setValue(Constants.FCM_TOKEN,token);
+                    }
+                });
+
+
+    }
 }

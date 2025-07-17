@@ -27,7 +27,7 @@
                     android:id="@+id/img_logo"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/logo"
+                    android:src="@drawable/logomedi"
                     android:layout_centerVertical="true"/>
 
                 <LinearLayout
@@ -45,7 +45,12 @@
                         android:text="Paracetamol"
                         android:textColor="@color/black"
                         android:fontFamily="@font/gotham_bold"
-                        android:textSize="14sp" />
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
 
@@ -56,10 +61,15 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/light_white"
-                            android:textSize="14sp"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeStepGranularity="1sp"
                             android:fontFamily="@font/gotham_bold"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="5dp"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"
                             />
 
 
@@ -106,6 +116,7 @@
                     android:textSize="16sp"
                     android:inputType="text"
                     android:fontFamily="@font/gothambook"
+                    android:completionThreshold="1"
                     />
 
             </LinearLayout>
@@ -122,10 +133,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Quantity:"
-                    android:textSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="18sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:fontFamily="@font/gotham_bold"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
                 <ImageView
                     android:id="@+id/img_sub"
@@ -139,11 +155,16 @@
                     android:id="@+id/txt_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="20sp"
+                    android:autoSizeStepGranularity="1sp"
                 android:fontFamily="@font/gotham_bold"
                     android:layout_gravity="center_vertical"
                     android:textColor="@color/black"
-                    android:layout_marginStart="20dp" />
+                    android:layout_marginStart="20dp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
                 <ImageView
                     android:id="@+id/img_add"
@@ -166,11 +187,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Unit:"
-                    android:textSize="16sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="18sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:fontFamily="@font/gotham_bold"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
 
                 <LinearLayout
@@ -193,7 +219,9 @@
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
                         android:ellipsize="end"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
                     <Spinner
                         android:id="@+id/spinner_unit"
@@ -223,9 +251,14 @@
                     android:layout_height="match_parent"
                     android:text="Add To Cart"
                     android:textColor="@color/white"
-                    android:textSize="15sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="18sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:fontFamily="@font/gotham_bold"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
 
             </androidx.cardview.widget.CardView>

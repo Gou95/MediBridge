@@ -4,49 +4,97 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class LoginResponse {
-    @SerializedName("retailer_id")
+    @SerializedName("message")
     @Expose
-    private String retailerId;
-    @SerializedName("retailer_name")
+    private String message;
+    @SerializedName("data")
     @Expose
-    private String retailerName;
-    @SerializedName("retailer_phone")
-    @Expose
-    private String retailerPhone;
-    @SerializedName("retailer_password")
-    @Expose
-    private String retailerPassword;
 
-    public String getRetailerId() {
-        return retailerId;
+    private Data data;
+
+    public String getMessage() {
+        return message;
     }
 
-    public void setRetailerId(String retailerId) {
-        this.retailerId = retailerId;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public String getRetailerName() {
-        return retailerName;
+    public Data getData() {
+        return data;
     }
 
-    public void setRetailerName(String retailerName) {
-        this.retailerName = retailerName;
+    public void setData(Data data) {
+        this.data = data;
     }
+    public class Data {
 
-    public String getRetailerPhone() {
-        return retailerPhone;
+        @SerializedName("retailer_id")
+        @Expose
+        private Integer retailerId;
+        @SerializedName("retailer_name")
+        @Expose
+        private String retailerName;
+        @SerializedName("retailer_phone")
+        @Expose
+        private String retailerPhone;
+        @SerializedName("retailer_password")
+        @Expose
+        private String retailerPassword;
+        @SerializedName("status")
+        @Expose
+        private String status;
+        @SerializedName("subs_expiry_date")
+        @Expose
+        private String subsExpiryDate;
+
+        public Integer getRetailerId() {
+            return retailerId;
+        }
+
+        public void setRetailerId(Integer retailerId) {
+            this.retailerId = retailerId;
+        }
+
+        public String getRetailerName() {
+            return retailerName;
+        }
+
+        public void setRetailerName(String retailerName) {
+            this.retailerName = retailerName;
+        }
+
+        public String getRetailerPhone() {
+            return retailerPhone;
+        }
+
+        public void setRetailerPhone(String retailerPhone) {
+            this.retailerPhone = retailerPhone;
+        }
+
+        public String getRetailerPassword() {
+            return retailerPassword;
+        }
+
+        public void setRetailerPassword(String retailerPassword) {
+            this.retailerPassword = retailerPassword;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public String getSubsExpiryDate() {
+            return subsExpiryDate;
+        }
+
+        public void setSubsExpiryDate(String subsExpiryDate) {
+            this.subsExpiryDate = subsExpiryDate;
+        }
+
     }
-
-    public void setRetailerPhone(String retailerPhone) {
-        this.retailerPhone = retailerPhone;
-    }
-
-    public String getRetailerPassword() {
-        return retailerPassword;
-    }
-
-    public void setRetailerPassword(String retailerPassword) {
-        this.retailerPassword = retailerPassword;
-    }
-
 }

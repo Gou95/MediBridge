@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:orientation="vertical"
     android:gravity="center"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.LoginActivity">
@@ -12,7 +13,7 @@
     <ImageView
         android:layout_width="160dp"
         android:layout_height="160dp"
-        android:src="@drawable/medicin"
+        android:src="@drawable/logomedi"
         android:scaleType="centerCrop"
         android:layout_marginTop="10dp"
         />
@@ -22,8 +23,13 @@
         android:layout_height="wrap_content"
         android:text="Welcome to "
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="16sp"
+        android:autoSizeMaxTextSize="18sp"
+        android:autoSizeStepGranularity="1sp"
         android:layout_margin="20dp"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"
         />
 
     <LinearLayout
@@ -41,15 +47,19 @@
 
         <EditText
             android:id="@+id/edt_mobile"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Mobile No"
-            android:textSize="16sp"
-            android:paddingLeft="10dp"
+            android:paddingLeft="15dp"
             android:background="@null"
             android:inputType="number"
+            android:maxLength="10"
             android:layout_gravity="center"
-            android:maxLength="10"/>
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeStepGranularity="1sp"/>
+
 
     </LinearLayout>
 
@@ -78,11 +88,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="Password"
-            android:textSize="16sp"
-            android:paddingLeft="10dp"
+            android:paddingLeft="15dp"
             android:background="@null"
             android:layout_centerVertical="true"
             android:inputType="textPassword"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeStepGranularity="1sp"
 
             />
 
@@ -90,7 +103,7 @@
             android:id="@+id/img_eye"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/eye"
+            android:src="@drawable/hide_eye"
             android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 
@@ -115,8 +128,13 @@
             android:layout_height="match_parent"
             android:text="Log in"
             android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="16sp"
+            android:autoSizeMaxTextSize="18sp"
+            android:autoSizeStepGranularity="1sp"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:fontFamily="@font/gotham_bold"
             android:gravity="center"/>
 
 
@@ -128,8 +146,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Forget password?"
-        android:textSize="16sp"
-        android:layout_marginTop="25dp"/>
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeMaxTextSize="16sp"
+        android:autoSizeStepGranularity="1sp"
+        android:layout_marginTop="25dp"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"/>
 
     <LinearLayout
         android:id="@+id/btn_signup"
@@ -146,9 +169,14 @@
             android:layout_height="match_parent"
             android:text="Sign up"
             android:textColor="@color/green"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center"/>
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="16sp"
+            android:autoSizeMaxTextSize="18sp"
+            android:autoSizeStepGranularity="1sp"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:gravity="center"
+            android:fontFamily="@font/gotham_bold"/>
 
 
     </LinearLayout>

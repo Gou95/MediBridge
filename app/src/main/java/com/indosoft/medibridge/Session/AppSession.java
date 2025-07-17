@@ -1,5 +1,7 @@
 package com.indosoft.medibridge.Session;
 
+
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -26,10 +28,11 @@ public class AppSession {
         sharedPreferences.edit().clear().apply();
     }
 
-    public void setValue(String key, String value) {
+    public String setValue(String key, String value) {
         if (key != null && value != null) {
             sharedPreferences.edit().putString(key, value).apply();
         }
+        return key;
     }
 
     public String getValue(String key) {
@@ -65,4 +68,20 @@ public class AppSession {
             return null;
         }
     }
+
+
+    public void putLong(String key, long value) {
+        if (key != null) {
+            sharedPreferences.edit().putLong(key, value).apply();
+        }
+    }
+
+    // ✅ Method to retrieve long values (for expiry timestamps)
+    public long getLong(String key, long defaultValue) {
+        return key != null ? sharedPreferences.getLong(key, defaultValue) : defaultValue;
+    }
+
+
+
+
 }

@@ -3,28 +3,32 @@
 
 
 
+
     <color name="purple_200">#BB86FC</color>
         <color name="purple_500">#6200EE</color>
         <color name="purple_700">#ffff</color>
         <color name="teal_200">#03DAC5</color>
         <color name="teal_700">#018786</color>
         <color name="black">#FFFFFFFF</color>
-        <color name="white">#121212</color>   <!-- Dark background color -->
+        <color name="white">#121212</color>
 
-        <color name="green">#28A745</color>
-        <color name="grey">#444444</color>    <!-- Darker grey for dark mode -->
-        <color name="light_white">#ffff</color> <!-- Slightly darker for dark mode -->
-        <color name="red">#CF6679</color>     <!-- Softer red for dark mode -->
-        <color name="tran">#00FFFf</color>    <!-- Unchanged -->
-        <color name="teal">#80CBC4</color>    <!-- Softer teal for dark mode -->
-        <color name="colorWhite">#FFFFFF</color> <!-- Text color for dark mode -->
-        <color name="colorGray">#888888</color> <!-- Softer grey for dark mode -->
-        <color name="orange">#FFA500</color>  <!-- Unchanged -->
-        <color name="yellow">#04AEC4</color>  <!-- Warmer yellow for dark mode -->
 
-        <color name="colorPrimary">#121212</color> <!-- Dark mode primary background -->
-        <color name="colorPrimaryDark">#000000</color> <!-- Even darker for contrast -->
-        <color name="colorAccent">#03DAC5</color> <!-- Teal accent for dark mode -->
+
+        <color name="green">#fff</color>
+        <color name="grey">#444444</color>
+        <color name="light_white">#ffff</color>
+        <color name="red">#CF6679</color>
+        <color name="tran">#00FFFf</color>
+        <color name="teal">#80CBC4</color>
+        <color name="colorWhite">#FFFFFF</color>
+        <color name="colorGray">#888888</color>
+        <color name="orange">#FFA500</color>
+        <color name="yellow">#04AEC4</color>
+    <color name="dark_gray">#fff</color>
+
+        <color name="colorPrimary">#121212</color>
+        <color name="colorPrimaryDark">#000000</color>
+        <color name="colorAccent">#03DAC5</color>
 
 
 

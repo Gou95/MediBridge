@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class OrderListResponse {
+
     @SerializedName("dealer_id")
     @Expose
     private String dealerId;
@@ -31,6 +32,12 @@ public class OrderListResponse {
     @SerializedName("totalmeds")
     @Expose
     private String totalmeds;
+    @SerializedName("fcm_id")
+    @Expose
+    private String fcmId;
+    @SerializedName("unlisted_medicines")
+    @Expose
+    private String unlistedMedicines;
 
     public String getDealerId() {
         return dealerId;
@@ -102,5 +109,21 @@ public class OrderListResponse {
 
     public void setTotalmeds(String totalmeds) {
         this.totalmeds = totalmeds;
+    }
+
+    public String getFcmId() {
+        return fcmId;
+    }
+
+    public void setFcmId(String fcmId) {
+        this.fcmId = fcmId;
+    }
+
+    public String getUnlistedMedicines() {
+        return unlistedMedicines;
+    }
+
+    public void setUnlistedMedicines(String unlistedMedicines) {
+        this.unlistedMedicines = unlistedMedicines;
     }
 }

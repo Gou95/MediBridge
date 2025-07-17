@@ -21,7 +21,7 @@
                 android:id="@+id/img_logo"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/logo"
+                android:src="@drawable/logomedi"
                 android:layout_centerVertical="true"/>
 
             <LinearLayout
@@ -38,20 +38,31 @@
                     android:text="Paracetamol"
                     android:textColor="@color/black"
                     android:fontFamily="@font/gotham_bold"
-                    android:textSize="15sp"/>
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
                 <TextView
                     android:id="@+id/txt_stockitName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Stocket name"
                     android:textColor="@color/green"
-                    android:textSize="14sp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:fontFamily="@font/gotham_bold"
                     android:layout_marginTop="5dp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
                    />
 
 
                 <LinearLayout
+                    android:id="@+id/linearUnit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -65,22 +76,46 @@
                         android:layout_height="wrap_content"
                         android:text="Unit :"
                         android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:textSize="16sp"/>
+                      android:fontFamily="@font/gotham_bold"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
                     <TextView
                         android:id="@+id/txt_unitcartName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Stocket name"
                         android:textColor="@color/green"
-                        android:textSize="14sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gotham_bold"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
                         />
 
 
 
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/unlistedMedicine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                   android:fontFamily="@font/gotham_bold"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:visibility="gone"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
+
 
 
 
@@ -97,55 +132,74 @@
 
         </RelativeLayout>
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:layout_marginTop="5dp"
+    android:gravity="center_vertical"
+    >
+    <RadioButton
+        android:id="@+id/radio_urgent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Urgent"
+        android:fontFamily="@font/gothambook"
+        android:textColor="@color/black"
+        android:layout_marginStart="20dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        >
+
+        <ImageView
+            android:id="@+id/img_delete"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/delete"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            />
+
+
+        <ImageView
+            android:id="@+id/img_sub"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/minus"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/txt_number"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end"
-            android:layout_marginTop="5dp"
-            >
+            android:layout_gravity="center"
+            android:layout_marginStart="20dp"
+            android:text="1"
+            android:fontFamily="@font/gotham_bold"
+            android:textColor="@color/black"
+            android:autoSizeMaxTextSize="18sp"
+            android:autoSizeMinTextSize="16sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"/>
 
-            <ImageView
-                android:id="@+id/img_delete"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/delete"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="20dp"
-                />
+        <ImageView
+            android:id="@+id/img_add"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/add"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"/>
 
-
-            <ImageView
-                android:id="@+id/img_sub"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/minus"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="20dp"
-                android:visibility="gone"/>
-
-            <TextView
-                android:id="@+id/txt_number"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="20dp"
-                android:text="1"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/img_add"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/add"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="20dp"/>
-
-        </LinearLayout>
-
+    </LinearLayout>
+</LinearLayout>
 
 
         <RadioGroup
@@ -154,15 +208,10 @@
             android:orientation="horizontal"
             android:padding="10dp"
             android:gravity="center"
-            android:layout_marginStart="10dp">
+            android:layout_marginStart="10dp"
+            android:visibility="gone">
 
-            <RadioButton
-                android:id="@+id/radio_urgent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Urgent"
-                android:fontFamily="@font/gothambook"
-                android:textColor="@color/black"/>
+
 
             <RadioButton
                 android:id="@+id/radio_today"
@@ -189,7 +238,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1.5dp"
+            android:layout_height="2dp"
             android:background="@color/grey"
             android:layout_marginTop="10dp"/>
 

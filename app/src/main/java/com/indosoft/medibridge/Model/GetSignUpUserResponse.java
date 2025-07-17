@@ -12,13 +12,13 @@ public class GetSignUpUserResponse {
     private String retailerName;
     @SerializedName("retailer_contact_name")
     @Expose
-    private String retailerContactName;
+    private Object retailerContactName;
     @SerializedName("retailer_password")
     @Expose
     private String retailerPassword;
     @SerializedName("retailer_email")
     @Expose
-    private String retailerEmail;
+    private Object retailerEmail;
     @SerializedName("retailer_phone")
     @Expose
     private String retailerPhone;
@@ -36,13 +36,25 @@ public class GetSignUpUserResponse {
     private String city;
     @SerializedName("retailer_address")
     @Expose
-    private String retailerAddress;
+    private Object retailerAddress;
     @SerializedName("retailer_gst")
     @Expose
-    private String retailerGst;
+    private Object retailerGst;
     @SerializedName("retailer_dl_no")
     @Expose
-    private String retailerDlNo;
+    private Object retailerDlNo;
+    @SerializedName("fcm_id")
+    @Expose
+    private String fcmId;
+    @SerializedName("photo_path")
+    @Expose
+    private Object photoPath;
+    @SerializedName("status")
+    @Expose
+    private String status;
+    @SerializedName("subs_expiry_date")
+    @Expose
+    private String subsExpiryDate;
 
     public String getRetailerId() {
         return retailerId;
@@ -60,11 +72,11 @@ public class GetSignUpUserResponse {
         this.retailerName = retailerName;
     }
 
-    public String getRetailerContactName() {
-        return retailerContactName;
+    public CharSequence getRetailerContactName() {
+        return (CharSequence) retailerContactName;
     }
 
-    public void setRetailerContactName(String retailerContactName) {
+    public void setRetailerContactName(Object retailerContactName) {
         this.retailerContactName = retailerContactName;
     }
 
@@ -77,10 +89,10 @@ public class GetSignUpUserResponse {
     }
 
     public String getRetailerEmail() {
-        return retailerEmail;
+        return (String) retailerEmail;
     }
 
-    public void setRetailerEmail(String retailerEmail) {
+    public void setRetailerEmail(Object retailerEmail) {
         this.retailerEmail = retailerEmail;
     }
 
@@ -124,29 +136,60 @@ public class GetSignUpUserResponse {
         this.city = city;
     }
 
-    public String getRetailerAddress() {
+    public Object getRetailerAddress() {
         return retailerAddress;
     }
 
-    public void setRetailerAddress(String retailerAddress) {
+    public void setRetailerAddress(Object retailerAddress) {
         this.retailerAddress = retailerAddress;
     }
 
-    public String getRetailerGst() {
-        return retailerGst;
+    public CharSequence getRetailerGst() {
+        return (CharSequence) retailerGst;
     }
 
-    public void setRetailerGst(String retailerGst) {
+    public void setRetailerGst(Object retailerGst) {
         this.retailerGst = retailerGst;
     }
 
-    public String getRetailerDlNo() {
-        return retailerDlNo;
+    public CharSequence getRetailerDlNo() {
+        return (CharSequence) retailerDlNo;
     }
 
-    public void setRetailerDlNo(String retailerDlNo) {
+    public void setRetailerDlNo(Object retailerDlNo) {
         this.retailerDlNo = retailerDlNo;
     }
 
+    public String getFcmId() {
+        return fcmId;
+    }
+
+    public void setFcmId(String fcmId) {
+        this.fcmId = fcmId;
+    }
+
+    public Object getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(Object photoPath) {
+        this.photoPath = photoPath;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getSubsExpiryDate() {
+        return subsExpiryDate;
+    }
+
+    public void setSubsExpiryDate(String subsExpiryDate) {
+        this.subsExpiryDate = subsExpiryDate;
+    }
 
 }

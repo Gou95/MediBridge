@@ -1,26 +1,37 @@
 {
   "project_info": {
-    "project_number": "103188310506",
-    "project_id": "medibridge-733f8",
-    "storage_bucket": "medibridge-733f8.firebasestorage.app"
+    "project_number": "265848289420",
+    "firebase_url": "https://indosoft-8faa8.firebaseio.com",
+    "project_id": "indosoft-8faa8",
+    "storage_bucket": "indosoft-8faa8.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:103188310506:android:764de90d931a4548a4ea93",
+        "mobilesdk_app_id": "1:265848289420:android:ac40b03aa09e0e00fee3a9",
         "android_client_info": {
           "package_name": "com.indosoft.medibridge"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "265848289420-6ht1d6d6jovcm14afvhpfkbj5r82ar64.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDBt72jBrpEH9f8JG_vuUUpIKGBfbipC9o"
+          "current_key": "AIzaSyBm2LzQghbv6fgp9xqpfeoCkeOrTFUlGYU"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "265848289420-6ht1d6d6jovcm14afvhpfkbj5r82ar64.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

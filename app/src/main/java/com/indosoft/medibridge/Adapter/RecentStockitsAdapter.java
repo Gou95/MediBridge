@@ -18,6 +18,8 @@ import com.indosoft.medibridge.R;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class RecentStockitsAdapter extends RecyclerView.Adapter<RecentStockitsAdapter.ViewHolder> {
 
     Context context;
@@ -62,6 +64,17 @@ public class RecentStockitsAdapter extends RecyclerView.Adapter<RecentStockitsAd
             intent.putExtra("dealerId", dealerId);
             context.startActivity(intent);
         });
+
+        int nightModeFlags = context.getResources().getConfiguration().uiMode &
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+
+        if (nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+            holder.userImage.setColorFilter(android.graphics.Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
+        } else {
+            holder.userImage.setColorFilter(android.graphics.Color.BLACK, android.graphics.PorterDuff.Mode.SRC_IN);
+        }
+
+
     }
 
 
@@ -72,12 +85,15 @@ public class RecentStockitsAdapter extends RecyclerView.Adapter<RecentStockitsAd
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView dealerName;
+        CircleImageView userImage;
         LinearLayout stockitsList;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             dealerName = itemView.findViewById(R.id.txt_recentStockits);
             stockitsList = itemView.findViewById(R.id.linear_stockits);
+            userImage = itemView.findViewById(R.id.img_image);
+
         }
     }
 }

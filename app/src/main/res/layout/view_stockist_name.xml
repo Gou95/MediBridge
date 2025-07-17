@@ -11,25 +11,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="10dp"
-        app:cardBackgroundColor="@color/white"
-        android:layout_weight="1"
-       android:layout_marginHorizontal="10dp"
-        android:layout_marginBottom="10dp"
         app:cardElevation="11dp"
-        android:layout_marginTop="10dp"
+        android:layout_margin="10dp"
         >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center">
 
             <ImageView
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:src="@drawable/b3"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/usertwo"
                 android:scaleType="fitXY"
                 android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+
                 />
 
             <LinearLayout
@@ -45,9 +44,15 @@
                     android:text="Expiry List"
                     android:textSize="14sp"
                     android:textColor="@color/black"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/gotham_bold"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="13sp"
+                    android:autoSizeMaxTextSize="14sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
                     />
 
 

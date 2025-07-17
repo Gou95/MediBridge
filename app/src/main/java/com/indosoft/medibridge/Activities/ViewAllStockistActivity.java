@@ -1,17 +1,32 @@
 package com.indosoft.medibridge.Activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.indosoft.medibridge.Adapter.ViewStockistAdapter;
 import com.indosoft.medibridge.Model.RecentStockitsResponse;
+import com.indosoft.medibridge.R;
 import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
@@ -25,6 +40,7 @@ public class ViewAllStockistActivity extends AppCompatActivity {
     RecentStockitsViewModel viewModel;
     ArrayList<RecentStockitsResponse> list = new ArrayList<>();
     ViewStockistAdapter adapter;
+    private boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +59,7 @@ public class ViewAllStockistActivity extends AppCompatActivity {
 
         binding.imgBack.setOnClickListener(v -> onBackPressed());
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
-
+        binding.swipeRefreshLayout.setRefreshing(false);
         initClicks();
     }
     private void initClicks() {
@@ -64,6 +80,16 @@ public class ViewAllStockistActivity extends AppCompatActivity {
 
             }
         });
+        TextView title = binding.txtViewAll;
+        SpannableString spannable = new SpannableString("View All Stockists");
+
+
+
+        int blue = ContextCompat.getColor(this, R.color.blue_light);
+        int red = ContextCompat.getColor(this, R.color.orange_dark);
+        spannable.setSpan(new ForegroundColorSpan(blue), 0, 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 6, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(spannable);
     }
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
@@ -94,5 +120,64 @@ public class ViewAllStockistActivity extends AppCompatActivity {
         startService(networkServiceIntent);
         Log.d("LoginActivity", "NetworkCheckService started");
     }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
 
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+
+                reloadData();
+            } else {
+
+            }
+        }
+    };
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, filter);
+            isReceiverRegistered = true;
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+    private void reloadData() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 5000);
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 }

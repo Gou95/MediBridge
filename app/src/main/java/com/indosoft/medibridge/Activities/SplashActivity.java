@@ -2,6 +2,7 @@ package com.indosoft.medibridge.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -21,6 +22,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.indosoft.medibridge.Adapter.ViewPagerAdapter;
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.Session.AppSession;
+import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.databinding.ActivitySplashBinding;
 
 public class SplashActivity extends AppCompatActivity {
@@ -41,6 +44,7 @@ public class SplashActivity extends AppCompatActivity {
         if (isOnboardingCompleted) {
             startActivity(new Intent(SplashActivity.this, LoginActivity.class));
             finish();
+         //   checkUserSession();
             return;
         }
 
@@ -67,8 +71,37 @@ public class SplashActivity extends AppCompatActivity {
         });
 
         binding.slideViewPager.addOnPageChangeListener(viewListener);
-        logFCM();
+       logFCM();
     }
+//    private void checkUserSession() {
+//        AppSession session = AppSession.getInstance(this);
+//        String retailerId = session.getValue(Constants.RELAILER_ID);
+//        String status = session.getValue(Constants.RELAILER_STATUS);
+//
+//        Log.i("SESSION_DEBUG", "Retailer ID: " + retailerId);
+//        Log.i("SESSION_DEBUG", "Retailer Status: " + status);
+//
+//        if (retailerId != null && !retailerId.isEmpty() && "Active".equalsIgnoreCase(status)) {
+//            navigateToDashboard();
+//        } else {
+//            navigateToLogin();
+//        }
+//    }
+//
+//
+//    private void navigateToDashboard() {
+//        Intent intent = new Intent(this, DashBoardActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(intent);
+//        finish();
+//    }
+//
+//    private void navigateToLogin() {
+//        Intent intent = new Intent(this, LoginActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(intent);
+//        finish();
+//    }
     private void logFCM(){
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -80,6 +113,7 @@ public class SplashActivity extends AppCompatActivity {
                         }
                         String token = task.getResult();
                         Log.i("##########FCM_TOKEN##########", "FCM Token: " + token);
+                        AppSession.getInstance(SplashActivity.this).setValue(Constants.FCM_TOKEN,token);
                     }
                 });
 
@@ -134,4 +168,13 @@ public class SplashActivity extends AppCompatActivity {
 
         }
     };
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,113 +7,127 @@
     tools:context=".Fragment.UrgentCartFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/swipe_refresh_layout">
-        <LinearLayout
+        android:layout_above="@id/btn_addCart"
+    >
+
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:fillViewport="true">
 
-
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="20dp">
+                android:orientation="vertical">
 
-
-                <ImageView
-                    android:id="@+id/img_back"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/backarrow"
-                    android:layout_centerVertical="true"/>
-
-                <TextView
+                <!-- Toolbar -->
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Urgent Cart"
-                    android:textColor="@color/black"
-                    android:layout_marginStart="20dp"
-                    android:fontFamily="@font/gotham_bold"
-                    android:gravity="center"
-                    android:textSize="20sp"/>
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="20dp">
 
-            </RelativeLayout>
+                    <ImageView
+                        android:id="@+id/img_back"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/backarrow"
+                        android:layout_centerVertical="true"/>
 
-            <!-- RecyclerView for List -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginBottom="20dp"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="10dp"
-                />
-            <LinearLayout
-                android:id="@+id/linear_hide"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:visibility="gone"
-                >
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Urgent Cart"
+                        android:textColor="@color/black"
+                        android:layout_marginStart="20dp"
+                        android:fontFamily="@font/gotham_bold"
+                        android:gravity="center"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="20sp"
+                        android:autoSizeStepGranularity="1sp"/>
+                </RelativeLayout>
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_width="160dp"
-                    android:layout_height="160dp"
-                    android:src="@drawable/empty"
-                    android:layout_gravity="center"
-                    app:civ_border_color="#FF000000"
-                    app:civ_border_width="1dp"/>
-
-
-                <TextView
+                <!-- RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Cart is empty! keep ordering"
-                    android:textSize="16sp"
-                    android:textColor="@color/black"
-                    android:gravity="center"
-                    android:layout_marginTop="10dp"/>
+                    android:nestedScrollingEnabled="false"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginHorizontal="10dp" />
+
+
+
+                <!-- Centered Empty view inside FrameLayout -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/linear_hide"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:visibility="gone"
+                        android:padding="16dp">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:layout_width="160dp"
+                            android:layout_height="160dp"
+                            android:src="@drawable/empty"
+                            android:layout_gravity="center"
+                            app:civ_border_color="#FF000000"
+                            app:civ_border_width="1dp"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Cart is empty! Keep ordering"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:textColor="@color/black"
+                            android:gravity="center"
+                            android:layout_marginTop="10dp"/>
+                    </LinearLayout>
+                </FrameLayout>
 
             </LinearLayout>
-
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btn_addCart"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="70dp"
-                app:cardCornerRadius="24dp"
-                app:cardBackgroundColor="@color/colorAccent"
-                android:layout_marginHorizontal="10dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Proceed to Checkout"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:gravity="center" />
-            </androidx.cardview.widget.CardView>
-
-
-
-
-        </LinearLayout>
-
-
-
-
-
-
-
+        </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <!-- Bottom Button -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btn_addCart"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:cardCornerRadius="25dp"
+        app:cardBackgroundColor="@color/colorAccent"
+        android:layout_marginTop="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="70dp"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Proceed to Checkout"
+            android:textColor="@color/white"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeStepGranularity="1sp"
+            android:textStyle="bold"
+            android:gravity="center"/>
+    </androidx.cardview.widget.CardView>
 
 
-</FrameLayout>
+</RelativeLayout>

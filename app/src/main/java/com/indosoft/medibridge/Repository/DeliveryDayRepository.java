@@ -20,7 +20,7 @@ public class DeliveryDayRepository {
     private final MutableLiveData<DeliveryDayResponse> mutableLiveData = new MutableLiveData<>();
 
 
-    // Singleton pattern
+
     public static DeliveryDayRepository getInstance() {
         if (repository == null) {
             repository = new DeliveryDayRepository();

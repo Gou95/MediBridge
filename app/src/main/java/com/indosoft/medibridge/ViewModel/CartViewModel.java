@@ -48,7 +48,7 @@ public class CartViewModel extends ViewModel {
         }
         repository = CartRepository.getInstance();
     }
-    CartListener listener = new CartListener() {
+    CartListener  listener = new CartListener() {
 
 
         @Override

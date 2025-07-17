@@ -20,7 +20,7 @@ public class LoginViewModel extends ViewModel {
 
     private MutableLiveData<Boolean> isConnecting = new MutableLiveData<>();
 
-    private MutableLiveData<List<LoginResponse>> responseMutableLiveData;
+    private MutableLiveData<LoginResponse> responseMutableLiveData;
 
 
     private LoginRepository repository;
@@ -35,7 +35,7 @@ public class LoginViewModel extends ViewModel {
 
     }
 
-    public LiveData<List<LoginResponse>>getLiveData(){
+    public LiveData<LoginResponse>getLiveData(){
         if (responseMutableLiveData == null){
             responseMutableLiveData = new MutableLiveData<>();
         }
@@ -53,7 +53,7 @@ public class LoginViewModel extends ViewModel {
 
 
         @Override
-        public void onSuccess(List<LoginResponse> response) {
+        public void onSuccess(LoginResponse response) {
             responseMutableLiveData.setValue(response);
         }
 

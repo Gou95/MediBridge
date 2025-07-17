@@ -3,19 +3,27 @@ package com.indosoft.medibridge.RetrofitServices;
 import com.indosoft.medibridge.Body.AddressUpdateBody;
 import com.indosoft.medibridge.Body.AddtoCartBody;
 import com.indosoft.medibridge.Body.ExitMobileBody;
+import com.indosoft.medibridge.Body.ExpiryRegisterBody;
+import com.indosoft.medibridge.Body.PosAddBody;
+import com.indosoft.medibridge.Body.PosUpdateBody;
+import com.indosoft.medibridge.Body.RegisterExpiryBody;
+import com.indosoft.medibridge.Body.SendEmailBody;
 import com.indosoft.medibridge.Body.SignUpBody;
 import com.indosoft.medibridge.Body.StockistBody;
+import com.indosoft.medibridge.Body.UnlistedBody;
+import com.indosoft.medibridge.Body.UpdateStatusBody;
 import com.indosoft.medibridge.Body.UserUpdateBody;
 import com.indosoft.medibridge.Model.AddressUpdateResponse;
 import com.indosoft.medibridge.Model.AddtoCartResponse;
 import com.indosoft.medibridge.Model.CardListResponse;
 import com.indosoft.medibridge.Model.CityDealerResponse;
-import com.indosoft.medibridge.Model.CounterResponse;
 import com.indosoft.medibridge.Model.DealersResponse;
 import com.indosoft.medibridge.Model.DeleteCartResponse;
 import com.indosoft.medibridge.Model.DeliveryDayResponse;
 import com.indosoft.medibridge.Model.ExitMobileResponse;
+import com.indosoft.medibridge.Model.ExpiryListResponse;
 import com.indosoft.medibridge.Model.GetOtpResponse;
+import com.indosoft.medibridge.Model.GetPosProductResponse;
 import com.indosoft.medibridge.Model.GetSignUpUserResponse;
 import com.indosoft.medibridge.Model.GetUrgentCartResponse;
 import com.indosoft.medibridge.Model.IndiaStateResponse;
@@ -29,12 +37,15 @@ import com.indosoft.medibridge.Model.OrderListResponse;
 import com.indosoft.medibridge.Model.OrderRegisterResponse;
 import com.indosoft.medibridge.Model.OrderResponse;
 import com.indosoft.medibridge.Model.OtpResponse;
+import com.indosoft.medibridge.Model.PlansResponse;
 import com.indosoft.medibridge.Model.ProceedOrderResponse;
 import com.indosoft.medibridge.Model.QuantityChangeResponse;
 import com.indosoft.medibridge.Model.RecentStockitsResponse;
+import com.indosoft.medibridge.Model.RecievedOrderResponse;
 import com.indosoft.medibridge.Model.ShowCartResponse;
 import com.indosoft.medibridge.Model.SignUpResponse;
 import com.indosoft.medibridge.Model.StateCityResponse;
+import com.indosoft.medibridge.Model.StockistListResponse;
 import com.indosoft.medibridge.Model.StockitsResponse;
 import com.indosoft.medibridge.Model.UnitResponse;
 import com.indosoft.medibridge.Model.UrgentCartResponse;
@@ -44,14 +55,17 @@ import com.indosoft.medibridge.Model.UserUpdateResponse;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface ApiInterface {
@@ -85,8 +99,8 @@ public interface ApiInterface {
     Call<List<ShowCartResponse>> showCartList(@Query("retailer_id") String retailer_id);
 
 
-    @POST("login.php")
-    Call<List<LoginResponse>> loginRes(@Query("retailer_phone") String retailer_phone, @Query("retailer_password") String retailer_password);
+    @POST("login_verify.php")
+    Call<LoginResponse> loginRes(@Query("retailer_phone") String retailer_phone, @Query("retailer_password") String retailer_password);
 
     @POST("users.php")
     Call<SignUpResponse> getRegisterRes(@Body SignUpBody body);
@@ -133,9 +147,13 @@ public interface ApiInterface {
     @POST("orders.php")
     Call<OrderResponse> orderRes(@Query("retailer_id") String retailer_id, @Query("order_no") String order_no);
 
-    @POST("orderdetails.php")
-    Call<List<OrderDetailsResponse>> getOrderDetails(@Query("retailer_id") String retailer_id, @Query("order_no") String order_no,
+    @POST("orderdetails_stockist.php")
+    Call<List<OrderDetailsResponse>> stockisOrderDetails(@Query("retailer_id") String retailer_id, @Query("order_no") String order_no,
                                                      @Query("dealer_id") String dealer_id, @Query("order_status") String order_status);
+    @POST("orderdetails.php")
+    Call<List<OrderDetailsResponse>> getOrderDetails(@Query("retailer_id") String retailer_id);
+    @DELETE("orderdetails.php")
+    Call<SignUpResponse> deleteOrder(@Query("order_items_id") String order_items_id );
 
     @DELETE("urgentcart.php")
     Call<UrgentDeleteResponse> deleteUrgentCart(@Query("cart_id") String cart_id);
@@ -147,7 +165,7 @@ public interface ApiInterface {
     Call<List<RecentStockitsResponse>> recentStockits(@Query("retailer_id") String retailer_id);
 
     @POST("stockistorderdetails.php")
-    Call<List<StockitsResponse>> stockitsList(@Query("retailer_id") String retailer_id, @Query("dealer_id") String dealer_id);
+    Call<List<StockitsResponse>>stockitsList(@Query("retailer_id") String retailer_id, @Query("dealer_id") String dealer_id);
 
     @PUT("showcart.php")
     Call<DeliveryDayResponse> deliveryDay(@Query("cart_id") String cart_id, @Query("delivery_day") String delivery_day);
@@ -172,7 +190,47 @@ public interface ApiInterface {
 
     @POST("registerstockist.php")
     Call<SignUpResponse> stockistRegister(@Body StockistBody body);
-    @GET("cartcounter.php")
-    Call<CounterResponse> getCounter(@Query("retailer_id") String retailer_id);
+    @GET("expiryregister.php")
+    Call<List<ExpiryListResponse>> getExpiryList();
+    @POST("expiryregister.php")
+    Call<SignUpResponse> expiryRegister(@Body ExpiryRegisterBody body);
+    @PUT("expiryregister.php")
+    Call<SignUpResponse> registerExpiry(@Body RegisterExpiryBody body);
 
+    @POST("unlistedproducts.php")
+    Call<SignUpResponse> unlistedMedicine(@Body UnlistedBody body);
+    @GET("subscriptions.php")
+    Call<List<PlansResponse>> getPlans();
+
+    @PUT("subscriptions.php")
+    Call<SignUpResponse> getUpdate(@Query("retailer_id") String retailer_id, @Body UpdateStatusBody body);
+
+    @PUT("subscription-expiry.php")
+    Call<SignUpResponse> expiryStatus(@Query("retailer_id") String retailer_id);
+    @Multipart
+    @POST("retailerpics.php")
+    Call<SignUpResponse> updateRetailerImage(
+            @Part MultipartBody.Part image
+    );
+    @POST("stockistlist.php")
+    Call<List<StockistListResponse>> stockistList(@Query("city_id") String city_id);
+    @PUT("retailerorderdetails.php")
+    Call<SignUpResponse> getOrderStatus(@Query("order_items_id") String order_items_id, @Query("order_status") String order_status);
+
+    @POST("receivedorderdetails.php")
+    Call<List<RecievedOrderResponse>> getRecievedProduct(@Query("retailer_id") String retailer_id);
+    @POST("send_email.php")
+    Call<SignUpResponse> sendEmail(@Body SendEmailBody body);
+
+    @PUT("reset_password.php")
+    Call<SignUpResponse> resetPassword(@Query("retailer_id") String retailer_id,@Query("retailer_password") String retailer_password);
+
+   // pos sale api
+    @POST("pos_cart.php")
+    Call<SignUpResponse> posAdd(@Query("retailer_id") String retailer_id, @Body PosAddBody body);
+
+    @PUT("pos_cart.php")
+    Call<SignUpResponse> posUpdate(@Query("id") String id, @Body PosUpdateBody body);
+    @GET("pos_cart.php")
+    Call<List<GetPosProductResponse>> getPosList(@Query("retailer_id") String retailer_id);
 }

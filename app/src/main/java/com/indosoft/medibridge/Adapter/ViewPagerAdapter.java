@@ -14,29 +14,29 @@ import com.indosoft.medibridge.R;
 
 public class ViewPagerAdapter extends PagerAdapter {
 
-
     private Context context;
     private LayoutInflater layoutInflater;
+
+    // Titles and images for each slide
+    private String[] titles = {
+            "Welcome to Medibro, a platform that facilitates communication, order management, and supply chain management for retailers, distributors, and super stockists of medical products.",
+            "Introducing Medibro, the comprehensive solution for managing and tracking medical orders, products, and inventory.",
+            "Designed specifically for retailers, suppliers, and super stockists, our app allows seamless order placement, tracking, and execution for medical products, medicines, surgicals, and other medical equipment."
+    };
+
+    private int[] imageResources = {
+            R.drawable.slides_one,
+            R.drawable.slides_two,
+            R.drawable.slides_three
+    };
 
     public ViewPagerAdapter(Context context) {
         this.context = context;
     }
 
-    private int[] slide_images = {
-            R.drawable.b1,
-            R.drawable.b2,
-            R.drawable.b3
-    };
-
-    private String[] slide_headings = {
-            "EAT",
-            "SLEEP",
-            "CODE"
-    };
-
     @Override
     public int getCount() {
-        return slide_headings.length;
+        return titles.length; // Ensure this matches the length of imageResources
     }
 
     @Override
@@ -47,25 +47,24 @@ public class ViewPagerAdapter extends PagerAdapter {
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        assert layoutInflater != null;
+        layoutInflater = LayoutInflater.from(context);
         View view = layoutInflater.inflate(R.layout.slider_layout, container, false);
 
-        ImageView slideImageView = view.findViewById(R.id.imageView);
-        TextView slideHeading = view.findViewById(R.id.heading);
-        TextView slideText = view.findViewById(R.id.textPage);
+        TextView titleText = view.findViewById(R.id.textPage);
+        ImageView imageView = view.findViewById(R.id.imageView);  // Reference to the ImageView
 
-        slideImageView.setImageResource(slide_images[position]);
-        slideHeading.setText(slide_headings[position]);
+
+        if (position < titles.length && position < imageResources.length) {
+            titleText.setText(titles[position]);
+            imageView.setImageResource(imageResources[position]);  // Set the image for this slide
+        }
 
         container.addView(view);
-
         return view;
     }
 
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-
         container.removeView((View) object);
     }
 }

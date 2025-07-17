@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.RecentStockistActivity">
@@ -17,49 +18,70 @@
             android:orientation="vertical"
             android:padding="10dp">
 
-
-            <ImageView
-                android:id="@+id/img_back"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/backarrow" />
-
-
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp">
-                <TextView
+                android:layout_marginTop="10dp">
+
+                <ImageView
+                    android:id="@+id/img_back"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/backarrow"
+                    />
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Stockist Name:"
-                    android:textColor="@color/black"
-                    android:fontFamily="@font/gothambook"
-                    android:textSize="16sp"/>
+                    android:orientation="horizontal"
+                   android:layout_centerInParent="true"
 
-                <TextView
-                    android:id="@+id/txt_dealername"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/green"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/gotham_bold"
-                    android:layout_marginStart="10dp"/>
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Stockist Name:"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/gothambook"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
+                        android:gravity="center"/>
+
+                    <TextView
+                        android:id="@+id/txt_dealername"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/green"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:fontFamily="@font/gotham_bold"
+                        android:layout_marginStart="10dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
-            </LinearLayout>
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="15dp"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="11dp"
-                app:cardBackgroundColor="@color/white"
                 android:layout_marginHorizontal="5dp"
                 >
 
@@ -70,7 +92,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginHorizontal="10dp"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginBottom="5dp">
+                    android:layout_marginBottom="10dp">
 
                     <ImageView
                         android:layout_width="30dp"
@@ -83,11 +105,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Start Date"
-                        android:textSize="16sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gothambook"
                         android:textColor="@color/black"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="20dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
                     <TextView
@@ -97,16 +124,15 @@
                         android:text="Last date"
                         android:textColor="@color/black"
                         android:gravity="end"
-                        android:textSize="16sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gothambook"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="20dp"/>
-
-
-
-
-
-
+                        android:layout_marginStart="20dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
                 </LinearLayout>
 
@@ -121,7 +147,6 @@
                 android:layout_marginTop="10dp"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="11dp"
-                android:backgroundTint="@color/white"
                 android:layout_marginHorizontal="10dp"
                 >
 
@@ -136,6 +161,7 @@
                     android:fontFamily="@font/gothambold"
                     android:paddingStart="20dp"
                     android:textSize="16sp"
+                    android:completionThreshold="1"
 
                     />
 
@@ -177,24 +203,24 @@
                     >
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Print Invoice"
+                        android:text="Print Order"
                         android:textColor="@color/white"
-                        android:textSize="15sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
                         android:fontFamily="@font/gothambold"
-                        android:layout_gravity="center"/>
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
 
 
                 </androidx.cardview.widget.CardView>
 
-                <ImageView
-                    android:id="@+id/img_whatsApp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/whatsapp"
-                    android:scaleType="centerCrop"
-                    android:background="@null"/>
+
             </LinearLayout>
 
 

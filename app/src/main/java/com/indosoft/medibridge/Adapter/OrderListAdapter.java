@@ -42,10 +42,12 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OrderListResponse response = orderList.get(position);
         holder.order_status.setText(response.getOrderStatus());
-       // holder.orderNum.setText("#"+response.getOrderNo());
+       // holder.address.setText("#"+response.geta());
         holder.dateTime.setText(response.getAddtime());
         holder.items.setText(response.getTotalmeds());
         holder.dealer.setText(response.getDealerName());
+
+
 
         switch (response.getOrderStatus()) {
             case "Pending":
@@ -72,6 +74,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.View
             String dot = response.getAddtime();
             String status =response.getOrderStatus();
             String name =response.getDealerName();
+            String qty =response.getTotalmeds();
 
            Intent intent = new Intent(context, SeeAllOrderDetailsActivity.class);
             intent.putExtra("retailerId", retailerId);
@@ -80,6 +83,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.View
             intent.putExtra("orderStatus", status);
             intent.putExtra("dot", dot);
             intent.putExtra("name", name);
+            intent.putExtra("qty", qty);
             context.startActivity(intent);
         });
 
@@ -103,18 +107,19 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.View
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView order_status,orderNum,dateTime,items,seeDetails,dealer;
+        TextView order_status,address,dateTime,items,seeDetails,dealer;
         CardView background;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             order_status = itemView.findViewById(R.id.txt_status);
-           // orderNum = itemView.findViewById(R.id.txt_orderNo);
+            address = itemView.findViewById(R.id.txt_address);
             dateTime = itemView.findViewById(R.id.txt_dateOftime);
             items = itemView.findViewById(R.id.txt_items);
             seeDetails = itemView.findViewById(R.id.txt_allDetails);
             background = itemView.findViewById(R.id.card_background);
             dealer = itemView.findViewById(R.id.txt_dealer);
+
 
 
         }

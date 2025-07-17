@@ -1,70 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
     tools:context=".Fragment.HomeFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/swipe_refresh_layout">
+        android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="10dp"
                 >
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/logo"/>
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/logomedi"
+
+                    />
 
                 <TextView
                     android:id="@+id/txt_retailerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
                     android:fontFamily="@font/gotham_bold"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="10dp"/>
-
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
+                    />
 
 
                 <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end">
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="10dp">
 
                     <ImageView
                         android:id="@+id/img_notification"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:src="@drawable/notification"
-                        android:layout_gravity="center_vertical" />
-
-                    <TextView
-                        android:id="@+id/notification_badge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="top|end"
-                        android:background="@drawable/badge_background"
-                        android:padding="4dp"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp"
-                        android:visibility="gone" />
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_vertical"
+                     />
                 </FrameLayout>
-
-
 
 
             </androidx.appcompat.widget.Toolbar>
@@ -74,11 +70,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="15dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="11dp"
-                android:backgroundTint="@color/white"
-                >
+                app:cardElevation="11dp">
 
                 <AutoCompleteTextView
                     android:id="@+id/auto_search"
@@ -86,321 +80,581 @@
                     android:layout_height="40dp"
                     android:background="@null"
                     android:drawableStart="@drawable/baseline_search"
-                    android:hint="search medicines for order"
-                    android:textColorHint="@color/green"
+                    android:drawablePadding="10dp"
                     android:fontFamily="@font/gothambold"
                     android:paddingStart="20dp"
-                    android:textSize="16sp"
-
-                    />
+                    android:textColorHint="@color/green"
+                    android:completionThreshold="1"
+                    android:hint="search for demand" />
 
 
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="140dp"
-                android:layout_marginTop="20dp"
+                android:layout_height="160dp"
                 android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
                 app:cardCornerRadius="20dp">
 
 
                 <com.denzcoskun.imageslider.ImageSlider
                     android:id="@+id/image_slider"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:iss_auto_cycle="true"
-                    app:iss_period="2000"
                     app:iss_delay="2000"
-                    app:iss_text_align="CENTER"/>
+                    app:iss_period="2000"
+                    app:iss_text_align="CENTER" />
 
 
             </androidx.cardview.widget.CardView>
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginBottom="70dp"
+                android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
-                >
+                android:layout_marginBottom="10dp"
+                android:fillViewport="true">
+
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="60dp">
 
-                    <RelativeLayout
+                    <LinearLayout
+
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginHorizontal="10dp"
+                        android:orientation="horizontal"
                         android:layout_marginTop="20dp">
 
                         <TextView
+                            android:id="@+id/txt_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Recent Stockists"
-                            android:textSize="18sp"
                             android:fontFamily="@font/gotham_bold"
                             android:textColor="@color/black"
-                            />
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@+id/txt_viewAll"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:layout_weight="1"
+                            android:textAllCaps="false"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="15sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"/>
+
+                        <TextView
+                            android:id="@+id/txt_viewAll"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentTop="true"
+                            android:text="View All"
+                            android:layout_marginStart="10dp"
+                            android:fontFamily="@font/gothambold"
+                            android:textColor="@color/blue_light"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="15sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:gravity="end"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="5dp"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"/>
+                    </LinearLayout>
 
 
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/card_viewAll"
-                            android:layout_width="80dp"
-                            android:layout_height="30dp"
-                            app:cardBackgroundColor="@color/grey"
-                            app:cardCornerRadius="20dp"
-                            android:layout_alignParentEnd="true">
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:text="View All"
-                                android:textColor="@color/green"
-                                android:fontFamily="@font/gothamlight"
-                                android:textSize="16sp"
-                                android:gravity="center"/>
-
-
-                        </androidx.cardview.widget.CardView>
-
-                    </RelativeLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/horizontalRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
                         android:orientation="horizontal"
-                        android:layout_marginHorizontal="20dp"/>
-
+                        android:nestedScrollingEnabled="false"
+                        android:layout_marginTop="10dp"/>
 
 
                     <TextView
+                        android:id="@+id/txt_features"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Featured Items"
-                        android:layout_marginTop="20dp"
-                        android:textColor="@color/black"
                         android:fontFamily="@font/gotham_bold"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:layout_marginHorizontal="20dp"/>
+                        android:textColor="@color/black"
+                        android:layout_alignParentStart="true"
+                        android:layout_toStartOf="@+id/txt_viewAll"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:layout_weight="1"
+                        android:textAllCaps="false"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="15sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"/>
 
-                    <LinearLayout
+                    <GridLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:layout_marginHorizontal="10dp"
-                        android:layout_marginTop="20dp">
+                        android:layout_marginTop="20dp"
+                        android:alignmentMode="alignMargins"
+                        android:columnCount="2"
+                        android:rowOrderPreserved="false">
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/card_orderRegister"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="10dp"
                             app:cardCornerRadius="10dp"
-                            app:cardBackgroundColor="@color/white"
-                            android:layout_weight="1"
-                            android:layout_marginBottom="10dp"
-                            app:cardElevation="11dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginTop="10dp"
-                            >
+                            app:cardElevation="11dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
                                 android:orientation="vertical">
 
-                                <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="140dp"
-                                    android:src="@drawable/expirylist"
-                                    android:scaleType="fitXY"
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
 
-                                    />
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/icon_today" />
 
-                                <LinearLayout
+                                </androidx.cardview.widget.CardView>
+
+
+                                <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center">
+                                    android:text="Today's Demand"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
+                            </LinearLayout>
 
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Order Register"
-                                        android:textSize="14sp"
-                                        android:textColor="@color/black"
-                                        android:fontFamily="@font/gotham_bold"
-                                        android:layout_marginTop="5dp"
-                                        android:layout_marginBottom="10dp"
-                                        />
+                        </androidx.cardview.widget.CardView>
 
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_allOrders"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="10dp"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
 
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
 
-                                </LinearLayout>
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/icon_all__demands" />
+
+                                </androidx.cardview.widget.CardView>
+
+                                <TextView
+
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="All Demands "
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
+
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_expiryRegister"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="10dp"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/icon_recieved" />
+
+                                </androidx.cardview.widget.CardView>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Product Received"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
+
+
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/card_expiryList"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="10dp"
                             app:cardCornerRadius="10dp"
-                            app:cardBackgroundColor="@color/white"
-                            android:layout_weight="1"
-                            android:layout_marginBottom="10dp"
-                            app:cardElevation="11dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginTop="10dp"
-                            >
+                            app:cardElevation="11dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                               android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
                                 android:orientation="vertical">
 
-                                <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="140dp"
-                                    android:src="@drawable/expiry"
-                                    android:scaleType="fitXY"
-                                    />
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
 
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center">
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/expirylist" />
 
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Expiry List"
-                                        android:textSize="14sp"
-                                        android:textColor="@color/black"
-                                        android:layout_marginTop="5dp"
-                                        android:layout_marginBottom="10dp"
-                                        android:fontFamily="@font/gotham_bold"
-                                        />
+                                </androidx.cardview.widget.CardView>
 
+                                <TextView
 
-
-                                </LinearLayout>
-                            </LinearLayout>
-                        </androidx.cardview.widget.CardView>
-
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_marginTop="10dp">
-
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/card_unlistedMedicine"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="10dp"
-                            app:cardBackgroundColor="@color/white"
-                            android:layout_weight="1"
-                            android:layout_marginBottom="10dp"
-                            app:cardElevation="11dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginTop="10dp"
-                            >
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="140dp"
-                                    android:src="@drawable/expirylist"
-                                    android:scaleType="fitXY"
-
-                                    />
-
-                                <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Unlisted Medicine"
-                                        android:textSize="14sp"
-                                        android:textColor="@color/black"
-                                        android:fontFamily="@font/gotham_bold"
-                                        android:layout_marginTop="5dp"
-                                        android:layout_marginBottom="10dp"
-                                        />
-
-
-
-                                </LinearLayout>
+                                    android:text="Expiry List"
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
                         <androidx.cardview.widget.CardView
                             android:id="@+id/card_unlistedStockist"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="10dp"
-                            app:cardBackgroundColor="@color/white"
-                            android:layout_weight="1"
-                            android:layout_marginBottom="10dp"
-                            app:cardElevation="11dp"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
                             android:layout_marginStart="10dp"
-                            android:layout_marginEnd="10dp"
                             android:layout_marginTop="10dp"
-                            >
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_weight="1"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
                                 android:orientation="vertical">
 
-                                <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="140dp"
-                                    android:src="@drawable/expiry"
-                                    android:scaleType="fitXY"
-                                    />
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/audience" />
+
+                                </androidx.cardview.widget.CardView>
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center">
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
 
                                     <TextView
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:text="Unlisted Stockist"
-                                        android:textSize="14sp"
+                                        android:autoSizeTextType="uniform"
+                                        android:autoSizeMinTextSize="13sp"
+                                        android:autoSizeMaxTextSize="15sp"
+                                        android:autoSizeStepGranularity="1sp"
                                         android:textColor="@color/black"
-                                        android:layout_marginTop="5dp"
-                                        android:layout_marginBottom="10dp"
+                                        android:layout_marginTop="8dp"
+                                        android:layout_marginBottom="8dp"
                                         android:fontFamily="@font/gotham_bold"
-                                        />
-
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:importantForAccessibility="no"
+                                        android:includeFontPadding="false"/>
 
 
                                 </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_stockistList"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="10dp"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
 
-                    </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/list" />
+
+                                </androidx.cardview.widget.CardView>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Stockists List "
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_pos"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_weight="1"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/pos_terminal" />
+
+                                </androidx.cardview.widget.CardView>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Pos"
+                                        android:autoSizeTextType="uniform"
+                                        android:autoSizeMinTextSize="13sp"
+                                        android:autoSizeMaxTextSize="15sp"
+                                        android:autoSizeStepGranularity="1sp"
+                                        android:textColor="@color/black"
+                                        android:layout_marginTop="8dp"
+                                        android:layout_marginBottom="8dp"
+                                        android:fontFamily="@font/gotham_bold"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:importantForAccessibility="no"
+                                        android:includeFontPadding="false"/>
 
 
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_posDetail"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="10dp"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/pos_1" />
+
+                                </androidx.cardview.widget.CardView>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pos Details "
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                    </GridLayout>
                 </LinearLayout>
 
             </androidx.core.widget.NestedScrollView>
@@ -409,4 +663,4 @@
         </LinearLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</FrameLayout>
+</RelativeLayout>
