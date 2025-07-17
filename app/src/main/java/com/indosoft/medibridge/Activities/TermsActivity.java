@@ -52,7 +52,7 @@ public class TermsActivity extends AppCompatActivity {
         int blue = ContextCompat.getColor(this, R.color.blue_light);
         int red = ContextCompat.getColor(this, R.color.orange_dark);
         spannable.setSpan(new ForegroundColorSpan(blue), 0, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannable.setSpan(new ForegroundColorSpan(red), 9, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 8, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         title.setText(spannable);
     }
     @Override
