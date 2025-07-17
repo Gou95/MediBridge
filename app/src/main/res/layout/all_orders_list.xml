@@ -353,7 +353,7 @@
 
         <TextView
             android:id="@+id/txt_all_expiry"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Register Expiry "
             android:textColor="@color/red"
@@ -365,6 +365,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
             android:maxLines="1"
+            android:layout_weight="1"
             android:importantForAccessibility="no"
             android:includeFontPadding="false"
 
@@ -372,7 +373,7 @@
 
         <TextView
             android:id="@+id/txt_all_expiryMonth"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/green"
             android:autoSizeTextType="uniform"
@@ -383,6 +384,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="20dp"
             android:maxLines="1"
+            android:layout_weight="1"
             android:importantForAccessibility="no"
             android:includeFontPadding="false"
             />

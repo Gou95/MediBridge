@@ -88,8 +88,8 @@ public class GetSignUpUserResponse {
         this.retailerPassword = retailerPassword;
     }
 
-    public CharSequence getRetailerEmail() {
-        return (CharSequence) retailerEmail;
+    public String getRetailerEmail() {
+        return (String) retailerEmail;
     }
 
     public void setRetailerEmail(Object retailerEmail) {

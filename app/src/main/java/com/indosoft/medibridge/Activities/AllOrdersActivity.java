@@ -64,6 +64,7 @@ public class AllOrdersActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(OrderDetailsViewModel.class);
         viewModel.init(this);
+
         sign = new ViewModelProvider(this).get(SignUpViewModel.class);
         sign.init(this);
         String retailer_id = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);

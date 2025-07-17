@@ -29,6 +29,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".Activities.PosDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.PosActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.AllOrdersActivity"
             android:exported="false" />
         <activity
@@ -76,7 +82,7 @@
         <activity
             android:name=".Activities.ChangePasswordActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".Activities.PrivacyPolicyActivity"
             android:exported="false" />
@@ -88,9 +94,6 @@
             android:exported="false" />
         <activity
             android:name=".Activities.StockistActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.AddressUpdateActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.EditProfileActivity"
@@ -140,6 +143,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCsum9JmFSxokkjB1itUPTrsa4UwX0yLYY" />
     </application>
 
 </manifest>

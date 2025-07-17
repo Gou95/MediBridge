@@ -59,9 +59,17 @@ public class ForgetPasswordActivity extends AppCompatActivity {
             if (signUpResponse != null) {
                 binding.edtEmailId.setText("");
                 binding.edtEnterMobile.setText("");
+
+                // ❗ Clear session before redirecting to LoginActivity
+                AppSession.getInstance(this).clear(); // 👈 Clear session
+
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
                 Toast.makeText(this, signUpResponse.getStatus(), Toast.LENGTH_SHORT).show();
             }
         });
+
+
         sign.getLiveData().observe(this, responses -> {
             if (responses != null) {
                 getAllUserList.clear();

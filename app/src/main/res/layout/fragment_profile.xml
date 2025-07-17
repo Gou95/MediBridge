@@ -94,29 +94,6 @@
 
 
         <TextView
-            android:id="@+id/txt_chat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/baseline_chat"
-            android:drawablePadding="10dp"
-            android:text="Chat"
-            android:textColor="@color/dark_gray"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/grey" />
-
-        <TextView
             android:id="@+id/txt_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

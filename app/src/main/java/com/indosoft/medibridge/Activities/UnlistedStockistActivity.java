@@ -325,7 +325,7 @@ ActivityUnlistedStockistBinding binding;
                         }
                         String token = task.getResult();
                         Log.i("##########FCM_TOKEN##########", "FCM Token: " + token);
-                        AppSession.getInstance(UnlistedStockistActivity.this).setValue(Constants.STOCKIST_FCM_TOKEN,token);
+                        AppSession.getInstance(UnlistedStockistActivity.this).setValue(Constants.STOCKIST_FCM_TOKEN ,token);
                     }
                 });
 

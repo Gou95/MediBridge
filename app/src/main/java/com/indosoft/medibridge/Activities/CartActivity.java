@@ -251,17 +251,25 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
     }
     public void returnToDashboard() {
         AppSession.getInstance(this).setValue(Constants.CART_COUNT, String.valueOf(list.size()));
-
         String savedUrgent = AppSession.getInstance(this).getValue(Constants.URGENT_BADGE_COUNT);
 
+        int urgentCount = 0;
+        try {
+            urgentCount = Integer.parseInt(savedUrgent);
+        } catch (NumberFormatException e) {
+            urgentCount = 0;
+        }
+
         Intent intent = new Intent(CartActivity.this, DashBoardActivity.class);
-       intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("CART_BADGE_COUNT", list.size());
+        intent.putExtra("URGENT_BADGE_COUNT", urgentCount); // Pass urgent badge
         intent.putExtra("SHOW_HOME_FRAGMENT", true);
-        intent.putExtra("URGENT_BADGE_COUNT", savedUrgent);
         startActivity(intent);
         finish();
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -315,13 +323,14 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
 
     @Override
     public void onUrgentItemMoved() {
-        AppSession.getInstance(this).setValue(Constants.URGENT_BADGE_COUNT, "1");
+        // Increase urgent count in session
+        String urgent = AppSession.getInstance(this).getValue(Constants.URGENT_BADGE_COUNT);
+        int newUrgent = 1;
+        try {
+            newUrgent = Integer.parseInt(urgent) + 1;
+        } catch (NumberFormatException ignored) {}
 
-        // Send intent to DashBoardActivity to update the badge
-        Intent intent = new Intent(this, DashBoardActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        intent.putExtra("URGENT_BADGE_COUNT", 1);
-        startActivity(intent);
-        finish();
+        AppSession.getInstance(this).setValue(Constants.URGENT_BADGE_COUNT, String.valueOf(newUrgent));
     }
+
 }

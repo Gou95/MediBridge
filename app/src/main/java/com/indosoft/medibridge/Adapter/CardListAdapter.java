@@ -166,7 +166,6 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
                     DashBoardActivity dashboard = (DashBoardActivity) context;
                     int currentUrgentCount = dashboard.getUrgentBadgeCount();
                     dashboard.updateUrgentBadge(currentUrgentCount + 1);
-
                 }
 
 

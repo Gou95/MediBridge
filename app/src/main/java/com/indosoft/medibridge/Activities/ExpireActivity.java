@@ -49,10 +49,12 @@ public class ExpireActivity extends AppCompatActivity {
         selectedProductId = getIntent().getStringExtra("productId");   // <-- FIXED
         selectedDealerId = getIntent().getStringExtra("stockistId");
         oderitemsId = getIntent().getStringExtra("orderItemsId");
+       String expiry = getIntent().getStringExtra("expiry");
 
         binding.txtProductName.setText(productName);
         binding.edtStockQty.setText(qty);
         binding.autoStockist.setText(stockist);
+        binding.edtExpiryMonth.setText(expiry);
         onAttachObservers();
         initClicks();
 
@@ -110,15 +112,18 @@ public class ExpireActivity extends AppCompatActivity {
                 binding.edtStockQty.setText("");
                 binding.autoStockist.setText("");
 
-              //  String expiryMonth = binding.edtExpiryMonth.getText().toString();
+                String expiryMonth = binding.edtExpiryMonth.getText().toString();
 
-//                Intent resultIntent = new Intent();
-//                resultIntent.putExtra("productId", selectedProductId);
-//                resultIntent.putExtra("expiryMonth", expiryMonth);
-//                setResult(RESULT_OK, resultIntent);
-//                finish();
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("productId", selectedProductId);
+                resultIntent.putExtra("expiryMonth", expiryMonth);
+                setResult(RESULT_OK, resultIntent);
+                finish();
               //  Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
             }
+
+
+
         });
     }
 

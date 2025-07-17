@@ -66,12 +66,14 @@ ActivityLoginBinding binding;
     }
 
     private void checkSubscriptionStatus() {
+        String isFirstLogin = AppSession.getInstance(this).getValue(Constants.IS_FIRST_LOGIN);
         String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
-        if (retailerId != null && !retailerId.isEmpty()) {
+
+        if ("true".equals(isFirstLogin) && retailerId != null && !retailerId.isEmpty()) {
             navigateToDashboard();
         }
-
     }
+
     private void attachObservers() {
         sign.getLiveData().observe(this, responses -> {
             if (responses != null) {
@@ -155,17 +157,28 @@ ActivityLoginBinding binding;
 
             if (loginResponse != null && loginResponse.getData() != null) {
                 String apiPhone = loginResponse.getData().getRetailerPhone();
-                String apiPassword = password; // Since decryption is handled by PHP and API already compares
+                String apiPassword = password;
 
                 if (mobile.equals(apiPhone)) {
-                    // Save session data
+                    // Save basic login session data
                     AppSession appSession = AppSession.getInstance(this);
                     appSession.setValue(Constants.RELAILER_ID, String.valueOf(loginResponse.getData().getRetailerId()));
                     appSession.setValue(Constants.RELAILER_NAME, loginResponse.getData().getRetailerName());
                     appSession.setValue(Constants.RELAILER_PASSWORD, password);
                     appSession.setValue(Constants.RELAILER_PHONE, apiPhone);
                     appSession.setValue(Constants.RETAILER_STATUS, loginResponse.getData().getStatus());
-                   // appSession.setValue(Constants.SUBSCRIPTION_EXPIRY, loginResponse.getData().getSubsExpiryDate());
+
+                    // 👇 Find the signed up user in getAllUserList by retailer ID
+                    String retailerId = String.valueOf(loginResponse.getData().getRetailerId());
+                    for (GetSignUpUserResponse user : getAllUserList) {
+                        if (user.getRetailerId().equals(retailerId)) {
+                            // Save these three values to session
+                            appSession.setValue(Constants.Email, user.getRetailerEmail());
+                            appSession.setValue(Constants.STATE_ID, user.getStateId());
+                            appSession.setValue(Constants.CITY_ID, user.getCityId());
+                            break; // Found, break loop
+                        }
+                    }
 
                     navigateToDashboard();
                 } else {
@@ -176,6 +189,7 @@ ActivityLoginBinding binding;
             }
         });
     }
+
 
 
 

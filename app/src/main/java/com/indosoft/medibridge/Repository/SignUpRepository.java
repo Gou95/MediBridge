@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
+import com.indosoft.medibridge.Body.PosAddBody;
+import com.indosoft.medibridge.Body.PosUpdateBody;
 import com.indosoft.medibridge.Body.RegisterExpiryBody;
 import com.indosoft.medibridge.Body.SendEmailBody;
 import com.indosoft.medibridge.Body.SignUpBody;
@@ -311,4 +313,47 @@ public class SignUpRepository {
         });
         return mutableLiveData;
     }
+    public MutableLiveData<SignUpResponse> posAdd(Context context,String retailer_id, PosAddBody body, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.posAdd(retailer_id,body);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
+
+    public MutableLiveData<SignUpResponse> posUpdate(Context context, String id, PosUpdateBody body, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.posUpdate(id,body);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
+
+
 }

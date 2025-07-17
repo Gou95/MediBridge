@@ -1,29 +1,16 @@
 package com.indosoft.medibridge.Activities;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -33,8 +20,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.*;
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.indosoft.medibridge.Body.AddressUpdateBody;
 import com.indosoft.medibridge.Model.GetSignUpUserResponse;
 import com.indosoft.medibridge.R;
@@ -45,19 +34,23 @@ import com.indosoft.medibridge.ViewModel.AddressUpdateViewModel;
 import com.indosoft.medibridge.ViewModel.GetSignUpUserViewModel;
 import com.indosoft.medibridge.databinding.ActivityUpdateAddressBinding;
 
-public class UpdateAddressActivity extends AppCompatActivity {
+public class UpdateAddressActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    ActivityUpdateAddressBinding binding;
-    AddressUpdateViewModel addressUpdateViewModel;
+    private ActivityUpdateAddressBinding binding;
+    private AddressUpdateViewModel addressUpdateViewModel;
+    private GetSignUpUserViewModel signUpUserViewModel;
 
-    GetSignUpUserViewModel signUpUserViewModel;
-    private boolean isReceiverRegistered = false;
+    private MapView mapView;
+    private GoogleMap googleMap;
+    private boolean isMapReady = false;
+
     private FusedLocationProviderClient fusedLocationsClient;
+    private LocationCallback locationCallback;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
-
+                    showCurrentLocationOnMap();
                 } else {
                     Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
                 }
@@ -66,71 +59,91 @@ public class UpdateAddressActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       binding = ActivityUpdateAddressBinding.inflate(getLayoutInflater());
+        binding = ActivityUpdateAddressBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Init viewModels
         addressUpdateViewModel = new ViewModelProvider(this).get(AddressUpdateViewModel.class);
         addressUpdateViewModel.init(this);
-        fusedLocationsClient = LocationServices.getFusedLocationProviderClient(this);
         signUpUserViewModel = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
         signUpUserViewModel.init(this);
         signUpUserViewModel.getAllSignUPData();
+
+        fusedLocationsClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Initialize map
+        mapView = binding.mapView;
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
+
         initClicks();
         onAttachObservers();
         startNetworkService();
+
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
-
     }
-    private void initClicks() {
 
+    private void initClicks() {
         binding.imgBack.setOnClickListener(v -> onBackPressed());
+
         binding.btnSubmit.setOnClickListener(v -> {
             String address = binding.edtPermanent.getText().toString();
-
-            if (address.isEmpty()){
-                Toast.makeText(this, "enter permanent address", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            if (address.isEmpty()) {
+                Toast.makeText(this, "Enter permanent address", Toast.LENGTH_SHORT).show();
+            } else {
                 AddressUpdateBody body = new AddressUpdateBody();
                 body.setRetailerAddress(address);
-                String retailerId = AppSession.getInstance(UpdateAddressActivity.this).getValue(Constants.RELAILER_ID);
-                Toast.makeText(this, retailerId, Toast.LENGTH_SHORT).show();
-                addressUpdateViewModel.getUpdateAddress(retailerId,body);
-
-                AppSession.getInstance(UpdateAddressActivity.this).setValue(Constants.PERMANENTADDRESS,address);
-
+                String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
+                addressUpdateViewModel.getUpdateAddress(retailerId, body);
+                AppSession.getInstance(this).setValue(Constants.PERMANENTADDRESS, address);
             }
         });
+
         binding.imgMap.setOnClickListener(v -> {
-            checkLocationPermission();
+            if (!isMapReady) {
+                Toast.makeText(this, "Map is still loading...", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+            } else {
+                showCurrentLocationOnMap();
+            }
         });
-        TextView title = binding.txtAddress;
+
+        binding.mapView.setOnClickListener(v -> showCurrentLocationOnMap());
+
         SpannableString spannable = new SpannableString("Add Address");
-
-
         int blue = ContextCompat.getColor(this, R.color.blue_light);
         int red = ContextCompat.getColor(this, R.color.orange_dark);
         spannable.setSpan(new ForegroundColorSpan(blue), 0, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannable.setSpan(new ForegroundColorSpan(red), 4, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        title.setText(spannable);
+        binding.txtAddress.setText(spannable);
     }
+
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
-        addressUpdateViewModel.getLiveData().observe(this,response -> {
+
+        addressUpdateViewModel.getLiveData().observe(this, response -> {
             binding.swipeRefreshLayout.setRefreshing(false);
-            if (response!=null){
+            if (response != null) {
                 Toast.makeText(this, response.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        signUpUserViewModel.getLiveData().observe(this,getSignUpUserResponses -> {
+
+        signUpUserViewModel.getLiveData().observe(this, responses -> {
             binding.swipeRefreshLayout.setRefreshing(false);
-            if (getSignUpUserResponses !=null){
+            if (responses != null) {
                 String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
-                for (GetSignUpUserResponse response : getSignUpUserResponses) {
-                    if (response != null && response.getRetailerId() != null && response.getRetailerId().equals(retailerId)) {
+                for (GetSignUpUserResponse response : responses) {
+                    if (response != null && retailerId.equals(response.getRetailerId())) {
                         binding.txtState.setText(response.getStateName() != null ? response.getStateName() : "State not available");
                         binding.txtCity.setText(response.getCity() != null ? response.getCity() : "City not available");
-                        binding.edtPermanent.setText
-                                 (response.getRetailerAddress() != null ? (CharSequence) response.getRetailerAddress() : "Address not available");
+
+
+                        binding.edtPermanent.setText(response.getRetailerAddress() != null ? (CharSequence) response.getRetailerAddress() : "Address not available");
                     }
                 }
             }
@@ -138,138 +151,89 @@ public class UpdateAddressActivity extends AppCompatActivity {
     }
 
     private void startNetworkService() {
-        Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
-        startService(networkServiceIntent);
-        Log.d("LoginActivity", "NetworkCheckService started");
+        startService(new Intent(this, NetworkCheckService.class));
     }
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Network network = cm.getActiveNetwork();
-                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
-                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-            } else {
 
-                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
-            }
+    private void showCurrentLocationOnMap() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Toast.makeText(this, "Please enable GPS", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            return;
         }
-        return false;
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(1000);
+        locationRequest.setFastestInterval(500);
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null || locationResult.getLastLocation() == null) {
+                    Toast.makeText(UpdateAddressActivity.this, "Unable to fetch location", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                double lat = locationResult.getLastLocation().getLatitude();
+                double lng = locationResult.getLastLocation().getLongitude();
+                LatLng latLng = new LatLng(lat, lng);
+
+                if (googleMap != null) {
+                    googleMap.clear();
+                    googleMap.addMarker(new MarkerOptions().position(latLng).title("You are here"));
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f));
+                }
+
+                fusedLocationsClient.removeLocationUpdates(locationCallback);
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Permission not granted", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        fusedLocationsClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
     }
-    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (isNetworkConnected()) {
 
-                reloadData();
-            } else {
 
-            }
-        }
-    };
+    // Google Map ready callback
+    @Override
+    public void onMapReady(GoogleMap map) {
+        googleMap = map;
+        isMapReady = true;
+
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
+    }
+
+
+    // MapView Lifecycle
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        if (!isReceiverRegistered) {
-            registerReceiver(networkReceiver, filter);
-            isReceiverRegistered = true;
-        }
+        mapView.onResume();
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (isReceiverRegistered) {
-            unregisterReceiver(networkReceiver);
-            isReceiverRegistered = false;
-        }
-    }
-    private void reloadData() {
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-            }
-        }, 5000);
+        mapView.onDestroy();
     }
 
-    private void checkLocationPermission() {
-        if (!isLocationEnabled()){
-            showLocationEnableDialog();
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            getCurrentLocation();
-        } else {
-
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
     }
 
-    private void getCurrentLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        fusedLocationsClient.getLastLocation().addOnSuccessListener(this, location -> {
-            if (location != null) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
 
-                // Show location in Toast or use it
-                Toast.makeText(this, "Lat: " + latitude + ", Lng: " + longitude, Toast.LENGTH_SHORT).show();
-
-                // Open Google Maps with the location
-                Uri gmmIntentUri = Uri.parse("geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude);
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                startActivity(mapIntent);
-            } else {
-                Toast.makeText(this, "Unable to get location", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(e ->
-                Toast.makeText(this, "Error getting location: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-        );
-    }
-    private boolean isLocationEnabled() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-    }
-    private void showLocationEnableDialog() {
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.popup_layout,null);
-
-        TextView title = view.findViewById(R.id.popup_title);
-        TextView massege = view.findViewById(R.id.popup_message);
-        TextView confirm = view.findViewById(R.id.popup_confirm);
-        TextView cancel = view.findViewById(R.id.popup_cancel);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(view);
-        AlertDialog dialog = builder.create();
-        dialog.setCancelable(false);
-        dialog.show();
-
-        title.setText("Enable Location");
-        massege.setText("Your Location is turned off .Please enabale it to continue");
-        cancel.setOnClickListener(v -> dialog.dismiss());
-
-        // Turn On Location Button Click
-        confirm.setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(intent);
-            dialog.dismiss();
-        });
-    }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         if (newConfig.fontScale > 1.0f) {

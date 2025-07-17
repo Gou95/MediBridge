@@ -170,9 +170,7 @@ SignUpViewModel sign;
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         });
-        binding.txtChat.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "coming soon", Toast.LENGTH_SHORT).show();
-        });
+
 
         binding.txtPlan.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), SubscribeActivity.class);

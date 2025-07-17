@@ -67,7 +67,7 @@ public class DashBoardActivity extends AppCompatActivity {
         binding = ActivityDashBoardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         bottomNavigation();
-        logFCM();
+        //logFCM();
         userSession();
 
         if (!isNetworkConnected()) {
@@ -88,54 +88,36 @@ public class DashBoardActivity extends AppCompatActivity {
             }
         }
 
-        // If no fragment handled yet, load default fragment
+        
         if (!handledFragment && savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, new HomeFragment(), "HomeFragment")
                     .commit();
             binding.bottomNavigation.setSelectedItemId(R.id.home);
         }
-//        Intent intent = getIntent();
-//
-//        if (intent != null) {
-//            int updatedCart = intent.getIntExtra("CART_BADGE_COUNT", -1);
-//            int updatedUrgent = intent.getIntExtra("URGENT_BADGE_COUNT", -1);
-//            boolean showOrder = intent.getBooleanExtra("SHOW_ORDER_FRAGMENT", false);
-//            boolean showHome = intent.getBooleanExtra("SHOW_HOME_FRAGMENT", false); // ✅ Add this line
-//            boolean showProfile = intent.getBooleanExtra("SHOW_PROFILE_FRAGMENT", false);
-//
-//            if (updatedCart != -1) updateBadgeCounter(updatedCart);
-//            if (updatedUrgent != -1) updateUrgentBadge(updatedUrgent);
-//
-//            if (showOrder) {
-//                switchFragment(new OrderFragment(), "OrderFragment");
-//                binding.bottomNavigation.setSelectedItemId(R.id.order);
-//            }else if (showProfile) {
-//                switchFragment(new ProfileFragment(), "ProfileFragment");
-//                binding.bottomNavigation.setSelectedItemId(R.id.profile);
-//            } else if (showHome) { // ✅ Show HomeFragment if coming from CartActivity
-//                switchFragment(new HomeFragment(), "HomeFragment");
-//                binding.bottomNavigation.setSelectedItemId(R.id.home);
-//            }
-//        }
+        Intent intent = getIntent();
 
+        if (intent != null) {
+            int updatedCart = intent.getIntExtra("CART_BADGE_COUNT", -1);
+            int updatedUrgent = intent.getIntExtra("URGENT_BADGE_COUNT", -1);
+            boolean showOrder = intent.getBooleanExtra("SHOW_ORDER_FRAGMENT", false);
+            boolean showHome = intent.getBooleanExtra("SHOW_HOME_FRAGMENT", false); // ✅ Add this line
+            boolean showProfile = intent.getBooleanExtra("SHOW_PROFILE_FRAGMENT", false);
 
-//
-//        Intent intent = getIntent();
-//        if (intent != null) {
-//            int updatedCart = intent.getIntExtra("CART_BADGE_COUNT", -1);
-//            int updatedUrgent = intent.getIntExtra("URGENT_BADGE_COUNT", -1);
-//            boolean showOrder = intent.getBooleanExtra("SHOW_ORDER_FRAGMENT", false);
-//
-//            if (updatedCart != -1) updateBadgeCounter(updatedCart);
-//            if (updatedUrgent != -1) updateUrgentBadge(updatedUrgent);
-//            if (showOrder) {
-//                switchFragment(new OrderFragment(), "OrderFragment");
-//                binding.bottomNavigation.setSelectedItemId(R.id.order);
-//            }
-//        }
-        handleIntent(getIntent());
+            if (updatedCart != -1) updateBadgeCounter(updatedCart);
+            if (updatedUrgent != -1) updateUrgentBadge(updatedUrgent);
 
+            if (showOrder) {
+                switchFragment(new OrderFragment(), "OrderFragment");
+                binding.bottomNavigation.setSelectedItemId(R.id.order);
+            }else if (showProfile) {
+                switchFragment(new ProfileFragment(), "ProfileFragment");
+                binding.bottomNavigation.setSelectedItemId(R.id.profile);
+            } else if (showHome) { // ✅ Show HomeFragment if coming from CartActivity
+                switchFragment(new HomeFragment(), "HomeFragment");
+                binding.bottomNavigation.setSelectedItemId(R.id.home);
+            }
+        }
         initializeBadge();
     }
     @Override
@@ -317,21 +299,7 @@ public class DashBoardActivity extends AppCompatActivity {
             }
         }, 5000);
     }
-    private void logFCM() {
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.i("##########FCM_TOKEN##########", "Fetching FCM token failed", task.getException());
-                            return;
-                        }
-                        String token = task.getResult();
-                        Log.i("##########FCM_TOKEN##########", "FCM Token: " + token);
-                        AppSession.getInstance(DashBoardActivity.this).setValue(Constants.STOCKIST_FCM_TOKEN, token);
-                    }
-                });
-    }
+
     public void updateBadgeCounter(int count) {
         cartCount = count;
         AppSession.getInstance(this).setValue(Constants.CART_COUNT, String.valueOf(count));
@@ -423,35 +391,48 @@ public class DashBoardActivity extends AppCompatActivity {
 
         dialog.show();
     }
-    private void handleIntent(Intent intent) {
-        if (intent == null) return;
+//    private void handleIntent(Intent intent) {
+//        if (intent == null) return;
+//
+//        int updatedCart = intent.getIntExtra("CART_BADGE_COUNT", -1);
+//        int updatedUrgent = intent.getIntExtra("URGENT_BADGE_COUNT", -1);
+//        boolean showOrder = intent.getBooleanExtra("SHOW_ORDER_FRAGMENT", false);
+//        boolean showProfile = intent.getBooleanExtra("SHOW_PROFILE_FRAGMENT", false);
+//        boolean showHome = intent.getBooleanExtra("SHOW_HOME_FRAGMENT", false);
+//
+//        if (updatedCart != -1) updateBadgeCounter(updatedCart);
+//        if (updatedUrgent != -1) updateUrgentBadge(updatedUrgent);
+//
+//        if (showOrder) {
+//            switchFragment(new OrderFragment(), "OrderFragment");
+//            binding.bottomNavigation.setSelectedItemId(R.id.order);
+//        } else if (showProfile) {
+//            switchFragment(new ProfileFragment(), "ProfileFragment");
+//            binding.bottomNavigation.setSelectedItemId(R.id.profile);
+//        } else if (showHome) {
+//            switchFragment(new HomeFragment(), "HomeFragment");
+//            binding.bottomNavigation.setSelectedItemId(R.id.home);
+//        }
+//    }
+@Override
+protected void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
 
-        int updatedCart = intent.getIntExtra("CART_BADGE_COUNT", -1);
-        int updatedUrgent = intent.getIntExtra("URGENT_BADGE_COUNT", -1);
-        boolean showOrder = intent.getBooleanExtra("SHOW_ORDER_FRAGMENT", false);
-        boolean showProfile = intent.getBooleanExtra("SHOW_PROFILE_FRAGMENT", false);
-        boolean showHome = intent.getBooleanExtra("SHOW_HOME_FRAGMENT", false);
+    setIntent(intent);
 
-        if (updatedCart != -1) updateBadgeCounter(updatedCart);
-        if (updatedUrgent != -1) updateUrgentBadge(updatedUrgent);
 
-        if (showOrder) {
-            switchFragment(new OrderFragment(), "OrderFragment");
-            binding.bottomNavigation.setSelectedItemId(R.id.order);
-        } else if (showProfile) {
-            switchFragment(new ProfileFragment(), "ProfileFragment");
-            binding.bottomNavigation.setSelectedItemId(R.id.profile);
-        } else if (showHome) {
-            switchFragment(new HomeFragment(), "HomeFragment");
-            binding.bottomNavigation.setSelectedItemId(R.id.home);
-        }
+    if (intent.hasExtra("CART_BADGE_COUNT")) {
+        int cartCount = intent.getIntExtra("CART_BADGE_COUNT", 0);
+        updateBadgeCounter(cartCount); // your method to update cart badge
     }
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        handleIntent(intent); // reuse same logic for consistency
+
+    if (intent.hasExtra("URGENT_BADGE_COUNT")) {
+        int urgentCount = intent.getIntExtra("URGENT_BADGE_COUNT", 0);
+        updateUrgentBadge(urgentCount); // your method to update urgent badge
     }
+}
+
+
 }
 
 

@@ -4,6 +4,8 @@ import com.indosoft.medibridge.Body.AddressUpdateBody;
 import com.indosoft.medibridge.Body.AddtoCartBody;
 import com.indosoft.medibridge.Body.ExitMobileBody;
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
+import com.indosoft.medibridge.Body.PosAddBody;
+import com.indosoft.medibridge.Body.PosUpdateBody;
 import com.indosoft.medibridge.Body.RegisterExpiryBody;
 import com.indosoft.medibridge.Body.SendEmailBody;
 import com.indosoft.medibridge.Body.SignUpBody;
@@ -21,6 +23,7 @@ import com.indosoft.medibridge.Model.DeliveryDayResponse;
 import com.indosoft.medibridge.Model.ExitMobileResponse;
 import com.indosoft.medibridge.Model.ExpiryListResponse;
 import com.indosoft.medibridge.Model.GetOtpResponse;
+import com.indosoft.medibridge.Model.GetPosProductResponse;
 import com.indosoft.medibridge.Model.GetSignUpUserResponse;
 import com.indosoft.medibridge.Model.GetUrgentCartResponse;
 import com.indosoft.medibridge.Model.IndiaStateResponse;
@@ -222,5 +225,12 @@ public interface ApiInterface {
     @PUT("reset_password.php")
     Call<SignUpResponse> resetPassword(@Query("retailer_id") String retailer_id,@Query("retailer_password") String retailer_password);
 
+   // pos sale api
+    @POST("pos_cart.php")
+    Call<SignUpResponse> posAdd(@Query("retailer_id") String retailer_id, @Body PosAddBody body);
 
+    @PUT("pos_cart.php")
+    Call<SignUpResponse> posUpdate(@Query("id") String id, @Body PosUpdateBody body);
+    @GET("pos_cart.php")
+    Call<List<GetPosProductResponse>> getPosList(@Query("retailer_id") String retailer_id);
 }

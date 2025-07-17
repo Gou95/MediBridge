@@ -6,23 +6,27 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.indosoft.medibridge.Listener.CartListener;
-import com.indosoft.medibridge.Model.CardListResponse;
-import com.indosoft.medibridge.Repository.CartRepository;
+import com.indosoft.medibridge.Listener.PlansListener;
+import com.indosoft.medibridge.Listener.PostProductListener;
+import com.indosoft.medibridge.Model.GetPosProductResponse;
+import com.indosoft.medibridge.Model.PlansResponse;
+import com.indosoft.medibridge.Repository.PlansRepository;
+import com.indosoft.medibridge.Repository.PosProductRepository;
 
 import java.util.List;
 
-public class CartViewModel extends ViewModel {
+public class PosProductViewModel extends ViewModel {
+
     private Context context;
 
     private MutableLiveData<String> isFailed = new MutableLiveData<>();
 
     private MutableLiveData<Boolean> isConnecting = new MutableLiveData<>();
 
-    private MutableLiveData<List<CardListResponse>> responseMutableLiveData;
+    private MutableLiveData<List<GetPosProductResponse>> responseMutableLiveData;
 
 
-    private CartRepository repository;
+    private PosProductRepository repository;
 
     public LiveData<String> getIsFailed(){
         return isFailed;
@@ -34,7 +38,7 @@ public class CartViewModel extends ViewModel {
 
     }
 
-    public LiveData<List<CardListResponse>>getLiveData(){
+    public LiveData<List<GetPosProductResponse>>getLiveData(){
         if (responseMutableLiveData == null){
             responseMutableLiveData = new MutableLiveData<>();
         }
@@ -46,27 +50,23 @@ public class CartViewModel extends ViewModel {
         if (responseMutableLiveData == null){
             return;
         }
-        repository = CartRepository.getInstance();
+        repository = PosProductRepository.getInstance();
     }
-    CartListener  listener = new CartListener() {
-
-
+    PostProductListener listener = new PostProductListener() {
         @Override
-        public void onSuccess(List<CardListResponse> response) {
+        public void onSuccess(List<GetPosProductResponse> response) {
             responseMutableLiveData.setValue(response);
         }
 
         @Override
         public void onError(String error) {
-       isFailed.setValue(error);
+            isFailed.setValue(error);
         }
     };
-        public void getModelData() {
-            isConnecting.setValue(true);  // Show loading state
-            repository = CartRepository.getInstance();
-            repository.getCartLiveData(context, listener);
-
-        }
-
+    public void getPosList(String retailer_id) {
+        isConnecting.setValue(true);  // Show loading state
+        repository = PosProductRepository.getInstance();
+        repository.getPosList(context,retailer_id, listener);
 
     }
+}

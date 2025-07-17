@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
+import com.indosoft.medibridge.Body.PosAddBody;
+import com.indosoft.medibridge.Body.PosUpdateBody;
 import com.indosoft.medibridge.Body.RegisterExpiryBody;
 import com.indosoft.medibridge.Body.SendEmailBody;
 import com.indosoft.medibridge.Body.SignUpBody;
@@ -143,6 +145,18 @@ public class SignUpViewModel extends ViewModel {
         isConnecting.setValue(true);
         repository = SignUpRepository.getInstance();
         repository.registerExpiry(context,body, listener);
+
+    }
+    public void posAdd(String retailer_id, PosAddBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.posAdd(context,retailer_id,body, listener);
+
+    }
+    public void posUpdate(String id, PosUpdateBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.posUpdate(context,id,body, listener);
 
     }
 

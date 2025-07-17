@@ -60,7 +60,7 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
 
         holder.serial.setText(String.valueOf(position+1)+".");
         holder.unlisted.setText(response.getUnlistedMedicines());
-        holder.expiryMonth.setText("Expiry Month :"+" "+" "+ response.getExpiryMonth());
+        holder.expiryMonth.setText("Expiry: "+ response.getExpiryMonth());
 
         if ("UNLISTED MEDICINES".equals(response.getProductName())){
             holder.unlisted.setVisibility(View.VISIBLE);
@@ -120,6 +120,7 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
             intent.putExtra("productId", response.getProductId());
             intent.putExtra("stockistId", response.getDealerId());
             intent.putExtra("orderItemsId", response.getOrderItemsId());
+            intent.putExtra("expiry", response.getExpiryMonth());
             expiryLauncher.launch(intent);  // ✅ Use launcher instead of direct startActivity
         });
 

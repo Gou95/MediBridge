@@ -85,7 +85,7 @@
                     android:paddingStart="20dp"
                     android:textColorHint="@color/green"
                     android:completionThreshold="1"
-                    android:hint="" />
+                    android:hint="search for demand" />
 
 
             </androidx.cardview.widget.CardView>
@@ -402,7 +402,7 @@
                                         android:layout_height="match_parent"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/icon_expiry_list" />
+                                        android:src="@drawable/expirylist" />
 
                                 </androidx.cardview.widget.CardView>
 
@@ -457,7 +457,7 @@
                                         android:layout_height="match_parent"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/icon_unlisted_stockist" />
+                                        android:src="@drawable/audience" />
 
                                 </androidx.cardview.widget.CardView>
 
@@ -516,7 +516,7 @@
                                         android:layout_height="match_parent"
                                         android:layout_gravity="center"
                                         android:scaleType="fitXY"
-                                        android:src="@drawable/icon_stockist_list" />
+                                        android:src="@drawable/list" />
 
                                 </androidx.cardview.widget.CardView>
 
@@ -524,6 +524,122 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="Stockists List "
+                                    android:autoSizeTextType="uniform"
+                                    android:autoSizeMinTextSize="13sp"
+                                    android:autoSizeMaxTextSize="15sp"
+                                    android:autoSizeStepGranularity="1sp"
+                                    android:textColor="@color/black"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:fontFamily="@font/gotham_bold"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:importantForAccessibility="no"
+                                    android:includeFontPadding="false"/>
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_pos"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_weight="1"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/pos_terminal" />
+
+                                </androidx.cardview.widget.CardView>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Pos"
+                                        android:autoSizeTextType="uniform"
+                                        android:autoSizeMinTextSize="13sp"
+                                        android:autoSizeMaxTextSize="15sp"
+                                        android:autoSizeStepGranularity="1sp"
+                                        android:textColor="@color/black"
+                                        android:layout_marginTop="8dp"
+                                        android:layout_marginBottom="8dp"
+                                        android:fontFamily="@font/gotham_bold"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:importantForAccessibility="no"
+                                        android:includeFontPadding="false"/>
+
+
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_posDetail"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="10dp"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="11dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="5dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="40dp"
+                                    app:cardElevation="11dp">
+
+
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/pos_1" />
+
+                                </androidx.cardview.widget.CardView>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pos Details "
                                     android:autoSizeTextType="uniform"
                                     android:autoSizeMinTextSize="13sp"
                                     android:autoSizeMaxTextSize="15sp"

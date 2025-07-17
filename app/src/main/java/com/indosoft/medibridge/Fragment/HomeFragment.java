@@ -57,6 +57,8 @@ import com.indosoft.medibridge.Activities.HelpActivity;
 import com.indosoft.medibridge.Activities.NotificationActivity;
 import com.indosoft.medibridge.Activities.OrderRegisterActivity;
 import com.indosoft.medibridge.Activities.ExpiryRegisterActivity;
+import com.indosoft.medibridge.Activities.PosActivity;
+import com.indosoft.medibridge.Activities.PosDetailActivity;
 import com.indosoft.medibridge.Activities.StockistActivity;
 import com.indosoft.medibridge.Activities.SubscribeActivity;
 import com.indosoft.medibridge.Activities.UnlistedStockistActivity;
@@ -225,224 +227,6 @@ public class HomeFragment extends Fragment {
                // updateCartBadgeCount(cartCount);
             }
         });
-    }
-
-    private void setUpImageSlider() {
-        ArrayList<SlideModel> imageList = new ArrayList<>();
-        imageList.add(new SlideModel(R.drawable.slides_4, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_5, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_6, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_7 , ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_8 , ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slide_1, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slide_2, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_3 , ScaleTypes.FIT));
-        imageSlider.setImageList(imageList, ScaleTypes.CENTER_CROP);
-        imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
-    }
-
-    @SuppressLint("ResourceAsColor")
-    private void initCliks() {
-        binding.autoSearch.setOnItemClickListener(this::onProductSelected);
-        binding.autoSearch.addTextChangedListener(new TextWatcher() {
-            private Handler handler = new Handler();
-            private Runnable inputFinishChecker;
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (inputFinishChecker != null) {
-                    handler.removeCallbacks(inputFinishChecker);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String enteredText = s.toString().trim();
-
-                inputFinishChecker = () -> {
-                    if (!enteredText.isEmpty() && !productMap.containsKey(enteredText)) {
-                      //  Toast.makeText(getContext(), "This product is not in the list. Please select unlisted medicine.", Toast.LENGTH_SHORT).show();
-                    }
-                };
-
-                handler.postDelayed(inputFinishChecker, 2000); // 1 second delay
-            }
-        });
-
-        binding.txtViewAll.setOnClickListener(v -> launchActivity(ViewAllStockistActivity.class));
-        binding.imgNotification.setOnClickListener(v -> launchActivity(HelpActivity.class));
-        binding.cardOrderRegister.setOnClickListener(v -> {
-            AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, "0");
-            AppSession.getInstance(getContext()).setValue(Constants.URGENT_BADGE_COUNT, "0");
-
-            if (getActivity() instanceof DashBoardActivity) {
-                DashBoardActivity activity = (DashBoardActivity) getActivity();
-                activity.updateBadgeCounter(0);
-                activity.updateUrgentBadge(0);
-            }
-            launchActivity(OrderRegisterActivity.class);
-        });
-
-        binding.cardExpiryRegister.setOnClickListener(v -> launchActivity(ExpiryRegisterActivity.class));
-        binding.cardUnlistedStockist.setOnClickListener(v -> launchActivity(UnlistedStockistActivity.class));
-        binding.cardExpiryList.setOnClickListener(v -> launchActivity(ExpiryListActivity.class));
-        binding.cardStockistList.setOnClickListener(v -> launchActivity(StockistActivity.class));
-        binding.cardAllOrders.setOnClickListener(v -> launchActivity(AllOrdersActivity.class));
-        Glide.with(this)
-                .asGif()
-                .load(R.drawable.help) // or use a URL or File
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.imgNotification);
-
-
-
-        TextView title = binding.txtTitle;
-        TextView title1 = binding.txtFeatures;
-        SpannableString spannable = new SpannableString("Recent Stockists");
-        SpannableString spannable1 = new SpannableString("Featured Items");
-
-        int blue = ContextCompat.getColor(getContext(), R.color.blue_light);
-        int red = ContextCompat.getColor(getContext(), R.color.orange_dark);
-        spannable.setSpan(new ForegroundColorSpan(blue), 0, 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannable.setSpan(new ForegroundColorSpan(red), 7, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannable1.setSpan(new ForegroundColorSpan(blue), 0, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannable1.setSpan(new ForegroundColorSpan(red), 9, spannable1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        title.setText(spannable);
-        title1.setText(spannable1);
-        TextView title2 = binding.txtRetailerName;
-
-        String retailerName = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_NAME);
-        if (retailerName == null) {
-            retailerName = "Default Retailer";
-        }
-        String welcomeText = "Welcome " + retailerName;
-        SpannableString spannable2 = new SpannableString(welcomeText);
-        spannable2.setSpan(new ForegroundColorSpan(blue), 0, 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // "Welcome"
-        spannable2.setSpan(new ForegroundColorSpan(red), 8, welcomeText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Name
-
-        title2.setText(spannable2);
-
-    }
-    private void onProductSelected(AdapterView<?> parent, View view, int position, long id) {
-        String selectedProductName = parent.getItemAtPosition(position).toString();
-        String selectedProductId = productMap.get(selectedProductName);
-
-        if (selectedProductId != null) {
-            if (selectedProductId.equals("1680")) {
-                unlistedShowPopup(selectedProductName);
-            } else {
-                AppSession.getInstance(getContext()).setValue(Constants.PRODUCT_ID, selectedProductId);
-                String supplierName = getSupplierNameForProduct(selectedProductId);
-                showPopup(selectedProductName, supplierName);
-            }
-            binding.autoSearch.setText("");
-        }
-    }
-
-    private String getSupplierNameForProduct(String productId) {
-        for (MedicineListResponse medicine : itemList) {
-            if (medicine.getProductId().equals(productId)) {
-                return medicine.getSupplierName();
-            }
-        }
-        return "Supplier not available";
-    }
-    private String getUnitForProduct(String productName) {
-        for (MedicineListResponse medicine : itemList) {
-            if (medicine.getProductName().equalsIgnoreCase(productName)) {
-               // Toast.makeText(getContext(), medicine.getProductId(), Toast.LENGTH_SHORT).show();
-                return (String) medicine.getUnitName();
-            }
-        }
-        return null;
-
-    }
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        if (newConfig.fontScale > 1.0f) {
-            newConfig.fontScale = 1.0f;
-            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
-        }
-        super.onConfigurationChanged(newConfig);
-    }
-
-    @SuppressLint("MissingInflatedId")
-    private void unlistedShowPopup(String selectedProductName) {
-        cityDealerViewModel = new ViewModelProvider(this).get(CityDealerViewModel.class);
-        cityDealerViewModel.init(requireContext());
-        View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.unlisted_medicine, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setView(popupView);
-        AlertDialog dialog = builder.create();
-        TextView txtItemDetails = popupView.findViewById(R.id.txt_unListedmedicine);
-        txtItemDetails.setText(selectedProductName);
-        AutoCompleteTextView unlistedStockist = popupView.findViewById(R.id.auto_unlistedDealerName);
-        ImageView imgCancel = popupView.findViewById(R.id.img_cancle);
-        TextInputEditText text =popupView.findViewById(R.id.et_enterMedicine);
-        CardView submit = popupView.findViewById(R.id.btn_unListaddCart);
-
-        imgCancel.setOnClickListener(v -> dialog.dismiss());
-        cityDealerViewModel.cityDealerData(AppSession.getInstance(getActivity()).getValue(Constants.CITY_ID));
-        cityDealerViewModel.getLiveData().observe(getViewLifecycleOwner(), cityDealerResponses -> {
-            if (cityDealerResponses != null) {
-                List<String> stockitsList = new ArrayList<>();
-                dealerMap.clear();
-                for (CityDealerResponse response : cityDealerResponses) {
-                    if (response != null && response.getDealerId() != null) {
-                        stockitsList.add(response.getDealerName());
-                        dealerMap.put(response.getDealerName(), response.getDealerId());
-                    }
-                }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.dealer_items, stockitsList);
-                unlistedStockist.setAdapter(adapter);
-                unlistedStockist.setOnClickListener(v -> {
-                    unlistedStockist.setText("");
-                    if (unlistedStockist.getText().toString().isEmpty()) {
-                        selectDealerId = null;
-                        AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, null);
-                    }
-                });
-                unlistedStockist.setOnItemClickListener((parent, view, position, id) -> {
-                    String selectedDealerName = parent.getItemAtPosition(position).toString();
-                    selectDealerId = dealerMap.get(selectedDealerName);
-                    AppSession.getInstance(requireContext()).setValue(Constants.DEALER_ID, selectDealerId);
-                    unlistedStockist.setText(selectedDealerName);
-                });
-            }
-        });
-        submit.setOnClickListener(v -> {
-            String dealerId = selectDealerId;
-            String enter = text.getText().toString();
-            String productId = "1680"; // Ensure correct product_id is passed
-
-            if (dealerId == null || dealerId.isEmpty()) {
-                Toast.makeText(requireContext(), "Please select a dealer", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (enter.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter product", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Log.d("UnlistedPopup", "Submitting Product ID: " + productId); // Debugging
-
-            UnlistedBody body = new UnlistedBody();
-            body.setRetailerId(AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID));
-            body.setDealerId(dealerId);
-            body.setProductId(productId); // Always pass "1680"
-            body.setUnlistedMedicines(enter);
-
-            sign.unlistedMedicine(body);
-
-            if (dialog != null && dialog.isShowing()) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
     }
     private void showPopup(String selectedProductName, String supplierName) {
         unitViewModel = new ViewModelProvider(this).get(UnitViewModel.class);
@@ -641,6 +425,226 @@ public class HomeFragment extends Fragment {
         }
         dialog.show();
     }
+
+    private void setUpImageSlider() {
+        ArrayList<SlideModel> imageList = new ArrayList<>();
+        imageList.add(new SlideModel(R.drawable.slides_4, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_5, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_6, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_7 , ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slide_1, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slide_2, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_3 , ScaleTypes.FIT));
+        imageSlider.setImageList(imageList, ScaleTypes.CENTER_CROP);
+        imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private void initCliks() {
+        binding.autoSearch.setOnItemClickListener(this::onProductSelected);
+        binding.autoSearch.addTextChangedListener(new TextWatcher() {
+            private Handler handler = new Handler();
+            private Runnable inputFinishChecker;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (inputFinishChecker != null) {
+                    handler.removeCallbacks(inputFinishChecker);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String enteredText = s.toString().trim();
+
+                inputFinishChecker = () -> {
+                    if (!enteredText.isEmpty() && !productMap.containsKey(enteredText)) {
+                      //  Toast.makeText(getContext(), "This product is not in the list. Please select unlisted medicine.", Toast.LENGTH_SHORT).show();
+                    }
+                };
+
+                handler.postDelayed(inputFinishChecker, 2000); // 1 second delay
+            }
+        });
+
+        binding.txtViewAll.setOnClickListener(v -> launchActivity(ViewAllStockistActivity.class));
+        binding.imgNotification.setOnClickListener(v -> launchActivity(HelpActivity.class));
+        binding.cardOrderRegister.setOnClickListener(v -> {
+            AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, "0");
+            AppSession.getInstance(getContext()).setValue(Constants.URGENT_BADGE_COUNT, "0");
+
+            if (getActivity() instanceof DashBoardActivity) {
+                DashBoardActivity activity = (DashBoardActivity) getActivity();
+                activity.updateBadgeCounter(0);
+                activity.updateUrgentBadge(0);
+            }
+            launchActivity(OrderRegisterActivity.class);
+        });
+
+        binding.cardExpiryRegister.setOnClickListener(v -> launchActivity(ExpiryRegisterActivity.class));
+        binding.cardUnlistedStockist.setOnClickListener(v -> launchActivity(UnlistedStockistActivity.class));
+        binding.cardExpiryList.setOnClickListener(v -> launchActivity(ExpiryListActivity.class));
+        binding.cardStockistList.setOnClickListener(v -> launchActivity(StockistActivity.class));
+        binding.cardAllOrders.setOnClickListener(v -> launchActivity(AllOrdersActivity.class));
+        binding.cardPos.setOnClickListener(v -> launchActivity(PosActivity.class));
+        binding.cardPosDetail.setOnClickListener(v -> launchActivity(PosDetailActivity.class));
+        Glide.with(this)
+                .asGif()
+                .load(R.drawable.help) // or use a URL or File
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(binding.imgNotification);
+
+
+
+        TextView title = binding.txtTitle;
+        TextView title1 = binding.txtFeatures;
+        SpannableString spannable = new SpannableString("Recent Stockists");
+        SpannableString spannable1 = new SpannableString("Featured Items");
+
+        int blue = ContextCompat.getColor(getContext(), R.color.blue_light);
+        int red = ContextCompat.getColor(getContext(), R.color.orange_dark);
+        spannable.setSpan(new ForegroundColorSpan(blue), 0, 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 7, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable1.setSpan(new ForegroundColorSpan(blue), 0, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable1.setSpan(new ForegroundColorSpan(red), 9, spannable1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(spannable);
+        title1.setText(spannable1);
+        TextView title2 = binding.txtRetailerName;
+
+        String retailerName = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_NAME);
+        if (retailerName == null) {
+            retailerName = "Default Retailer";
+        }
+        String welcomeText = "Welcome " + retailerName;
+        SpannableString spannable2 = new SpannableString(welcomeText);
+        spannable2.setSpan(new ForegroundColorSpan(blue), 0, 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // "Welcome"
+        spannable2.setSpan(new ForegroundColorSpan(red), 8, welcomeText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Name
+
+        title2.setText(spannable2);
+
+    }
+    private void onProductSelected(AdapterView<?> parent, View view, int position, long id) {
+        String selectedProductName = parent.getItemAtPosition(position).toString();
+        String selectedProductId = productMap.get(selectedProductName);
+
+        if (selectedProductId != null) {
+            if (selectedProductId.equals("1680")) {
+                unlistedShowPopup(selectedProductName);
+            } else {
+                AppSession.getInstance(getContext()).setValue(Constants.PRODUCT_ID, selectedProductId);
+                String supplierName = getSupplierNameForProduct(selectedProductId);
+                showPopup(selectedProductName, supplierName);
+            }
+            binding.autoSearch.setText("");
+        }
+    }
+
+    private String getSupplierNameForProduct(String productId) {
+        for (MedicineListResponse medicine : itemList) {
+            if (medicine.getProductId().equals(productId)) {
+                return medicine.getSupplierName();
+            }
+        }
+        return "Supplier not available";
+    }
+    private String getUnitForProduct(String productName) {
+        for (MedicineListResponse medicine : itemList) {
+            if (medicine.getProductName().equalsIgnoreCase(productName)) {
+               // Toast.makeText(getContext(), medicine.getProductId(), Toast.LENGTH_SHORT).show();
+                return (String) medicine.getUnitName();
+            }
+        }
+        return null;
+
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+        }
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @SuppressLint("MissingInflatedId")
+    private void unlistedShowPopup(String selectedProductName) {
+        cityDealerViewModel = new ViewModelProvider(this).get(CityDealerViewModel.class);
+        cityDealerViewModel.init(requireContext());
+        View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.unlisted_medicine, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setView(popupView);
+        AlertDialog dialog = builder.create();
+        TextView txtItemDetails = popupView.findViewById(R.id.txt_unListedmedicine);
+        txtItemDetails.setText(selectedProductName);
+        AutoCompleteTextView unlistedStockist = popupView.findViewById(R.id.auto_unlistedDealerName);
+        ImageView imgCancel = popupView.findViewById(R.id.img_cancle);
+        TextInputEditText text =popupView.findViewById(R.id.et_enterMedicine);
+        CardView submit = popupView.findViewById(R.id.btn_unListaddCart);
+
+        imgCancel.setOnClickListener(v -> dialog.dismiss());
+        cityDealerViewModel.cityDealerData(AppSession.getInstance(getActivity()).getValue(Constants.CITY_ID));
+        cityDealerViewModel.getLiveData().observe(getViewLifecycleOwner(), cityDealerResponses -> {
+            if (cityDealerResponses != null) {
+                List<String> stockitsList = new ArrayList<>();
+                dealerMap.clear();
+                for (CityDealerResponse response : cityDealerResponses) {
+                    if (response != null && response.getDealerId() != null) {
+                        stockitsList.add(response.getDealerName());
+                        dealerMap.put(response.getDealerName(), response.getDealerId());
+                    }
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.dealer_items, stockitsList);
+                unlistedStockist.setAdapter(adapter);
+                unlistedStockist.setOnClickListener(v -> {
+                    unlistedStockist.setText("");
+                    if (unlistedStockist.getText().toString().isEmpty()) {
+                        selectDealerId = null;
+                        AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, null);
+                    }
+                });
+                unlistedStockist.setOnItemClickListener((parent, view, position, id) -> {
+                    String selectedDealerName = parent.getItemAtPosition(position).toString();
+                    selectDealerId = dealerMap.get(selectedDealerName);
+                    AppSession.getInstance(requireContext()).setValue(Constants.DEALER_ID, selectDealerId);
+                    unlistedStockist.setText(selectedDealerName);
+                });
+            }
+        });
+        submit.setOnClickListener(v -> {
+            String dealerId = selectDealerId;
+            String enter = text.getText().toString();
+            String productId = "1680"; // Ensure correct product_id is passed
+
+            if (dealerId == null || dealerId.isEmpty()) {
+                Toast.makeText(requireContext(), "Please select a dealer", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (enter.isEmpty()) {
+                Toast.makeText(requireContext(), "Please enter product", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Log.d("UnlistedPopup", "Submitting Product ID: " + productId); // Debugging
+
+            UnlistedBody body = new UnlistedBody();
+            body.setRetailerId(AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID));
+            body.setDealerId(dealerId);
+            body.setProductId(productId); // Always pass "1680"
+            body.setUnlistedMedicines(enter);
+
+            sign.unlistedMedicine(body);
+
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
 
 
     private void startNetworkCheckService() {
