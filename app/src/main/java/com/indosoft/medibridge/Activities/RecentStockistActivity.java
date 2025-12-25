@@ -7,10 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.pdf.PdfDocument;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -64,6 +68,7 @@ public class RecentStockistActivity extends AppCompatActivity {
     private String startDateSelected = null;
     private String lastDateSelected = null;
     private boolean isReceiverRegistered = false;
+    private String orderDate = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,6 +166,7 @@ public class RecentStockistActivity extends AppCompatActivity {
                 .setView(calendarView)
                 .create();
         dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         calendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             String selectedDate = String.format(Locale.getDefault(), "%02d-%02d-%04d", dayOfMonth, (month + 1), year);
 
@@ -233,6 +239,263 @@ public class RecentStockistActivity extends AppCompatActivity {
 
         adapter.updateList(filteredList);
     }
+
+    private void setDefaultDates() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+
+        lastDateSelected = sdf.format(calendar.getTime());
+        binding.txtLastDate.setText(lastDateSelected);
+
+        // Start Date = Current Date - 7 Days
+        calendar.add(Calendar.DAY_OF_MONTH, -3);
+        startDateSelected = sdf.format(calendar.getTime());
+        binding.txtStartDate.setText(startDateSelected);
+    }
+    private void generateInvoicePdf() {
+        String dealer = getIntent().getStringExtra("dealerName");
+        if (dealer == null) dealer = "Unknown_Stockist";
+
+        if (list == null || list.isEmpty()) {
+            Toast.makeText(this, "No order details available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        orderDate = list.get(0).getAddtime(); // ✅ Get order date from first item
+        dealer = dealer.replaceAll("[^a-zA-Z0-9\\-_ ]", "").replaceAll(" +", "_");
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String fileName = dealer + "_Invoice_" + timeStamp + ".pdf";
+
+        PdfDocument pdfDocument = new PdfDocument();
+        Paint paint = new Paint();
+        Paint titlePaint = new Paint();
+        Paint dealerPaint = new Paint();
+        Paint borderPaint = new Paint();
+
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setColor(Color.BLACK);
+        borderPaint.setStrokeWidth(1);
+
+        int pageWidth = 600;
+        int pageHeight = 800;
+        int rowHeight = 40;
+
+        int col1 = 140, col2 = 100, col3 = 100, col4 = 80, col5 = 100;
+        int itemIndex = 0;
+        int pageNumber = 1;
+
+        while (itemIndex < list.size()) {
+            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber++).create();
+            PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+            Canvas canvas = page.getCanvas();
+
+            // 1. Draw QR Code (Top-Right)
+            // 1. Draw QR Code on Top-Right
+            Bitmap qrBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.qr_code);
+            if (qrBitmap != null) {
+                Rect src = new Rect(0, 0, qrBitmap.getWidth(), qrBitmap.getHeight());
+                Rect dest = new Rect(pageWidth - 130, 30, pageWidth - 30, 130); // QR top-right corner
+                canvas.drawBitmap(qrBitmap, src, dest, null);
+
+                // 2. Draw text below QR
+                Paint qrTextPaint = new Paint();
+                qrTextPaint.setColor(Color.BLACK);
+                qrTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                qrTextPaint.setTextSize(12);
+
+// First line: "Scan & download"
+                String line1 = "Scan & download";
+                float textWidth1 = qrTextPaint.measureText(line1);
+                float textX1 = pageWidth - 130 + (100 - textWidth1) / 2;
+                float textY1 = 145;
+                canvas.drawText(line1, textX1, textY1, qrTextPaint);
+
+// Second line: "Medibro" (bigger + bold)
+                Paint qrTextBoldPaint = new Paint();
+                qrTextBoldPaint.setColor(Color.BLACK);
+                qrTextBoldPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                qrTextBoldPaint.setTextSize(14);
+
+                String line2 = "Medibro App";
+                float textWidth2 = qrTextBoldPaint.measureText(line2);
+                float textX2 = pageWidth - 130 + (100 - textWidth2) / 2;
+                float textY2 = textY1 + 15; // a little below first line
+                canvas.drawText(line2, textX2, textY2, qrTextBoldPaint);
+            }
+
+            String retailerName = "Shop Name: " + AppSession.getInstance(this).getValue(Constants.RELAILER_NAME);
+            String retailerAddress = "Address: " + AppSession.getInstance(this).getValue(Constants.PERMANENTADDRESS);
+            String DL = "DL: " + AppSession.getInstance(this).getValue(Constants.RETAILER_DL);
+            String GST = "GST: " + AppSession.getInstance(this).getValue(Constants.RETAILER_GST);
+
+            Paint linePaint = new Paint();
+            linePaint.setTextSize(18);
+            linePaint.setColor(Color.BLACK);
+            linePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+
+            Paint namePaint = new Paint();
+            namePaint.setTextSize(22);
+            namePaint.setColor(Color.BLACK);
+            namePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+            float startX1 = 30;
+            float startY = 40;
+            float lineSpacing = 25;
+
+            canvas.drawText(retailerName, startX1, startY, namePaint);                           // Line 1: Shop Name (bold)
+            canvas.drawText(retailerAddress, startX1, startY + lineSpacing, linePaint);         // Line 2: Address
+            canvas.drawText(DL, startX1, startY + 2 * lineSpacing, linePaint);                  // Line 3: DL
+            canvas.drawText(GST, startX1, startY + 3 * lineSpacing, linePaint);                 // Line 4: GST
+
+            titlePaint.setTextSize(20);
+            titlePaint.setColor(Color.BLACK);
+            titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            String titleText = "Purchase List";
+            float titleWidth = titlePaint.measureText(titleText);
+            canvas.drawText(titleText, (pageWidth - titleWidth) / 2, 160, titlePaint);
+
+            // 3. Draw Expiry Date Centered Below Title
+            dealerPaint.setTextSize(18);
+            dealerPaint.setColor(Color.BLACK);
+            dealerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            String dateText = "Order Date: " + orderDate;
+            float dateTextWidth = dealerPaint.measureText(dateText);
+            canvas.drawText(dateText, (pageWidth - dateTextWidth) / 2, 180, dealerPaint);
+
+            dealerPaint.setTextSize(18);
+            dealerPaint.setColor(Color.BLACK);
+            dealerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            String dealerName = "" + dealer;
+            float dealerTextWidth = dealerPaint.measureText(dealerName);
+            canvas.drawText(dealerName, (pageWidth - dealerTextWidth) / 2, 200, dealerPaint);
+
+            int y = 210;
+            paint.setTextSize(14);
+            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+            int startX = 50;
+            int endX = startX + col1 + col2 + col3 + col4 + col5;
+            int headerBottom = y + rowHeight;
+
+            canvas.drawText("Product Name", startX + 10, y + 25, paint);
+            canvas.drawText("Quantity", startX + col1 + 10, y + 25, paint);
+            canvas.drawText("Unit", startX + col1 + col2 + 10, y + 25, paint);
+            canvas.drawText("Delivery", startX + col1 + col2 + col3 + 10, y + 25, paint);
+            canvas.drawText("Remarks", startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
+
+            canvas.drawRect(startX, y, endX, headerBottom, borderPaint);
+            y += rowHeight;
+            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+
+            while (itemIndex < list.size() && y + rowHeight < pageHeight - 50) {
+                StockitsResponse item = list.get(itemIndex);
+
+                String productName = safe(item.getProductName());
+                String quantity = safe(item.getOrderQty());
+                String unitName = safe(item.getUnitName());
+                String deliveryDay = safe(item.getDeliveryDay(), "-");
+                String remarks = "";
+                String unlistedMedicines = safe((String) item.getUnlistedMedicines());
+
+                int rowHeightAdjusted = rowHeight;
+                int textY = y + 20;
+
+                if ("UNLISTED MEDICINES".equals(productName)) {
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                    canvas.drawText(productName, startX + 10, textY, paint);
+                    textY += 20;
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                    List<String> wrapped = wrapText(unlistedMedicines, paint, col1 - 20);
+                    for (String line : wrapped) {
+                        canvas.drawText(line, startX + 10, textY, paint);
+                        textY += 20;
+                    }
+                    rowHeightAdjusted = wrapped.size() * 20 + 20;
+                } else {
+                    List<String> wrappedName = wrapText(productName, paint, col1 - 20);
+                    for (String line : wrappedName) {
+                        canvas.drawText(line, startX + 10, textY, paint);
+                        textY += 20;
+                    }
+
+                    canvas.drawText(!quantity.isEmpty() ? quantity : "-", startX + col1 + 10, y + 25, paint);
+                    canvas.drawText(!unitName.isEmpty() ? unitName : "-", startX + col1 + col2 + 10, y + 25, paint);
+                    canvas.drawText(deliveryDay, startX + col1 + col2 + col3 + 10, y + 25, paint);
+                    rowHeightAdjusted = wrappedName.size() * 20;
+                }
+
+                // Stockist name (wrapped)
+                String[] stockistLines = remarks.split(" ", 2);
+                canvas.drawText(stockistLines[0], startX + col1 + col2 + col3 + col4 + 10, y + 20, paint);
+                if (stockistLines.length > 1) {
+                    canvas.drawText(stockistLines[1], startX + col1 + col2 + col3 + col4 + 10, y + 40, paint);
+                    rowHeightAdjusted = Math.max(rowHeightAdjusted, 60);
+                } else {
+                    rowHeightAdjusted = Math.max(rowHeightAdjusted, 40);
+                }
+
+                canvas.drawRect(startX, y, endX, y + rowHeightAdjusted, borderPaint);
+                y += rowHeightAdjusted;
+                itemIndex++;
+            }
+
+            pdfDocument.finishPage(page);
+        }
+
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
+        try {
+            pdfDocument.writeTo(new FileOutputStream(file));
+            Toast.makeText(this, "PDF saved as " + fileName, Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to save PDF", Toast.LENGTH_SHORT).show();
+        }
+
+        pdfDocument.close();
+        openPdf(file);
+    }
+
+    private String safe(String val) {
+        return val != null ? val : "";
+    }
+    private String safe(String val, String defaultVal) {
+        return val != null ? val : defaultVal;
+    }
+    private List<String> wrapText(String text, Paint paint, int maxWidth) {
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            float textWidth = paint.measureText(testLine);
+
+            if (textWidth < maxWidth) {
+                currentLine.append(word).append(" ");
+            } else {
+                lines.add(currentLine.toString().trim());
+                currentLine = new StringBuilder(word).append(" ");
+            }
+        }
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString().trim());
+        }
+
+        return lines;
+    }
+    private void openPdf(File file) {
+        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(uri, "application/pdf");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No PDF Viewer Installed", Toast.LENGTH_SHORT).show();
+        }
+    }
     private void startNetworkService() {
         Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
         startService(networkServiceIntent);
@@ -290,196 +553,4 @@ public class RecentStockistActivity extends AppCompatActivity {
             }
         }, 5000);
     }
-    private void setDefaultDates() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        Calendar calendar = Calendar.getInstance();
-
-        lastDateSelected = sdf.format(calendar.getTime());
-        binding.txtLastDate.setText(lastDateSelected);
-
-        // Start Date = Current Date - 7 Days
-        calendar.add(Calendar.DAY_OF_MONTH, -3);
-        startDateSelected = sdf.format(calendar.getTime());
-        binding.txtStartDate.setText(startDateSelected);
-    }
-    private void generateInvoicePdf() {
-        String dealer = getIntent().getStringExtra("dealerName");
-        if (dealer == null) dealer = "Unknown_Stockist";
-
-        if (list == null || list.isEmpty()) {
-            Toast.makeText(this, "No order details available", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Clean the dealer name to make it filename-safe
-        dealer = dealer.replaceAll("[^a-zA-Z0-9\\-_ ]", "").replaceAll(" +", "_");
-
-        // Create timestamp for filename
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-
-        // Final filename
-        String fileName = dealer + "_Invoice_" + timeStamp + ".pdf";
-
-        PdfDocument pdfDocument = new PdfDocument();
-        Paint paint = new Paint();
-        Paint titlePaint = new Paint();
-        Paint dealerPaint = new Paint();
-        Paint borderPaint = new Paint();
-
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setColor(Color.BLACK);
-        borderPaint.setStrokeWidth(1);
-
-        int pageWidth = 600;
-        int pageHeight = 800;
-        int marginTop = 50;
-        int rowHeight = 40;
-        int availableHeight = pageHeight - 150;
-
-        int col1 = 150, col2 = 100, col3 = 100, col4 = 100, col5 = 80;
-        int itemIndex = 0;
-
-        while (itemIndex < list.size()) {
-            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create();
-            PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-            Canvas canvas = page.getCanvas();
-
-            // Title
-            titlePaint.setTextSize(20);
-            titlePaint.setColor(Color.BLACK);
-            titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            canvas.drawText("Purchase Order", 250, marginTop, titlePaint);
-
-            // Dealer Info
-            dealerPaint.setTextSize(16);
-            dealerPaint.setColor(Color.DKGRAY);
-            dealerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            canvas.drawText("Stockist: " + dealer, 50, marginTop + 30, dealerPaint);
-
-            int y = marginTop + 70;
-            paint.setTextSize(14);
-            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-
-            int startX = 50;
-            int endX = startX + col1 + col2 + col3 + col4 + col5;
-
-            // Table headers
-            canvas.drawText("Product Name", startX + 10, y + 25, paint);
-            canvas.drawText("Quantity", startX + col1 + 10, y + 25, paint);
-            canvas.drawText("Unit", startX + col1 + col2 + 10, y + 25, paint);
-            canvas.drawText("Delivery Day", startX + col1 + col2 + col3 + 10, y + 25, paint);
-            canvas.drawText("Remarks", startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
-
-            canvas.drawRect(startX, y, endX, y + rowHeight, borderPaint);
-            y += rowHeight;
-            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-
-            while (itemIndex < list.size() && y + rowHeight < availableHeight) {
-                StockitsResponse item = list.get(itemIndex);
-
-                String productName = item.getProductName() != null ? item.getProductName() : "";
-                String quantity = item.getOrderQty() != null ? item.getOrderQty() : "-";
-                String unit = item.getUnitName() != null ? item.getUnitName() : "-";
-                String deliveryDay = item.getDeliveryDay() != null ? item.getDeliveryDay() : "-";
-                String remarks = "";
-
-                int textY = y;
-                int rowLines = 1;
-
-                if (productName.equalsIgnoreCase("UNLISTED MEDICINES")) {
-                    String unlisted = item.getUnlistedMedicines() != null ? (String) item.getUnlistedMedicines() : "";
-                    String[] lines = unlisted.split(",");
-
-                    canvas.drawText("UNLISTED MEDICINES", startX + 10, textY + 20, paint);
-                    textY += 20;
-                    rowLines++;
-
-                    paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
-                    paint.setTextSize(12);
-
-                    for (String line : lines) {
-                        canvas.drawText(line.trim(), startX + 10, textY + 20, paint);
-                        textY += 20;
-                        rowLines++;
-                    }
-
-                    paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-                    paint.setTextSize(14);
-                } else {
-                    List<String> wrapped = wrapText(productName, paint, col1 - 20);
-                    for (String line : wrapped) {
-                        canvas.drawText(line, startX + 10, textY + 20, paint);
-                        textY += 20;
-                        rowLines++;
-                    }
-                }
-
-                int actualRowHeight = Math.max(rowHeight, rowLines * 20 + 10);
-
-                canvas.drawText(quantity, startX + col1 + 10, y + 25, paint);
-                canvas.drawText(unit, startX + col1 + col2 + 10, y + 25, paint);
-                canvas.drawText(deliveryDay, startX + col1 + col2 + col3 + 10, y + 25, paint);
-                canvas.drawText(remarks, startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
-
-                canvas.drawRect(startX, y, endX, y + actualRowHeight, borderPaint);
-
-                y += actualRowHeight;
-                itemIndex++;
-            }
-
-            pdfDocument.finishPage(page);
-        }
-
-        File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
-
-        try {
-            pdfDocument.writeTo(new FileOutputStream(file));
-            Toast.makeText(this, "PDF saved as " + fileName, Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Failed to save PDF", Toast.LENGTH_SHORT).show();
-        }
-
-        pdfDocument.close();
-        openPdf(file);
-    }
-
-
-
-
-    private List<String> wrapText(String text, Paint paint, int maxWidth) {
-        List<String> lines = new ArrayList<>();
-        String[] words = text.split(" ");
-        StringBuilder currentLine = new StringBuilder();
-
-        for (String word : words) {
-            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
-            float textWidth = paint.measureText(testLine);
-
-            if (textWidth < maxWidth) {
-                currentLine.append(word).append(" ");
-            } else {
-                lines.add(currentLine.toString().trim());
-                currentLine = new StringBuilder(word).append(" ");
-            }
-        }
-        if (currentLine.length() > 0) {
-            lines.add(currentLine.toString().trim());
-        }
-
-        return lines;
-    }
-    private void openPdf(File file) {
-        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(uri, "application/pdf");
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "No PDF Viewer Installed", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 }

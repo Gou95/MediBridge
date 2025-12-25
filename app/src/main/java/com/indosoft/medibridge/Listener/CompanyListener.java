@@ -1,0 +1,10 @@
+package com.indosoft.medibridge.Listener;
+
+import com.indosoft.medibridge.Model.CompanyResponse;
+
+import java.util.List;
+
+public interface CompanyListener {
+    void onSuccess(List<CompanyResponse> responses);
+    void onError(String error);
+}

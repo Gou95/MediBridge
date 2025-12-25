@@ -4,6 +4,8 @@ import android.content.Context;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.indosoft.medibridge.Body.AddBillBody;
+import com.indosoft.medibridge.Body.CashMemoAddBody;
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
 import com.indosoft.medibridge.Body.PosAddBody;
 import com.indosoft.medibridge.Body.PosUpdateBody;
@@ -47,7 +49,26 @@ public class SignUpRepository {
     public SignUpRepository() {
         apiInterface = RetrofitService.userService(ApiInterface.class);
     }
+    public MutableLiveData<SignUpResponse> deleteAllCart(Context context, String retailer_id, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.deleteAllCart(retailer_id);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
 
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
     public MutableLiveData<SignUpResponse> sendEmail(Context context, SendEmailBody body, SignUpListener listener) {
         Call<SignUpResponse> call = apiInterface.sendEmail(body);
         call.enqueue(new Callback<SignUpResponse>() {
@@ -293,8 +314,8 @@ public class SignUpRepository {
         return mutableLiveData;
     }
 
-    public MutableLiveData<SignUpResponse> registerExpiry(Context context, RegisterExpiryBody registerBody, SignUpListener listener) {
-        Call<SignUpResponse> call = apiInterface.registerExpiry(registerBody);
+    public MutableLiveData<SignUpResponse> registerExpiry(Context context,String retailer_id,String product_id,String order_items_id,RegisterExpiryBody registerBody, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.registerExpiry(retailer_id,product_id,order_items_id,registerBody);
         call.enqueue(new Callback<SignUpResponse>() {
             @Override
             public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
@@ -336,6 +357,108 @@ public class SignUpRepository {
 
     public MutableLiveData<SignUpResponse> posUpdate(Context context, String id, PosUpdateBody body, SignUpListener listener) {
         Call<SignUpResponse> call = apiInterface.posUpdate(id,body);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
+
+    public MutableLiveData<SignUpResponse> addCashMemo(Context context, String retailer_id, CashMemoAddBody body, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.addMedicine(retailer_id,body);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
+
+    public MutableLiveData<SignUpResponse> addBill(Context context, String retailer_id, AddBillBody body, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.addBill(retailer_id,body);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
+    public MutableLiveData<SignUpResponse> updateMedicine(Context context, String id, CashMemoAddBody body, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.updateMedicine(id,body);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
+    public MutableLiveData<SignUpResponse> deleteItem(Context context, String id, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.deleteItems(id);
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    listener.onSuccess(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                listener.onError("Something went wrong: " + t.getMessage());
+
+            }
+        });
+        return mutableLiveData;
+    }
+    public MutableLiveData<SignUpResponse> updateItem(Context context, String retailer_id, String id, CashMemoAddBody body, SignUpListener listener) {
+        Call<SignUpResponse> call = apiInterface.updateItems(retailer_id,id,body);
         call.enqueue(new Callback<SignUpResponse>() {
             @Override
             public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {

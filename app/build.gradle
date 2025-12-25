@@ -3,18 +3,18 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
-//    alias(libs.plugins.google.gms.google.services)
+
 }
 
 android {
     namespace 'com.indosoft.medibridge'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.indosoft.medibridge"
         minSdk 24
         targetSdk 35
-        versionCode 6
+        versionCode 8
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -73,16 +73,20 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.nex3z:notification-badge:1.0.4'
-    implementation 'androidx.work:work-runtime:2.8.1'
+    implementation 'androidx.work:work-runtime:2.10.2'
     implementation 'com.github.denzcoskun:ImageSlideshow:0.1.2'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.ertugrulkaragoz:SuperBottomBar:0.4'
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.google.android.gms:play-services-location:21.3.0'
     implementation 'com.razorpay:checkout:1.6.41'
     implementation 'com.itextpdf:itext7-core:7.1.15'
     implementation 'androidx.webkit:webkit:1.6.1'
     implementation 'com.android.volley:volley:1.2.1'
     implementation 'com.caverock:androidsvg:1.4'
+    implementation 'com.google.android.play:app-update:2.1.0'
+
+
+
 
 
 

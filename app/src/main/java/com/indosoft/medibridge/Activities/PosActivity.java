@@ -1,10 +1,24 @@
 package com.indosoft.medibridge.Activities;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.speech.RecognizerIntent;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
@@ -31,6 +46,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.Gson;
 import com.indosoft.medibridge.Adapter.PosListAdapter;
+import com.indosoft.medibridge.Adapter.SearchAdapter;
 import com.indosoft.medibridge.Body.AddtoCartBody;
 import com.indosoft.medibridge.Body.PosAddBody;
 import com.indosoft.medibridge.Model.CityDealerResponse;
@@ -66,11 +82,15 @@ public class PosActivity extends AppCompatActivity {
     PosListAdapter adapter;
     ArrayList<UnitResponse> unitList = new ArrayList<>();
     ArrayList<GetPosProductResponse> list = new ArrayList<>();
-    ArrayList<MedicineListResponse> itemList = new ArrayList<>();
-    private HashMap<String, String> productMap = new HashMap<>();
+    ArrayList<MedicineListResponse.Datum> itemList = new ArrayList<>();
+    HashMap<String, MedicineListResponse.Datum> productMap = new HashMap<>();
     private HashMap<String, String> unitNameToIdMap = new HashMap<>();
-    String selectDealerId;
+    SearchAdapter searchAdapter;
+    private ArrayList<String> fullProductNameList = new ArrayList<>();
     String selectUnitId;
+    private String currentQuery = "";
+    private boolean isMedicineLoaded = false;
+    private boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,80 +103,107 @@ public class PosActivity extends AppCompatActivity {
         viewModel.init(this);
         sign = new ViewModelProvider(this).get(SignUpViewModel.class);
         viewModel.init(this);
-        medicineViewModel.getMedicineData();
         String retailerId=AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
         viewModel.getPosList(retailerId);
         initClicks();
         onAttachObservers();
+        medicineViewModel.searchMedicine("");
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
         binding.swipeRefreshLayout.setRefreshing(false);
 
         adapter = new PosListAdapter(this,list,sign,()->{
             viewModel.getPosList(retailerId);
 
-        });
+        }
+        );
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this
 
         ));
+        searchAdapter = new SearchAdapter(item -> {
+
+            binding.etSearch.setText("");
+            binding.rvSearch.setVisibility(View.GONE);
+
+            // ✅ Product ID
+            AppSession.getInstance(this)
+                    .setValue(Constants.PRODUCT_ID, String.valueOf(item.getProductId()));
+
+            // ✅ Unit ID & Name (IMPORTANT)
+            AppSession.getInstance(this)
+                    .setValue(Constants.UNIT_ID, String.valueOf(item.getUnitId()));
+
+            AppSession.getInstance(this)
+                    .setValue(Constants.UNIT_NAME, item.getUnitName());
+
+            showPopup(item.getProductName(), item.getSupplierName());
+        });
+
+
+        binding.rvSearch.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvSearch.setAdapter(searchAdapter);
     }
 
     private void initClicks() {
-        binding.autoMedi.setOnItemClickListener(this::onProductSelected);
-        binding.autoMedi.addTextChangedListener(new TextWatcher() {
-            private Handler handler = new Handler();
-            private Runnable inputFinishChecker;
+        binding.etSearch.addTextChangedListener(new TextWatcher() {
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            private final Handler handler = new Handler(Looper.getMainLooper());
+            private Runnable runnable;
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (inputFinishChecker != null) {
-                    handler.removeCallbacks(inputFinishChecker);
-                }
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
+                handler.removeCallbacksAndMessages(null);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                String enteredText = s.toString().trim();
 
-                inputFinishChecker = () -> {
-                    if (!enteredText.isEmpty() && !productMap.containsKey(enteredText)) {
-                        //  Toast.makeText(getContext(), "This product is not in the list. Please select unlisted medicine.", Toast.LENGTH_SHORT).show();
-                    }
-                };
+                currentQuery = s.toString().trim();   // ✅ IMPORTANT
 
-                handler.postDelayed(inputFinishChecker, 2000); // 1 second delay
+                if (currentQuery.isEmpty()) {
+                    binding.rvSearch.setVisibility(View.GONE);
+                    searchAdapter.submitList(new ArrayList<>());
+                    return;
+                }
+
+                runnable = () -> medicineViewModel.searchMedicine(currentQuery);
+                handler.postDelayed(runnable, 300);
             }
         });
         binding.imgBack.setOnClickListener(v -> onBackPressed());
         binding.txtPosDate.setText("");
+        binding.imgVoice.setOnClickListener(v -> {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US"); // ya "hi-IN" agar Hindi chahiye
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak medicine name...");
+            try {
+                startActivityForResult(intent, 1001);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+//        binding.tx.setOnClickListener(v -> openCalendarDialog("start"));
+//        binding.txtLastDate.setOnClickListener(v -> openCalendarDialog("last"));
     }
-
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
-        medicineViewModel.getLiveData().observe(this, medicineListResponses -> {
-            binding.swipeRefreshLayout.setRefreshing(false);
-            if (medicineListResponses != null && !medicineListResponses.isEmpty()) {
-                itemList.clear();
-                itemList.addAll(medicineListResponses);
-                List<String> productNameList = new ArrayList<>();
-                productMap.clear();
-                for (MedicineListResponse response : medicineListResponses) {
-                    if (response != null && response.getProductId() != null) {
-                        productNameList.add(response.getProductName());
-                        productMap.put(response.getProductName(), response.getProductId());
-                        AppSession.getInstance(this).setValue(Constants.PRODUCT_ID, response.getProductId());
+        medicineViewModel.getLiveData().observe(this, list -> {
 
-                    }
-                }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_items, productNameList);
-                binding.autoMedi.setAdapter(adapter);
-
-            } else {
-                Log.e("HomeFragment", "Medicine data is null or empty");
+            // ✅ Agar user ne search hi nahi ki
+            if (currentQuery == null || currentQuery.isEmpty()) {
+                binding.rvSearch.setVisibility(View.GONE);
+                return;
             }
+
+            if (list == null || list.isEmpty()) {
+                binding.rvSearch.setVisibility(View.GONE);
+                return;
+            }
+
+            searchAdapter.submitList(list);
+            binding.rvSearch.setVisibility(View.VISIBLE);
         });
         viewModel.getLiveData().observe(this, responses -> {
             binding.swipeRefreshLayout.setRefreshing(false);
@@ -182,36 +229,6 @@ public class PosActivity extends AppCompatActivity {
 
     }
 
-    private void onProductSelected(AdapterView<?> parent, View view, int position, long id) {
-        String selectedProductName = parent.getItemAtPosition(position).toString();
-        String selectedProductId = productMap.get(selectedProductName);
-
-        if (selectedProductId != null) {
-
-            AppSession.getInstance(this).setValue(Constants.PRODUCT_ID, selectedProductId);
-            String supplierName = getSupplierNameForProduct(selectedProductId);
-            showPopup(selectedProductName, supplierName);
-            binding.autoMedi.setText("");
-        }
-    }
-    private String getSupplierNameForProduct(String productId) {
-        for (MedicineListResponse medicine : itemList) {
-            if (medicine.getProductId().equals(productId)) {
-                return medicine.getSupplierName();
-            }
-        }
-        return "Supplier not available";
-    }
-    private String getUnitForProduct(String productName) {
-        for (MedicineListResponse medicine : itemList) {
-            if (medicine.getProductName().equalsIgnoreCase(productName)) {
-                // Toast.makeText(getContext(), medicine.getProductId(), Toast.LENGTH_SHORT).show();
-                return (String) medicine.getUnitName();
-            }
-        }
-        return null;
-
-    }
     private void calculateTotalAmount() {
         double totalAmount = 0.0;
         int totalItems = 0;
@@ -227,13 +244,24 @@ public class PosActivity extends AppCompatActivity {
             }
         }
 
-        // Show total amount
         binding.txtTotalAmount.setText("₹ " + String.format(Locale.getDefault(), "%.2f", totalAmount));
-
-        // Show total number of sold medicine items
         binding.txtSoldMedicine.setText("" + totalItems);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
+            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (result != null && result.size() > 0) {
+                String spokenText = result.get(0); // user jo bola
+
+                // Ab aap is text ko apni medicine list me search kar sakte ho
+                //binding.autoMedi.setText(spokenText);
+              //  searchMedicine(spokenText);
+            }
+        }
+    }
 
     private void showPopup(String selectedProductName, String supplierName) {
         unitViewModel = new ViewModelProvider(this).get(UnitViewModel.class);
@@ -241,12 +269,17 @@ public class PosActivity extends AppCompatActivity {
         sign = new ViewModelProvider(this).get(SignUpViewModel.class);
         sign.init(this);
         unitViewModel.getUnits();
-        String retailerId=AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
+        String savedUnitId =
+                AppSession.getInstance(this).getValue(Constants.UNIT_ID);
 
+        String savedUnitName =
+                AppSession.getInstance(this).getValue(Constants.UNIT_NAME);
+        String retailerId=AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
         View popupView = LayoutInflater.from(this).inflate(R.layout.pos_list_popup, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(popupView);
         AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         TextView txtItemDetails = popupView.findViewById(R.id.txt_posMediName);
         txtItemDetails.setText(selectedProductName);
         TextView companyNm = popupView.findViewById(R.id.txt_posCompanyName);
@@ -261,36 +294,48 @@ public class PosActivity extends AppCompatActivity {
         EditText amount = popupView.findViewById(R.id.edt_posAmount);
        // AutoCompleteTextView dealerName = popupView.findViewById(R.id.auto_dealerName);
         unitViewModel.getLiveData().observe(this, unitResponses -> {
-            if (unitResponses != null && !unitResponses.isEmpty()) {
-                unitList.clear();
-                unitList.addAll(unitResponses);
-                List<String> unitNames = new ArrayList<>();
-                unitNameToIdMap.clear();
-                for (UnitResponse unit : unitList) {
-                    unitNames.add(unit.getUnitName());
-                    unitNameToIdMap.put(unit.getUnitName(), unit.getUnitId());
-                    AppSession.getInstance(this).setValue(Constants.UNIT_ID, unit.getUnitId());
-                }
-                ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, unitNames);
-                unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                unitSpn.setAdapter(unitAdapter);
-                String selectedUnitName = getUnitForProduct(selectedProductName);
-                if (selectedUnitName != null) {
-                    txtUnitName.setText(selectedUnitName);
-                    selectUnitId = unitNameToIdMap.get(selectedUnitName);
-                } else {
-                    txtUnitName.setText("Unit not available");
-                    Log.e("UnitError", "No unit name found for product: " + selectedProductName);
+
+            if (unitResponses == null || unitResponses.isEmpty()) return;
+
+            unitList.clear();
+            unitList.addAll(unitResponses);
+
+            List<String> unitNames = new ArrayList<>();
+            unitNameToIdMap.clear();
+
+            for (UnitResponse unit : unitList) {
+                unitNames.add(unit.getUnitName());
+                unitNameToIdMap.put(unit.getUnitName(), unit.getUnitId());
+            }
+
+            ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(
+                    this,
+                    android.R.layout.simple_spinner_item,
+                    unitNames
+            );
+            unitAdapter.setDropDownViewResource(
+                    android.R.layout.simple_spinner_dropdown_item);
+
+            unitSpn.setAdapter(unitAdapter);
+
+            // ✅ AUTO SELECT UNIT FROM SESSION
+            if (savedUnitId != null) {
+                for (int i = 0; i < unitList.size(); i++) {
+                    if (unitList.get(i).getUnitId().equals(savedUnitId)) {
+                        unitSpn.setSelection(i);
+                        txtUnitName.setText(savedUnitName);
+                        selectUnitId = savedUnitId;
+                        break;
+                    }
                 }
                 unitSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         selectUnitId = unitList.get(position).getUnitId();
-                        txtUnitName.setText(selectedUnitName);
+                        txtUnitName.setText(unitList.get(position).getUnitName());
                     }
                     @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
+                    public void onNothingSelected(AdapterView<?> parent) {}
                 });
                 txtUnitName.setOnClickListener(v -> {
                     txtUnitName.setVisibility(View.GONE);
@@ -326,6 +371,10 @@ public class PosActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please select a valid quantity greater than 0", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (amt == null || amt.isEmpty()) {
+                Toast.makeText(this, "Enter Amount", Toast.LENGTH_SHORT).show();
+                return;
+           }
 
 
             PosAddBody body = new PosAddBody();
@@ -376,9 +425,64 @@ public class PosActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+                ///  hideNoConnectionView();
+                reloadData();
+            } else {
+//                showNoConnectionView();
+            }
+
+        }
+    };
+
     @Override
     protected void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, filter);
+            isReceiverRegistered = true;
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+    private void reloadData() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        }, 5000);
+    }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
+
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
     }
 }

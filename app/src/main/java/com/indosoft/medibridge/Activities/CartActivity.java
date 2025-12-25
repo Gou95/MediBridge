@@ -6,6 +6,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -15,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -35,6 +38,7 @@ import com.indosoft.medibridge.ViewModel.DeliveryDayViewModel;
 import com.indosoft.medibridge.ViewModel.ProceedOrderViewModel;
 import com.indosoft.medibridge.ViewModel.QuantityChangeViewModel;
 import com.indosoft.medibridge.ViewModel.ShowCartViewModel;
+import com.indosoft.medibridge.ViewModel.SignUpViewModel;
 import com.indosoft.medibridge.databinding.ActivityCartBinding;
 
 import java.util.ArrayList;
@@ -47,6 +51,7 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
     ProceedOrderViewModel orderViewModel;
     QuantityChangeViewModel quantityChangeViewModel;
     DeliveryDayViewModel dayViewModel;
+    SignUpViewModel sign;
     ArrayList<ShowCartResponse> list = new ArrayList<>();
     private static final String CHANNEL_ID = "myFirebaseChannel";
     private int updatedCartCount = 0;
@@ -68,6 +73,8 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
         dayViewModel.init(this);
         orderViewModel = new ViewModelProvider(this).get(ProceedOrderViewModel.class);  // Ensure this is initialized
         orderViewModel.init(this);
+        sign = new ViewModelProvider(this).get(SignUpViewModel.class);  // Ensure this is initialized
+        sign.init(this);
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
         onAttachObservers();
         initClicks();
@@ -82,8 +89,8 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setVisibility(View.GONE);
-        binding.btnAddCart.setVisibility(View.GONE);
         binding.linearHide.setVisibility(View.VISIBLE);
+        binding.linearButtons.setVisibility(View.GONE);
         binding.swipeRefreshLayout.setRefreshing(false);
         String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
         showCartViewModel.getShowPostCartData(retailerId);
@@ -120,6 +127,23 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
         binding.imgBack.setOnClickListener(v -> {
             onBackPressed();
         });
+        binding.btnClearCart.setOnClickListener(v -> {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Clear Cart")
+                    .setMessage("Are you sure you want to delete all items?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+
+                        String retailerId = AppSession.getInstance(this)
+                                .getValue(Constants.RELAILER_ID);
+
+                        sign.deleteAllCart(retailerId);
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
+
 
         TextView title = binding.txtCart;
         SpannableString spannable = new SpannableString("My Cart");
@@ -130,6 +154,7 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
         spannable.setSpan(new ForegroundColorSpan(blue), 0, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannable.setSpan(new ForegroundColorSpan(red), 3, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         title.setText(spannable);
+
     }
 
     private void onAttachObservers() {
@@ -137,16 +162,17 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
         showCartViewModel.getLiveData().observe(this, response -> {
             binding.swipeRefreshLayout.setRefreshing(false);
             list.clear();
+
             if (response != null && !response.isEmpty()) {
                 list.addAll(response);
                 adapter.notifyDataSetChanged();
-                updateCartUI(true);
+                updateCartUI(true);   // ✅ List me data
 
             } else {
-                updateCartUI(false);
-
+                updateCartUI(false);  // ✅ List empty
             }
         });
+
         deleteCartViewModel.getLiveData().observe(this, response -> {
             binding.swipeRefreshLayout.setRefreshing(false);
             if (response != null) {
@@ -162,6 +188,29 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
 
             }
         });
+        sign.getLiveData().observe(this, signUpResponse -> {
+
+            if (signUpResponse != null) {
+
+                Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
+
+                // ✅ Cart UI clear
+                list.clear();
+                adapter.notifyDataSetChanged();
+
+                updateCartUI(false);
+
+                // ✅ Session cart count reset
+                AppSession.getInstance(this).setValue(Constants.CART_COUNT, "0");
+
+                // ✅ Dashboard badge reset
+                if (getApplicationContext() instanceof DashBoardActivity) {
+                    ((DashBoardActivity) getApplicationContext()).updateBadgeCounter(0);
+                }
+            }
+
+        });
+
     }
 
     private void showPopup() {
@@ -173,6 +222,7 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
         TextView confirm = popupView.findViewById(R.id.popup_confirm);
         title.setText("Are you sure you want to confirm your order?");
         AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         confirm.setOnClickListener(v -> {
             if (list == null || list.isEmpty()) {
                 updateCartUI(false);
@@ -210,13 +260,6 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
                     Intent intent = new Intent(CartActivity.this, OrderRegisterActivity.class);
                     startActivity(intent);
                     finish();
-//                    Intent intent = new Intent(CartActivity.this, OrderRegisterActivity.class);
-//                    intent.putExtra("SHOW_ORDER_FRAGMENT", true);
-//                    intent.putExtra("CART_BADGE_COUNT", updatedCartCount);
-//                    startActivity(intent);
-//                    finish();
-//
-
                     refreshCartData();
                    // navigateToOrderFragment();
                 } else {
@@ -239,16 +282,21 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
     }
 
     private void updateCartUI(boolean isCartNotEmpty) {
+
         if (isCartNotEmpty) {
+            // ✅ Data hai → List show, Empty layout hide
             binding.recyclerView.setVisibility(View.VISIBLE);
             binding.linearHide.setVisibility(View.GONE);
-            binding.btnAddCart.setVisibility(View.VISIBLE);
+            binding.linearButtons.setVisibility(View.VISIBLE);
+
         } else {
+            // ✅ Data nahi hai → List hide, Empty layout show
             binding.recyclerView.setVisibility(View.GONE);
             binding.linearHide.setVisibility(View.VISIBLE);
-            binding.btnAddCart.setVisibility(View.GONE);
+            binding.linearButtons.setVisibility(View.GONE);
         }
     }
+
     public void returnToDashboard() {
         AppSession.getInstance(this).setValue(Constants.CART_COUNT, String.valueOf(list.size()));
         String savedUrgent = AppSession.getInstance(this).getValue(Constants.URGENT_BADGE_COUNT);
@@ -259,7 +307,6 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
         } catch (NumberFormatException e) {
             urgentCount = 0;
         }
-
         Intent intent = new Intent(CartActivity.this, DashBoardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("CART_BADGE_COUNT", list.size());
@@ -268,8 +315,6 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
         startActivity(intent);
         finish();
     }
-
-
 
     @Override
     public void onBackPressed() {
@@ -321,9 +366,9 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
 
     }
 
+
     @Override
     public void onUrgentItemMoved() {
-        // Increase urgent count in session
         String urgent = AppSession.getInstance(this).getValue(Constants.URGENT_BADGE_COUNT);
         int newUrgent = 1;
         try {

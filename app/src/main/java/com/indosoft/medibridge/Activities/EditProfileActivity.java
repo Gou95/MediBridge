@@ -17,12 +17,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,6 +91,10 @@ public class EditProfileActivity extends AppCompatActivity {
         startNetworkService();
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
         binding.swipeRefreshLayout.setRefreshing(false);
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN |
+                        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        );
     }
     private void loadSessionData() {
         binding.edtShopName.setText(AppSession.getInstance(this).getValue(Constants.RELAILER_NAME));
@@ -154,8 +163,30 @@ public class EditProfileActivity extends AppCompatActivity {
         binding.btnSubmit.setOnClickListener(v -> {
             // Collect inputs
             String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
-            UserUpdateBody body = new UserUpdateBody();
+            String dlNumber = binding.edtDlNumber.getText().toString().trim();
+            String gstNumber = binding.edtGstNumber.getText().toString().trim();
 
+            // ✅ DL Regex (Drug License Format: MH-1234-20-123456)
+          //  String dlRegex = "^[A-Z]{2}-\\d{2,4}-(20|21)-\\d{5,7}$";
+
+            // ✅ GST Regex (15 characters format: 22AAAAA0000A1Z5)
+            String gstRegex = "\\d{2}[A-Z]{5}\\d{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}";
+
+            // Validation
+//            if (!dlNumber.matches(dlRegex)) {
+
+
+//                Toast.makeText(this, "DL Number not correct! Format: MH-1234-21-123456", Toast.LENGTH_LONG).show();
+//                return;
+//            }
+//            if (!gstNumber.matches(gstRegex)) {
+//                Toast.makeText(this, "GST Number not correct! Format: 22AAAAA0000A1Z5", Toast.LENGTH_LONG).show();
+//                return;
+//            }
+
+
+            // ✅ If both are valid then submit
+            UserUpdateBody body = new UserUpdateBody();
             body.setRetailerName(binding.edtShopName.getText().toString());
             body.setRetailerContactName(binding.edtContactPerson.getText().toString());
             body.setRetailerPassword(AppSession.getInstance(this).getValue(Constants.RELAILER_PASSWORD));
@@ -165,30 +196,121 @@ public class EditProfileActivity extends AppCompatActivity {
             body.setStateName(AppSession.getInstance(this).getValue(Constants.STATE_NAME));
             body.setCityId(AppSession.getInstance(this).getValue(Constants.CITY_ID));
             body.setCity(AppSession.getInstance(this).getValue(Constants.CITY_NAME));
-            body.setRetailerDlNo(binding.edtDlNumber.getText().toString());
-            body.setRetailerGst(binding.edtGstNumber.getText().toString());
+            body.setRetailerDlNo(dlNumber);
+            body.setRetailerGst(gstNumber);
             body.setPhotoPath("uploads/image" + retailerId + ".png");
 
             model.getUserUpdateData(retailerId, body);
 
             if (selectedImageFile != null) {
                 signUpViewModel.uploadImage(selectedImageFile);
-            } else {
-               // Toast.makeText(this, "Please select an image first", Toast.LENGTH_SHORT).show();
             }
         });
 
+
         binding.btnImage.setOnClickListener(v -> showImagePickerDialog());
+
+        // Heading color
         TextView title = binding.txtProfile;
         SpannableString spannable = new SpannableString("Profile");
-
-
         int blue = ContextCompat.getColor(this, R.color.blue_light);
         int red = ContextCompat.getColor(this, R.color.orange_dark);
         spannable.setSpan(new ForegroundColorSpan(blue), 0, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannable.setSpan(new ForegroundColorSpan(red), 4, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(red), 3 , spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         title.setText(spannable);
+
+
+        binding.edtDlNumber.setHint("Ex: MH-1234-20-123456");
+        binding.edtDlNumber.setFilters(new InputFilter[]{
+                new InputFilter.AllCaps(),
+                (source, start, end, dest, dstart, dend) -> {
+                    for (int i = start; i < end; i++) {
+                        char c = source.charAt(i);
+                        if (!Character.isLetterOrDigit(c) && c != '-') {
+                            return ""; // block invalid chars
+                        }
+                    }
+                    return null;
+                }
+        });
+
+        binding.edtDlNumber.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+
+        binding.edtGstNumber.setHint("Ex: 22AAAAA0000A1Z5");
+        binding.edtGstNumber.setFilters(new InputFilter[]{
+                new InputFilter.AllCaps(),
+                new InputFilter.LengthFilter(15) // GST always 15 chars
+        });
+
+        binding.edtGstNumber.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        // Inside initClicks() after setting hints
+        binding.edtDlNumber.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Example DL format: DL-XX-1234567
+                int length = s.length();
+
+                if (length <= 5) {
+                    // "DL-XX" => letters allowed
+                    binding.edtDlNumber.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                } else {
+                    // After 6th char => digits allowed
+                    binding.edtDlNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
+                }
+
+                // cursor ko last me le jane ke liye
+                binding.edtDlNumber.setSelection(binding.edtDlNumber.getText().length());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+// GST Number (Format: 22AAAAA0000A1Z5)
+        binding.edtGstNumber.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int length = s.length();
+
+                if (length < 2) {
+                    // First 2 chars => digits (State code)
+                    binding.edtGstNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
+                } else if (length < 7) {
+                    // Next 5 chars => letters
+                    binding.edtGstNumber.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                } else if (length < 11) {
+                    // Next 4 chars => digits
+                    binding.edtGstNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
+                } else if (length == 11) {
+                    // Next 1 char => letter
+                    binding.edtGstNumber.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                } else if (length == 12) {
+                    // Next 1 => digit or letter
+                    binding.edtGstNumber.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                } else if (length == 13) {
+                    // Must be 'Z'
+                    binding.edtGstNumber.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                } else {
+                    // Last 1 => alphanumeric
+                    binding.edtGstNumber.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                }
+
+                // cursor ko last me le jane ke liye
+                binding.edtGstNumber.setSelection(binding.edtGstNumber.getText().length());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
     }
+
     private void startNetworkService() {
         Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
         startService(networkServiceIntent);
@@ -269,22 +391,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
         dialog.show();
     }
-
-    private void checkCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
-        } else {
-            openCamera();
-        }
-    }
-
-    // Open Camera
     private void openCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
     }
 
-    // Open Gallery
     private void openGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);

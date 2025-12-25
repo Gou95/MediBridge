@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/cash_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+      >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_cashMemoProductName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Paracetamol 500mg Tablet"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:fontFamily="@font/poppins"/>
+
+            <TextView
+                android:id="@+id/txt_cashMemoRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rate"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginTop="5dp"
+        />
+
+
+        </LinearLayout>
+
+
+
+        <TextView
+            android:id="@+id/txt_cashMemoUnitNM"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Stripe"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:fontFamily="@font/poppins"/>
+        <TextView
+            android:id="@+id/txt_cashMemoBatch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2.00"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:fontFamily="@font/poppins"/>
+        <TextView
+            android:id="@+id/txt_cashMemoExpiry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2.00"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:fontFamily="@font/poppins"/>
+        <TextView
+            android:id="@+id/txt_cashMemoQty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2.00"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:fontFamily="@font/poppins"/>
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_cashMemoAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="200"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:fontFamily="@font/poppins"/>
+
+            <ImageView
+                android:id="@+id/img_delete"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/poppins"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/bin"
+                android:layout_gravity="center"
+                />
+
+
+        </LinearLayout>
+
+
+
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_marginTop="10dp"/>
+
+</LinearLayout>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/company_background">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/swipe_refresh_layout">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+            >
+
+
+                <ImageView
+                    android:id="@+id/img_back"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/backarrow"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:id="@+id/txt_unlisted"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Unlisted Stockist"
+                    android:textColor="@color/black"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_centerVertical="true"
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
+                    />
+
+                <ImageView
+                    android:id="@+id/img_cancle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/remove"
+                    android:layout_alignParentEnd="true" />
+
+
+
+
+
+            </RelativeLayout>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="20dp"
+                android:fillViewport="true"
+                android:scrollbars="none"
+                >
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/edit_background"
+
+                        >
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/location"
+                            android:layout_gravity="center_vertical"
+                            android:paddingLeft="5dp"/>
+
+
+                        <AutoCompleteTextView
+                            android:id="@+id/edt_state"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:paddingLeft="10dp"
+                            android:background="@null"
+                            android:layout_gravity="center"
+                            android:hint="select State"
+                            android:inputType="text"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:textColorHint="@color/black"
+                            />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/edit_background"
+                        android:layout_marginTop="20dp"
+                        >
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/location"
+                            android:layout_gravity="center_vertical"
+                            android:paddingLeft="5dp"/>
+
+
+                        <AutoCompleteTextView
+                            android:id="@+id/edt_city"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:paddingLeft="10dp"
+                            android:background="@null"
+                            android:layout_gravity="center"
+                            android:hint="select city"
+                            android:inputType="text"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:textColorHint="@color/black"
+                            />
+
+
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Stockist Name"
+                        android:textColor="@color/black"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:layout_marginTop="10dp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"/>
+
+
+                    <AutoCompleteTextView
+                        android:id="@+id/auto_stockist"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@drawable/edit_background"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:paddingLeft="10dp"
+                        android:hint="enter stockist name"
+                        android:layout_marginBottom="10dp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:completionThreshold="1"
+                        />
+
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        app:boxStrokeColor="@color/green"
+                        app:boxStrokeWidthFocused="2dp"
+                        app:boxBackgroundMode="outline"
+                        android:hint="enter address">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edt_stockistAdd"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:paddingTop="12dp"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="10dp"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textColorHint="@color/green"
+                            android:background="@drawable/edit_background"
+                            android:gravity="start|top"
+                            android:inputType="textMultiLine"
+                            android:maxLines="5"
+                            android:scrollbars="vertical"
+                            android:overScrollMode="always"
+                            android:fontFamily="@font/poppins"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+<!--                    <EditText-->
+<!--                       -->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="100dp"-->
+<!--                        android:background="@drawable/edit_background"-->
+<!--                        android:layout_marginHorizontal="20dp"-->
+<!--                        android:layout_marginTop="20dp"-->
+<!--                        android:inputType="text"-->
+<!--                        android:imeOptions="actionNext"-->
+<!--                        android:fontFamily="@font/poppins_semibold"-->
+<!--                        android:paddingLeft="10dp"-->
+<!--                        android:hint="enter address"-->
+<!--                        android:layout_marginBottom="10dp"-->
+<!--                        android:autoSizeTextType="uniform"-->
+<!--                        android:autoSizeMinTextSize="14sp"-->
+<!--                        android:autoSizeMaxTextSize="16sp"-->
+<!--                        android:autoSizeStepGranularity="1sp"-->
+<!--                        />-->
+
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/btn_submit"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        app:cardCornerRadius="20dp"
+                        android:layout_marginTop="25dp"
+                        app:cardBackgroundColor="@color/green"
+                        android:layout_marginBottom="10dp"
+                        >
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Submit"
+                            android:textColor="@color/white"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="16sp"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:gravity="center"/>
+
+
+                    </androidx.cardview.widget.CardView>
+
+
+
+
+                </LinearLayout>
+
+
+
+
+
+
+            </ScrollView>
+
+
+
+        </LinearLayout>
+
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

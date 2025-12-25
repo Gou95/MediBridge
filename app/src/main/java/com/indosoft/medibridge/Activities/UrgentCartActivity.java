@@ -33,6 +33,7 @@ import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.GetUrgentCartViewModel;
+import com.indosoft.medibridge.ViewModel.SignUpViewModel;
 import com.indosoft.medibridge.ViewModel.UrgentDeleteViewModel;
 import com.indosoft.medibridge.ViewModel.UrgentProceedViewModel;
 import com.indosoft.medibridge.databinding.ActivityUrgentCartBinding;
@@ -47,6 +48,7 @@ public class UrgentCartActivity extends AppCompatActivity {
     ArrayList<GetUrgentCartResponse> list = new ArrayList<>();
     UrgentDeleteViewModel urgentDeleteViewModel;
     UrgentProceedViewModel urgentProceedViewModel;
+    SignUpViewModel sign;
 
     private int cartCount = 0;
     private boolean isReceiverRegistered = false;
@@ -62,6 +64,8 @@ public class UrgentCartActivity extends AppCompatActivity {
         viewModel.init(this);
         urgentDeleteViewModel = new ViewModelProvider(this).get(UrgentDeleteViewModel.class);
         urgentDeleteViewModel.init(this);
+        sign = new ViewModelProvider(this).get(SignUpViewModel.class);
+        sign.init(this);
 
         String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
 
@@ -73,7 +77,7 @@ public class UrgentCartActivity extends AppCompatActivity {
 
         binding.recyclerView.setVisibility(View.GONE);
         binding.linearHide.setVisibility(View.VISIBLE);
-        binding.btnAddCart.setVisibility(View.GONE);
+        binding.linearButtons.setVisibility(View.GONE);
         binding.swipeRefreshLayout.setRefreshing(false);
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachobservers);
 
@@ -93,6 +97,23 @@ public class UrgentCartActivity extends AppCompatActivity {
         });
         binding.imgBack.setOnClickListener(v -> {
           onBackPressed();
+        });
+
+        binding.btnClearCart.setOnClickListener(v -> {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Clear Cart")
+                    .setMessage("Are you sure you want to delete all items?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+
+                        String retailerId = AppSession.getInstance(this)
+                                .getValue(Constants.RELAILER_ID);
+
+                        sign.deleteAllCart(retailerId);
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
         });
         TextView title = binding.txtUrgent;
         SpannableString spannable = new SpannableString("Urgent Cart");
@@ -119,6 +140,27 @@ public class UrgentCartActivity extends AppCompatActivity {
 
             }
 
+        });
+        sign.getLiveData().observe(this, signUpResponse -> {
+
+            if (signUpResponse != null) {
+
+                Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
+
+                // ✅ Cart UI clear
+                list.clear();
+                urgentCartAdapter.notifyDataSetChanged();
+
+                updateCartUI(false);
+
+                // ✅ Session cart count reset
+                AppSession.getInstance(this).setValue(Constants.URGENT_BADGE_COUNT, "0");
+
+                // ✅ Dashboard badge reset
+                if (getApplicationContext() instanceof DashBoardActivity) {
+                    ((DashBoardActivity) getApplicationContext()).updateUrgentBadge(0);
+                }
+            }
         });
     }
     private void showPopup() {
@@ -222,11 +264,11 @@ public class UrgentCartActivity extends AppCompatActivity {
         if (isCartNotEmpty) {
             binding.recyclerView.setVisibility(View.VISIBLE);
             binding.linearHide.setVisibility(View.GONE);
-            binding.btnAddCart.setVisibility(View.VISIBLE);
+            binding.linearButtons.setVisibility(View.VISIBLE);
         } else {
             binding.recyclerView.setVisibility(View.GONE);
             binding.linearHide.setVisibility(View.VISIBLE);
-            binding.btnAddCart.setVisibility(View.GONE);
+            binding.linearButtons.setVisibility(View.GONE);
         }
 
     }

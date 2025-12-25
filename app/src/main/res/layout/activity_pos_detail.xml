@@ -5,16 +5,10 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".Activities.PosDetailActivity">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/swipe_refresh_layout"
-        android:layout_above="@id/linearLayout"
-        android:layout_marginBottom="10dp">
-
-        <LinearLayout
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -42,190 +36,118 @@
                     android:text=" Sale Product Details"
                     android:textColor="@color/black"
                     android:textSize="16dp"
-                    android:fontFamily="@font/gotham_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:layout_marginHorizontal="20dp"
                     android:layout_centerVertical="true"
                     android:gravity="center"
-                    android:layout_marginTop="20dp"
                     android:importantForAccessibility="no"
                     android:includeFontPadding="false"/>
 
 
 
             </RelativeLayout>
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="11dp"
-                android:layout_marginHorizontal="5dp"
-                >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginHorizontal="10dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginBottom="10dp">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@drawable/calendr"
-                        android:scaleType="fitXY"
-                        />
-
-                    <TextView
-                        android:id="@+id/txt_startDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Start Date"
-                        android:textColor="@color/black"
-                        android:autoSizeTextType="uniform"
-                        android:autoSizeMinTextSize="14sp"
-                        android:autoSizeMaxTextSize="16sp"
-                        android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gothambook"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="20dp"
-                        android:importantForAccessibility="no"
-                        android:includeFontPadding="false"/>
-
-
-                    <TextView
-                        android:id="@+id/txt_lastDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Last date"
-                        android:textColor="@color/black"
-                        android:gravity="end"
-                        android:autoSizeTextType="uniform"
-                        android:autoSizeMinTextSize="14sp"
-                        android:autoSizeMaxTextSize="16sp"
-                        android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gothambook"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="20dp"
-                        android:importantForAccessibility="no"
-                        android:includeFontPadding="false"/>
-
-
-
-
-
-
-
-                </LinearLayout>
-
-
-
-
-            </androidx.cardview.widget.CardView>
-
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="List of Sold Medicine "
-                android:textSize="16dp"
-                android:fontFamily="@font/gotham_bold"
-                android:textColor="@color/black"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp"
-                />
-
-
-            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/txt_totalSum"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:layout_marginHorizontal="10dp"
-                android:id="@+id/recyclerView"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="total Amount"
+                android:textSize="16dp"
+                android:textColor="@color/black"/>
+<!--            <androidx.cardview.widget.CardView-->
+<!--                android:id="@+id/cardView"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="15dp"-->
+<!--                app:cardCornerRadius="10dp"-->
+<!--                app:cardElevation="11dp"-->
+<!--                android:layout_marginHorizontal="5dp"-->
+<!--                >-->
 
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:layout_marginHorizontal="10dp"-->
+<!--                    android:layout_gravity="center_vertical"-->
+<!--                    android:layout_marginBottom="10dp">-->
+
+<!--                    <ImageView-->
+<!--                        android:layout_width="30dp"-->
+<!--                        android:layout_height="30dp"-->
+<!--                        android:src="@drawable/calendr"-->
+<!--                        android:scaleType="fitXY"-->
+<!--                        />-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/txt_startDate"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Start Date"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:autoSizeTextType="uniform"-->
+<!--                        android:autoSizeMinTextSize="14sp"-->
+<!--                        android:autoSizeMaxTextSize="16sp"-->
+<!--                        android:autoSizeStepGranularity="1sp"-->
+<!--                        android:fontFamily="@font/poppins"-->
+<!--                        android:layout_gravity="center_vertical"-->
+<!--                        android:layout_marginStart="20dp"-->
+<!--                        android:importantForAccessibility="no"-->
+<!--                        android:includeFontPadding="false"/>-->
+
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/txt_lastDate"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Last date"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:gravity="end"-->
+<!--                        android:autoSizeTextType="uniform"-->
+<!--                        android:autoSizeMinTextSize="14sp"-->
+<!--                        android:autoSizeMaxTextSize="16sp"-->
+<!--                        android:autoSizeStepGranularity="1sp"-->
+<!--                        android:fontFamily="@font/poppins"-->
+<!--                        android:layout_gravity="center_vertical"-->
+<!--                        android:layout_marginStart="20dp"-->
+<!--                        android:importantForAccessibility="no"-->
+<!--                        android:includeFontPadding="false"/>-->
+
+
+
+
+
+
+
+<!--                </LinearLayout>-->
+
+
+
+
+<!--            </androidx.cardview.widget.CardView>-->
+
+
+
+
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@color/white"
+                app:tabIndicatorColor="@color/yellow"
+                app:tabTextColor="@color/black"
 
                 />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
-
-
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
-        android:layout_marginHorizontal="10dp"
-        android:background="@drawable/edit_background"
-        android:padding="10dp">
-
-<!--        <RelativeLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:layout_above="@id/relativeLayout">-->
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Total Sold Medicine"-->
-<!--                android:textSize="16dp"-->
-<!--                android:textColor="@color/black"-->
-<!--                android:fontFamily="@font/gotham_bold"-->
-<!--                />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/txt_soldMedicine"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="00.00"-->
-<!--                android:textSize="16dp"-->
-<!--                android:textColor="@color/black"-->
-<!--                android:fontFamily="@font/gotham_bold"-->
-<!--                android:layout_alignParentEnd="true"-->
-<!--                />-->
-
-
-
-<!--        </RelativeLayout>-->
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Total Sale "
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/gotham_bold"
-                />
-
-            <TextView
-                android:id="@+id/txt_totalAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00.00"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/gotham_bold"
-                android:layout_alignParentEnd="true"
-                />
-
-
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
 
 </RelativeLayout>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/company_background"
+    android:padding="20dp"
+
+    >
+
+  <TextView
+      android:id="@+id/txt_list"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+    android:text="List of Companies"
+    android:textSize="18sp"
+    android:textColor="@color/green"
+      android:fontFamily="@font/poppins_bold"/>
+
+
+  <androidx.recyclerview.widget.RecyclerView
+      android:layout_below="@id/txt_list"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:id="@+id/recyclerView"
+      android:layout_above="@id/btn_closed"
+      android:layout_marginBottom="10dp"
+      android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn_closed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/green"
+        android:text="Close"
+        android:textColor="@android:color/white"
+        android:padding="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="10dp"
+        />
+
+</RelativeLayout>

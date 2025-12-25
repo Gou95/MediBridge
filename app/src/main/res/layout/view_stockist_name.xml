@@ -44,7 +44,7 @@
                     android:text="Expiry List"
                     android:textSize="14sp"
                     android:textColor="@color/black"
-                    android:fontFamily="@font/gotham_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="13sp"
                     android:autoSizeMaxTextSize="14sp"

@@ -3,11 +3,15 @@ package com.indosoft.medibridge.Activities;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,33 +23,42 @@ import androidx.lifecycle.ViewModelProvider;
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
 import com.indosoft.medibridge.Body.RegisterExpiryBody;
 import com.indosoft.medibridge.Model.ProductItem;
+import com.indosoft.medibridge.Model.StockistListResponse;
 import com.indosoft.medibridge.R;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.SignUpViewModel;
+import com.indosoft.medibridge.ViewModel.StockistListViewModel;
 import com.indosoft.medibridge.databinding.ActivityExpireBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExpireActivity extends AppCompatActivity {
 
     ActivityExpireBinding binding;
-    List<ProductItem> productList;
     SignUpViewModel viewModel;
     private String selectedProductId = null;
     private String selectedDealerId = null;
     private String oderitemsId = null;
+    ArrayList<StockistListResponse> list = new ArrayList<>();
+    StockistListViewModel stockistListViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-     binding = ActivityExpireBinding.inflate(getLayoutInflater());
+        binding = ActivityExpireBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
         viewModel.init(this);
+        stockistListViewModel = new ViewModelProvider(this).get(StockistListViewModel.class);
+        stockistListViewModel.init(this);
 
+        String cityId = AppSession.getInstance(this).getValue(Constants.CITY_ID);
+        stockistListViewModel.stockitsList(cityId);
         String productName = getIntent().getStringExtra("productName");
         String qty = getIntent().getStringExtra("qty");
         String stockist = getIntent().getStringExtra("stockist");
+        String batch = getIntent().getStringExtra("batch");
         selectedProductId = getIntent().getStringExtra("productId");   // <-- FIXED
         selectedDealerId = getIntent().getStringExtra("stockistId");
         oderitemsId = getIntent().getStringExtra("orderItemsId");
@@ -55,47 +68,49 @@ public class ExpireActivity extends AppCompatActivity {
         binding.edtStockQty.setText(qty);
         binding.autoStockist.setText(stockist);
         binding.edtExpiryMonth.setText(expiry);
+        binding.edtBatchNo.setText(batch);
         onAttachObservers();
         initClicks();
-
+//        getWindow().setSoftInputMode(
+//                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN |
+//                        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+//        );
 
     }
-
     private void initClicks() {
         binding.edtExpiryMonth.setOnClickListener(v -> {
             showCalendarDialog();
         });
         binding.btnSubmit.setOnClickListener(v -> {
-            String expiryMonth = binding.edtExpiryMonth.getText().toString();
-            String stock = binding.edtStockQty.getText().toString();
+            String expiryMonth = binding.edtExpiryMonth.getText().toString().trim();
+            String stock = binding.edtStockQty.getText().toString().trim();
+            String batchNo = binding.edtBatchNo.getText().toString().trim();
+            String dealerName = binding.autoStockist.getText().toString().trim();
 
             if (selectedProductId == null) {
                 Toast.makeText(this, "Select a product", Toast.LENGTH_SHORT).show();
-            }  else if (expiryMonth.isEmpty()) {
+            } else if (expiryMonth.isEmpty()) {
                 Toast.makeText(this, "Enter expiry month", Toast.LENGTH_SHORT).show();
-            }  else if (selectedDealerId == null) {
-                Toast.makeText(this, "Enter dealer", Toast.LENGTH_SHORT).show();
+            } else if (dealerName.isEmpty() || selectedDealerId == null || selectedDealerId.trim().isEmpty()) {
+                Toast.makeText(this, "Select a dealer name", Toast.LENGTH_SHORT).show();
             } else {
-                ExpiryRegisterBody body = new ExpiryRegisterBody();
-                body.setRetailerId(AppSession.getInstance(this).getValue(Constants.RELAILER_ID));
-                body.setProductId(selectedProductId);
-                body.setExpiryMonth(expiryMonth);
-                body.setStock(stock);
-                body.setDealerId(selectedDealerId);
-                viewModel.expiryRegister(body);
+                String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
 
                 RegisterExpiryBody registerExpiryBody = new RegisterExpiryBody();
                 registerExpiryBody.setExpiryMonth(expiryMonth);
-                registerExpiryBody.setRetailerId(AppSession.getInstance(this).getValue(Constants.RELAILER_ID));
-                registerExpiryBody.setOrderItemsId(oderitemsId);
-                registerExpiryBody.setProductId(selectedProductId);
-                viewModel.registerexpiry(registerExpiryBody);
+                registerExpiryBody.setBatchNo(batchNo);
+                registerExpiryBody.setStock(stock);
+                registerExpiryBody.setDealerId(selectedDealerId);
+
+                // ✅ API call
+                viewModel.registerexpiry(retailerId, selectedProductId, oderitemsId, registerExpiryBody);
             }
         });
+
+
         binding.imgBack.setOnClickListener(v -> onBackPressed());
         TextView title = binding.txtExpiry;
         SpannableString spannable = new SpannableString("Expiry Products");
-
 
         int blue = ContextCompat.getColor(this, R.color.blue_light);
         int red = ContextCompat.getColor(this, R.color.orange_dark);
@@ -105,27 +120,62 @@ public class ExpireActivity extends AppCompatActivity {
     }
 
     private void onAttachObservers() {
-        viewModel.getLiveData().observe(this,signUpResponse -> {
-            if (signUpResponse!=null){
+        viewModel.getLiveData().observe(this, signUpResponse -> {
+            if (signUpResponse != null) {
                 binding.txtProductName.setText("");
                 binding.edtExpiryMonth.setText("");
                 binding.edtStockQty.setText("");
                 binding.autoStockist.setText("");
+                binding.edtBatchNo.setText("");
 
                 String expiryMonth = binding.edtExpiryMonth.getText().toString();
+                String batch = binding.edtExpiryMonth.getText().toString();
 
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("productId", selectedProductId);
                 resultIntent.putExtra("expiryMonth", expiryMonth);
+                resultIntent.putExtra("batch", batch);
                 setResult(RESULT_OK, resultIntent);
                 finish();
-              //  Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
             }
+        });
 
+        stockistListViewModel.getLiveData().observe(this, responses -> {
+            if (responses != null) {
+                list.clear();
+                list.addAll(responses);
 
+                List<String> dealerNames = new ArrayList<>();
 
+                for (StockistListResponse dealer : list) {
+                    if (dealer.getDealerName() != null) {
+                        dealerNames.add(dealer.getDealerName());
+                    }
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        this,
+                        android.R.layout.simple_dropdown_item_1line,
+                        dealerNames
+                );
+
+                binding.autoStockist.setAdapter(adapter);
+                binding.autoStockist.setThreshold(1);
+                binding.autoStockist.setDropDownHeight(200);
+                binding.autoStockist.setDropDownVerticalOffset(-200);
+                binding.autoStockist.setOnItemClickListener((parent, view, position, id) -> {
+                    String selectedName = parent.getItemAtPosition(position).toString();
+                    for (StockistListResponse dealer : list) {
+                        if (dealer.getDealerName().equals(selectedName)) {
+                            selectedDealerId = dealer.getDealerId(); // ID set
+                            break;
+                        }
+                    }
+                });
+            }
         });
     }
+
 
     private void showCalendarDialog() {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
@@ -145,7 +195,7 @@ public class ExpireActivity extends AppCompatActivity {
         TextView btnCancel = dialogView.findViewById(R.id.txt_cancel);
         TextView btnOk = dialogView.findViewById(R.id.txt_ok);
         final AlertDialog dialog = builder.create();
-
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
         btnOk.setOnClickListener(v -> {

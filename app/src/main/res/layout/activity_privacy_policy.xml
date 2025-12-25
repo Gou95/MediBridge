@@ -13,35 +13,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        >
+        android:padding="10dp">
 
         <ImageView
             android:id="@+id/img_back"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_centerVertical="true"
             android:src="@drawable/backarrow"
-            android:layout_marginHorizontal="10dp"
-            />
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp" />
 
         <TextView
             android:id="@+id/txt_pravicy"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:gravity="center"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="14sp"
             android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"/>
-
-
+            android:autoSizeStepGranularity="1sp"
+            android:text="Privacy Policy" />
     </LinearLayout>
-    <FrameLayout
-        android:id="@+id/webViewContainer"
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="wrap_content"
-    android:padding="16dp"
-    android:background="@color/white">
+    android:padding="20dp"
+    android:background="@drawable/company_background">
 
     <CalendarView
         android:id="@+id/calendarView"

@@ -57,4 +57,7 @@ public class Constants {
     public static final String IS_ORDER_GENERATED = "is_order_generated";
     public static final String POPUP_SHOWN_FOR_RETAILER = "popup_shown_retailer";
 
+    public static final String EXPIRY_DATE = "expiry_date";
+    public static final String SALE_ID = "sale_id";
+    public static final String UNIT_NAME = "unit_name";
 }

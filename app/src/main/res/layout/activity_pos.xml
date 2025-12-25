@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".Activities.PosActivity">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -43,7 +44,7 @@
                     android:text="Daily Sales Register"
                     android:textColor="@color/black"
                     android:textSize="16dp"
-                    android:fontFamily="@font/gotham_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:layout_marginHorizontal="20dp"
                     android:layout_centerVertical="true"
                     android:gravity="center"
@@ -71,8 +72,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Date : "
-                        android:textSize="16dp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins_semibold"
                         android:textColor="@color/black"/>
 
                     <TextView
@@ -80,8 +81,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="11-07-2025"
-                        android:textSize="16dp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:textSize="14dp"
+                        android:fontFamily="@font/poppins_semibold"
                         android:textColor="@color/black"
                         android:layout_marginStart="10dp"/>
 
@@ -92,44 +93,68 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Select Medicine for sale "
-                    android:textSize="16dp"
-                    android:fontFamily="@font/gotham_bold"
+                    android:textSize="14dp"
+                    android:fontFamily="@font/poppins_semibold"
                     android:textColor="@color/black"
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"/>
 
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_margin="12dp"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="11dp"
-                    android:layout_marginBottom="10dp"
-                    >
+                    app:cardElevation="6dp">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/auto_medi"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@null"
-                        android:drawableStart="@drawable/baseline_search"
-                        android:hint="search medicine "
-                        android:textColorHint="@color/green"
-                        android:fontFamily="@font/gothambold"
-                        android:paddingStart="20dp"
-                        android:autoSizeTextType="uniform"
-                        android:autoSizeMinTextSize="16sp"
-                        android:autoSizeMaxTextSize="18sp"
-                        android:autoSizeStepGranularity="1sp"
-                        android:drawablePadding="10dp"
-                        android:completionThreshold="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="10dp">
 
-                        />
+                        <!-- 🔍 SEARCH EDITTEXT -->
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
+                            <EditText
+                                android:id="@+id/et_search"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_toStartOf="@+id/img_voice"
+                                android:background="@drawable/bg_search"
+                                android:drawableStart="@drawable/baseline_search"
+                                android:drawablePadding="8dp"
+                                android:padding="12dp"
+                                android:fontFamily="@font/poppins"
+                                android:hint="Search for demands"
+                                android:textColor="@color/black"
+                                android:textColorHint="@color/green"
+                                android:inputType="text"
+                                android:maxLines="1"/>
 
+                            <ImageView
+                                android:id="@+id/img_voice"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:padding="6dp"
+                                android:src="@drawable/microphone"/>
+                        </RelativeLayout>
+
+                        <!-- 🔽 SEARCH RESULT LIST -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            android:layout_marginTop="8dp"
+                            android:overScrollMode="never"
+                            />
+
+                    </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
 
@@ -140,8 +165,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="List of Sold Medicine "
-                android:textSize="16dp"
-                android:fontFamily="@font/gotham_bold"
+                android:textSize="14dp"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
               android:layout_marginTop="5dp"
                 android:layout_marginStart="10dp"
@@ -153,7 +178,8 @@
                 android:padding="10dp"
                 android:background="@drawable/edit_background"
                 android:layout_marginTop="5dp"
-                android:layout_marginHorizontal="10dp">
+                android:layout_marginHorizontal="10dp"
+                >
                 <TextView
                     android:id="@+id/txt_posProductName"
                     android:layout_width="0dp"
@@ -161,10 +187,10 @@
                     android:layout_weight="1"
                     android:text="Product Name"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:fontFamily="@font/gotham_bold"/>
+                    android:fontFamily="@font/poppins_semibold"/>
 
                 <TextView
                     android:id="@+id/txt_posQty"
@@ -173,9 +199,9 @@
                     android:layout_weight="1"
                     android:text="Qty"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:gravity="center"
-                    android:fontFamily="@font/gotham_bold"/>
+                    android:fontFamily="@font/poppins_semibold"/>
 
                 <TextView
                     android:id="@+id/txt_posUnitNM"
@@ -184,9 +210,9 @@
                     android:layout_weight="1"
                     android:text="Unit"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:gravity="center"
-                    android:fontFamily="@font/gotham_bold"/>
+                    android:fontFamily="@font/poppins_semibold"/>
 
                 <TextView
                     android:id="@+id/txt_posAmount"
@@ -195,9 +221,9 @@
                     android:layout_weight="1"
                     android:text="Amount"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:gravity="center"
-                    android:fontFamily="@font/gotham_bold"/>
+                    android:fontFamily="@font/poppins_semibold"/>
 
 
 
@@ -228,6 +254,7 @@
         android:layout_marginBottom="20dp"
         android:layout_marginHorizontal="10dp"
         android:background="@drawable/edit_background"
+        android:backgroundTint="@color/green"
         android:padding="10dp">
 
         <RelativeLayout
@@ -239,21 +266,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Total Sold Medicine"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/gotham_bold"
+                android:textSize="14dp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/poppins_semibold"
                 />
 
             <TextView
                 android:id="@+id/txt_soldMedicine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00.00"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/gotham_bold"
                 android:layout_alignParentEnd="true"
-                />
+                android:fontFamily="@font/poppins_semibold"
+                android:text="No. : 00.00"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
 
 
 
@@ -269,9 +295,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Total Sale Value"
-                android:textSize="16dp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/gotham_bold"
+                android:textSize="14dp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/poppins_semibold"
                 />
 
             <TextView
@@ -280,8 +306,8 @@
                 android:layout_height="wrap_content"
                 android:text="00.00"
                 android:textSize="16dp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/gotham_bold"
+                android:textColor="@color/white"
+                android:fontFamily="@font/poppins_semibold"
                 android:layout_alignParentEnd="true"
                 />
 

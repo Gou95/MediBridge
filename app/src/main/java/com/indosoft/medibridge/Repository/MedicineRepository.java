@@ -1,9 +1,5 @@
 package com.indosoft.medibridge.Repository;
 
-import android.content.Context;
-
-import androidx.lifecycle.MutableLiveData;
-
 import com.indosoft.medibridge.Listener.MedicineListListener;
 import com.indosoft.medibridge.Model.MedicineListResponse;
 import com.indosoft.medibridge.RetrofitServices.ApiInterface;
@@ -17,13 +13,12 @@ import retrofit2.Response;
 
 public class MedicineRepository {
 
+    private static MedicineRepository repository;
+    private final ApiInterface apiInterface;
 
-    public static MedicineRepository repository;
+    // 🔥 VERY IMPORTANT: keep reference of last call
+    private Call<MedicineListResponse> currentCall;
 
-    private final MutableLiveData<List<MedicineListResponse>> mutableLiveData = new MutableLiveData<>();
-
-
-    // Singleton pattern
     public static MedicineRepository getInstance() {
         if (repository == null) {
             repository = new MedicineRepository();
@@ -31,39 +26,59 @@ public class MedicineRepository {
         return repository;
     }
 
-    private final ApiInterface apiInterface;
-
-    // Constructor
-    public MedicineRepository() {
+    private MedicineRepository() {
         apiInterface = RetrofitService.userService(ApiInterface.class);
     }
 
-    public MutableLiveData<List<MedicineListResponse>> getItemsData(Context context, MedicineListListener listener) {
-        Call<List<MedicineListResponse>> call = apiInterface.medicineList();
-        call.enqueue(new Callback<List<MedicineListResponse>>() {
-            @Override
-            public void onResponse(Call<List<MedicineListResponse>> call, Response<List<MedicineListResponse>> response) {
-                if (response.isSuccessful() && response.body() != null) {
+    // ✅ SERVER SIDE SEARCH (FAST & SAFE)
+    public void searchMedicine(
+            String search,
+            MedicineListListener listener
+    ) {
 
-                    listener.onSuccess(response.body());
+        // ✅ cancel previous API call
+        if (currentCall != null && currentCall.isExecuted()) {
+            currentCall.cancel();
+        }
+
+        // ✅ make new call
+        currentCall = apiInterface.medicineList(search);
+
+        currentCall.enqueue(new Callback<MedicineListResponse>() {
+            @Override
+            public void onResponse(
+                    Call<MedicineListResponse> call,
+                    Response<MedicineListResponse> response
+            ) {
+
+                if (listener == null) return;
+
+                if (response.isSuccessful()
+                        && response.body() != null
+                        && response.body().getData() != null) {
+
+                    List<MedicineListResponse.Datum> list =
+                            response.body().getData();
+
+                    listener.onSuccess(list);
 
                 } else {
-
-                    if (listener != null) {
-                        listener.onError("Failed to fetch data. Response is empty or null.");
-                    }
+                    listener.onError("No medicine found");
                 }
             }
 
             @Override
-            public void onFailure(Call<List<MedicineListResponse>> call, Throwable t) {
+            public void onFailure(
+                    Call<MedicineListResponse> call,
+                    Throwable t
+            ) {
+                if (listener == null) return;
 
-                if (listener != null) {
-                    listener.onError("Something went wrong: " + t.getMessage());
-                }
+                // ❌ ignore cancelled calls
+                if (call.isCanceled()) return;
+
+                listener.onError(t.getMessage());
             }
         });
-        return mutableLiveData;
     }
-
 }

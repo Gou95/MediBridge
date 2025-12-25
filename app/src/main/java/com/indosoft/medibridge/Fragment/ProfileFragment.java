@@ -18,11 +18,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.indosoft.medibridge.Activities.AboutUsActivity;
 import com.indosoft.medibridge.Activities.ChangePasswordActivity;
 import com.indosoft.medibridge.Activities.DashBoardActivity;
 import com.indosoft.medibridge.Activities.EditProfileActivity;
@@ -81,7 +83,10 @@ SignUpViewModel sign;
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .into(binding.imgProfile);
 
-
+        getActivity().getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN |
+                        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        );
         return binding.getRoot();
     }
 
@@ -95,6 +100,7 @@ SignUpViewModel sign;
                 for (GetSignUpUserResponse response : getSignUpUserResponses) {
                     if (response.getRetailerId().equals(currentRetailerId)) {
                         binding.txtEmail.setText(response.getRetailerEmail());
+                        binding.txtName.setText(response.getRetailerName());
 
                         String savedPlanName = AppSession.getInstance(getContext())
                                 .getValue(Constants.SUBSCRIPTION_PLAN_NAME + "_" + currentRetailerId);
@@ -167,6 +173,11 @@ SignUpViewModel sign;
         });
         binding.txtChangePass.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), ChangePasswordActivity.class);  // Assuming you have a LoginActivity
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        });
+        binding.txtAboutUs.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), AboutUsActivity.class);  // Assuming you have a LoginActivity
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         });

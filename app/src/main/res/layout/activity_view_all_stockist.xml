@@ -41,7 +41,7 @@
                     android:layout_height="match_parent"
                     android:textColor="@color/black"
                     android:gravity="center"
-                    android:fontFamily="@font/gotham_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="14sp"
                     android:autoSizeMaxTextSize="16sp"
@@ -73,8 +73,9 @@
                     android:drawableStart="@drawable/baseline_search"
                     android:hint="Search Stockist Name "
                     android:paddingStart="20dp"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:completionThreshold="1"
+                    android:fontFamily="@font/poppins"
 
                     />
 

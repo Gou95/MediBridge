@@ -10,14 +10,23 @@
     android:fitsSystemWindows="true"
     tools:context=".Activities.SignUpActivity">
 
-
+<androidx.cardview.widget.CardView
+    android:layout_width="160dp"
+    android:layout_height="160dp"
+    app:cardCornerRadius="80dp"
+    android:layout_marginTop="10dp"
+    app:cardElevation="5dp"
+    >
     <ImageView
-        android:layout_width="160dp"
-        android:layout_height="160dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:src="@drawable/logomedi"
-        android:scaleType="centerCrop"
-        android:layout_marginTop="10dp"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center"
         />
+
+</androidx.cardview.widget.CardView>
+
 
     <TextView
         android:layout_width="match_parent"
@@ -31,6 +40,7 @@
         android:layout_margin="20dp"
         android:importantForAccessibility="no"
         android:includeFontPadding="false"
+        android:fontFamily="@font/poppins_semibold"
         />
 
     <ScrollView
@@ -66,7 +76,7 @@
                     android:background="@null"
                     android:layout_gravity="center"
                     android:inputType="text"
-                    android:fontFamily="@font/gothambook"
+                    android:fontFamily="@font/poppins_semibold"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="14sp"
                     android:autoSizeMaxTextSize="16sp"
@@ -105,7 +115,7 @@
                     android:background="@null"
                     android:inputType="textEmailAddress"
                     android:layout_gravity="center"
-                    android:fontFamily="@font/gothambook"
+                    android:fontFamily="@font/poppins_semibold"
                    />
 
             </LinearLayout>
@@ -140,7 +150,7 @@
                     android:background="@null"
                     android:inputType="number"
                     android:layout_gravity="center"
-                    android:fontFamily="@font/gothambook"
+                    android:fontFamily="@font/poppins_semibold"
                     android:maxLength="10"/>
 
             </LinearLayout>
@@ -178,7 +188,7 @@
                     android:background="@null"
                     android:inputType="textPassword"
                     android:layout_centerInParent="true"
-                    android:fontFamily="@font/gothambook"
+                    android:fontFamily="@font/poppins_semibold"
 
                     />
 
@@ -230,7 +240,7 @@
                     android:layout_gravity="center"
                     android:hint="select State"
                     android:inputType="text"
-                    android:fontFamily="@font/gothambook"
+                    android:fontFamily="@font/poppins_semibold"
                     />
             </LinearLayout>
 
@@ -266,7 +276,7 @@
                     android:layout_gravity="center"
                     android:inputType="text"
                     android:hint="Select City"
-                    android:fontFamily="@font/gothambook"
+                    android:fontFamily="@font/poppins_semibold"
                     />
             </LinearLayout>
 
@@ -287,7 +297,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
-                    android:fontFamily="@font/gothambook"
+                    android:fontFamily="@font/poppins_semibold"
                     android:layout_marginTop="10dp"/>
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btn_signin"
@@ -311,7 +321,7 @@
                         android:gravity="center"
                         android:importantForAccessibility="no"
                         android:includeFontPadding="false"
-                        android:fontFamily="@font/gotham_bold"/>
+                        android:fontFamily="@font/poppins_semibold"/>
 
 
                 </androidx.cardview.widget.CardView>
@@ -336,6 +346,7 @@
                         android:layout_marginBottom="10dp"
                         android:importantForAccessibility="no"
                         android:includeFontPadding="false"
+                        android:fontFamily="@font/poppins"
                         />
 
 
@@ -349,7 +360,7 @@
                         android:autoSizeMaxTextSize="16sp"
                         android:autoSizeStepGranularity="1sp"
                         android:textColor="@color/green"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:layout_marginStart="5dp"
                         android:layout_marginBottom="10dp"
                         android:importantForAccessibility="no"

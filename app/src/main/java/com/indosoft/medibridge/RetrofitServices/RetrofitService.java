@@ -18,12 +18,18 @@ public class RetrofitService {
     private static HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
 
 
-
     private static final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(5, TimeUnit.SECONDS)
-            .readTimeout(5,TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(interceptor)
-            .writeTimeout(5,TimeUnit.SECONDS).build();
+            .retryOnConnectionFailure(true)
+            .build();
+//    private static final OkHttpClient client = new OkHttpClient.Builder()
+//            .connectTimeout(30, TimeUnit.SECONDS)
+//            .readTimeout(5,TimeUnit.SECONDS)
+//            .addInterceptor(interceptor)
+//            .writeTimeout(5,TimeUnit.SECONDS).build();
 
     private static final Gson gson = new GsonBuilder().setLenient().create();
 

@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.indosoft.medibridge.Body.AddBillBody;
+import com.indosoft.medibridge.Body.CashMemoAddBody;
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
 import com.indosoft.medibridge.Body.PosAddBody;
 import com.indosoft.medibridge.Body.PosUpdateBody;
@@ -73,7 +75,11 @@ public class SignUpViewModel extends ViewModel {
             isFailed.setValue(error);
         }
     };
-
+    public void deleteAllCart(String retailer_id) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.deleteAllCart(context,retailer_id, listener);
+    }
     public void sendEmail(SendEmailBody body) {
         isConnecting.setValue(true);
         repository = SignUpRepository.getInstance();
@@ -141,10 +147,10 @@ public class SignUpViewModel extends ViewModel {
         repository.resetPassword(context,retailer_id,retailer_password, listener);
 
     }
-    public void registerexpiry(RegisterExpiryBody body) {
+    public void registerexpiry(String retailer_id,String product_id,String order_items_id,RegisterExpiryBody body) {
         isConnecting.setValue(true);
         repository = SignUpRepository.getInstance();
-        repository.registerExpiry(context,body, listener);
+        repository.registerExpiry(context,retailer_id,product_id,order_items_id,body, listener);
 
     }
     public void posAdd(String retailer_id, PosAddBody body) {
@@ -158,6 +164,33 @@ public class SignUpViewModel extends ViewModel {
         repository = SignUpRepository.getInstance();
         repository.posUpdate(context,id,body, listener);
 
+    }
+    public void cashMemoAdd(String retailer_id, CashMemoAddBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.addCashMemo(context,retailer_id,body, listener);
+
+    }
+    public void addBill(String retailer_id, AddBillBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.addBill(context,retailer_id,body, listener);
+
+    }
+    public void updateMedicine(String id, CashMemoAddBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.updateMedicine(context,id,body, listener);
+    }
+    public void deleteItem(String id) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.deleteItem(context,id, listener);
+    }
+    public void updateItem(String retailer_id,String id,CashMemoAddBody body) {
+        isConnecting.setValue(true);
+        repository = SignUpRepository.getInstance();
+        repository.updateItem(context,retailer_id,id,body, listener);
     }
 
 }

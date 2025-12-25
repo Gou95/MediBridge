@@ -6,9 +6,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
 import android.net.ConnectivityManager;
@@ -38,7 +41,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.indosoft.medibridge.Adapter.OrderRegisterAdapter;
-import com.indosoft.medibridge.Model.OrderDetailsResponse;
 import com.indosoft.medibridge.Model.OrderRegisterResponse;
 import com.indosoft.medibridge.R;
 import com.indosoft.medibridge.Session.AppSession;
@@ -60,9 +62,13 @@ import java.util.Locale;
 public class OrderRegisterActivity extends AppCompatActivity {
 ActivityOrderRegisterBinding binding;
     OrderRegisterViewModel viewModel;
-    ArrayList<OrderRegisterResponse> list = new ArrayList<>();
+    ArrayList<OrderRegisterResponse> fullList = new ArrayList<>();  // ✅ ORIGINAL DATA
+    ArrayList<OrderRegisterResponse> list = new ArrayList<>();      // ✅ DISPLAY DATA
+
     OrderRegisterAdapter adapter;
     private String orderDate = null;
+    private String startDateSelected = null;
+    private String lastDateSelected = null;
 
 
     private boolean isReceiverRegistered = false;
@@ -75,6 +81,7 @@ ActivityOrderRegisterBinding binding;
         viewModel.init(this);
         initClicks();
         onAttachObservers();
+        setDefaultDates();
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
         adapter = new OrderRegisterAdapter(this,list);
         binding.recyclerView.setAdapter(adapter);
@@ -86,6 +93,8 @@ ActivityOrderRegisterBinding binding;
 
     }
     private void initClicks() {
+        binding.txtStartDate.setOnClickListener(v -> openCalendarDialog("start"));
+        binding.txtLastDate.setOnClickListener(v -> openCalendarDialog("last"));
        binding.autoMonth.addTextChangedListener(new TextWatcher() {
            @Override
            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -100,9 +109,13 @@ ActivityOrderRegisterBinding binding;
 
            }
        });
-       binding.btnPrintOrder.setOnClickListener(v -> {
-           generateInvoicePdf();
-       });
+        binding.btnPrintOrder.setOnClickListener(v -> {
+
+            ArrayList<OrderRegisterResponse> todayList = getTodayDataForPdf();
+
+            generateInvoicePdf(todayList);
+        });
+
 
         TextView title = binding.txtToday;
         SpannableString spannable = new SpannableString("Today's Order Demand");
@@ -115,36 +128,65 @@ ActivityOrderRegisterBinding binding;
         title.setText(spannable);
     }
     private void filterByProductName(String product) {
-        if (product.isEmpty()){
+        if (product.isEmpty()) {
             adapter.updateList(list);
             return;
         }
+
         ArrayList<OrderRegisterResponse> filterList = new ArrayList<>();
-        for (OrderRegisterResponse response : list){
-            if (response.getProductName() !=null && response.getProductName().toLowerCase().contains(product.toLowerCase())){
+
+        for (OrderRegisterResponse response : list) {
+            if (response.getProductName() != null &&
+                    response.getProductName().toLowerCase().contains(product.toLowerCase())) {
                 filterList.add(response);
             }
         }
+
         adapter.updateList(filterList);
     }
+    private ArrayList<OrderRegisterResponse> getTodayDataForPdf() {
+
+        ArrayList<OrderRegisterResponse> result = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        String todayStr = sdf.format(new Date());
+
+        for (OrderRegisterResponse response : fullList) {
+            if (response.getAddtime() != null &&
+                    response.getAddtime().equals(todayStr)) {
+
+                result.add(response);
+            }
+        }
+        return result;
+    }
+
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
+
         viewModel.getLiveData().observe(this, orderDetailsResponses -> {
             binding.swipeRefreshLayout.setRefreshing(false);
+
             if (orderDetailsResponses != null) {
-                list.clear();
-                for (OrderRegisterResponse response : orderDetailsResponses) {
-                    // Filter by status AND time
-                    if (isToday(response.getAddtime())) {
-                        list.add(response);
-                    }
 
-                }
+                fullList.clear();
+                fullList.addAll(orderDetailsResponses); // ✅ PURE DATA SAVE
 
-                adapter.notifyDataSetChanged();
+                showTodayData(); // ✅ DEFAULT ONLY TODAY DATA
             }
         });
     }
+    private void showTodayData() {
+        list.clear();
+
+        for (OrderRegisterResponse response : fullList) {
+            if (isToday(response.getAddtime())) {
+                list.add(response);
+            }
+        }
+
+        adapter.updateList(list);
+    }
+
 
     private boolean isToday(String addtime) {
         try {
@@ -160,6 +202,82 @@ ActivityOrderRegisterBinding binding;
             e.printStackTrace();
             return false;
         }
+    }
+    private void openCalendarDialog(String dateType) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View calendarView = inflater.inflate(R.layout.custom_calendar, null);
+
+        CalendarView calendar = calendarView.findViewById(R.id.calendarView);
+        Button btnClose = calendarView.findViewById(R.id.btnClose);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(calendarView)
+                .create();
+        dialog.show();
+
+        calendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            String selectedDate = String.format(Locale.getDefault(), "%02d-%02d-%04d", dayOfMonth, (month + 1), year);
+
+            if ("start".equals(dateType)) {
+                startDateSelected = selectedDate;
+                binding.txtStartDate.setText(selectedDate);
+            } else if ("last".equals(dateType)) {
+                lastDateSelected = selectedDate;
+                binding.txtLastDate.setText(selectedDate);
+            }
+            dialog.dismiss();
+            filterListByDateRange();
+        });
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+    }
+    private void filterListByDateRange() {
+
+        if (startDateSelected == null || lastDateSelected == null) {
+            showTodayData();  // ✅ fallback to TODAY again
+            return;
+        }
+
+        ArrayList<OrderRegisterResponse> filteredList = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+
+        try {
+            Date start = sdf.parse(startDateSelected);
+            Date end = sdf.parse(lastDateSelected);
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(end);
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            end = cal.getTime();
+
+            for (OrderRegisterResponse response : fullList) {  // ✅ FULL LIST SE FILTER
+                Date orderDate = sdf.parse(response.getAddtime());
+
+                if (orderDate != null && !orderDate.before(start) && !orderDate.after(end)) {
+                    filteredList.add(response);
+                }
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        list.clear();
+        list.addAll(filteredList);
+        adapter.updateList(list);
+    }
+
+    private void setDefaultDates() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        String todayDate = sdf.format(new Date());
+
+        startDateSelected = todayDate;
+        lastDateSelected = todayDate;
+
+        binding.txtStartDate.setText(todayDate);
+        binding.txtLastDate.setText(todayDate);
     }
 
 
@@ -210,22 +328,23 @@ ActivityOrderRegisterBinding binding;
             }
         }, 5000);
     }
-    private void generateInvoicePdf() {
+    private void generateInvoicePdf(ArrayList<OrderRegisterResponse> todayList) {
         if (list == null || list.isEmpty()) {
             Toast.makeText(this, "No order details available", Toast.LENGTH_SHORT).show();
             return;
         }
-        orderDate = list.get(0).getAddtime();  // <-- Correct date from API
-        String timestamp = new SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(new Date());
 
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        orderDate = sdf.format(new Date());
+
+//        orderDate = list.get(0).getAddtime();  // <-- Correct date from API
+        String timestamp = new SimpleDateFormat("ddMMyyyy_HHmmss", Locale.getDefault()).format(new Date());
         File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Todays_Order_" + timestamp + ".pdf");
-
         PdfDocument pdfDocument = new PdfDocument();
         Paint paint = new Paint();
         Paint titlePaint = new Paint();
         Paint dealerPaint = new Paint();
         Paint borderPaint = new Paint();
-
 
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setColor(Color.BLACK);
@@ -233,9 +352,7 @@ ActivityOrderRegisterBinding binding;
 
         int pageWidth = 600;
         int pageHeight = 800;
-        int marginTop = 50;
         int rowHeight = 40;
-        int availableHeight = pageHeight - 150;
 
         int col1 = 140, col2 = 100, col3 = 100, col4 = 80, col5 = 100;
         int itemIndex = 0;
@@ -246,20 +363,81 @@ ActivityOrderRegisterBinding binding;
             PdfDocument.Page page = pdfDocument.startPage(pageInfo);
             Canvas canvas = page.getCanvas();
 
-            // Title
+            // 1. Draw QR Code (Top-Right)
+            // 1. Draw QR Code on Top-Right
+            Bitmap qrBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.qr_code);
+            if (qrBitmap != null) {
+                Rect src = new Rect(0, 0, qrBitmap.getWidth(), qrBitmap.getHeight());
+                Rect dest = new Rect(pageWidth - 130, 30, pageWidth - 30, 130); // QR top-right corner
+                canvas.drawBitmap(qrBitmap, src, dest, null);
+
+                // 2. Draw text below QR
+                Paint qrTextPaint = new Paint();
+                qrTextPaint.setColor(Color.BLACK);
+                qrTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                qrTextPaint.setTextSize(12);
+
+// First line: "Scan & download"
+                String line1 = "Scan & download";
+                float textWidth1 = qrTextPaint.measureText(line1);
+                float textX1 = pageWidth - 130 + (100 - textWidth1) / 2;
+                float textY1 = 145;
+                canvas.drawText(line1, textX1, textY1, qrTextPaint);
+
+// Second line: "Medibro" (bigger + bold)
+                Paint qrTextBoldPaint = new Paint();
+                qrTextBoldPaint.setColor(Color.BLACK);
+                qrTextBoldPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                qrTextBoldPaint.setTextSize(14);
+
+                String line2 = "Medibro App";
+                float textWidth2 = qrTextBoldPaint.measureText(line2);
+                float textX2 = pageWidth - 130 + (100 - textWidth2) / 2;
+                float textY2 = textY1 + 15; // a little below first line
+                canvas.drawText(line2, textX2, textY2, qrTextBoldPaint);
+            }
+
+            String retailerName = "Shop Name: " + AppSession.getInstance(this).getValue(Constants.RELAILER_NAME);
+            String retailerAddress = "Address: " + AppSession.getInstance(this).getValue(Constants.PERMANENTADDRESS);
+            String DL = "DL: " + AppSession.getInstance(this).getValue(Constants.RETAILER_DL);
+            String GST = "GST: " + AppSession.getInstance(this).getValue(Constants.RETAILER_GST);
+
+            Paint linePaint = new Paint();
+            linePaint.setTextSize(18);
+            linePaint.setColor(Color.BLACK);
+            linePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+
+            Paint namePaint = new Paint();
+            namePaint.setTextSize(22);
+            namePaint.setColor(Color.BLACK);
+            namePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+            float startX1 = 30;
+            float startY = 40;
+            float lineSpacing = 25;
+
+            canvas.drawText(retailerName, startX1, startY, namePaint);                           // Line 1: Shop Name (bold)
+            canvas.drawText(retailerAddress, startX1, startY + lineSpacing, linePaint);         // Line 2: Address
+            canvas.drawText(DL, startX1, startY + 2 * lineSpacing, linePaint);                  // Line 3: DL
+            canvas.drawText(GST, startX1, startY + 3 * lineSpacing, linePaint);                 // Line 4: GST
+
             titlePaint.setTextSize(20);
             titlePaint.setColor(Color.BLACK);
             titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            canvas.drawText("Purchase Order", 220, marginTop, titlePaint);
+            String titleText = "Today Purchase Order";
+            float titleWidth = titlePaint.measureText(titleText);
+            canvas.drawText(titleText, (pageWidth - titleWidth) / 2, 160, titlePaint);
 
+            // 3. Draw Expiry Date Centered Below Title
             dealerPaint.setTextSize(18);
             dealerPaint.setColor(Color.BLACK);
             dealerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             String dateText = "Order Date: " + orderDate;
             float dateTextWidth = dealerPaint.measureText(dateText);
-            canvas.drawText(dateText, pageWidth - dateTextWidth - 50, marginTop + 30, dealerPaint);
+            canvas.drawText(dateText, (pageWidth - dateTextWidth) / 2, 190, dealerPaint);
 
-            int y = marginTop + 50;
+            // 4. Start Table below expiry info
+            int y = 210;
             paint.setTextSize(14);
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
@@ -267,13 +445,11 @@ ActivityOrderRegisterBinding binding;
             int endX = startX + col1 + col2 + col3 + col4 + col5;
             int headerBottom = y + rowHeight;
 
-            // Header row
             canvas.drawText("Product Name", startX + 10, y + 25, paint);
             canvas.drawText("Quantity", startX + col1 + 10, y + 25, paint);
             canvas.drawText("Unit", startX + col1 + col2 + 10, y + 25, paint);
             canvas.drawText("Delivery", startX + col1 + col2 + col3 + 10, y + 25, paint);
             canvas.drawText("Stockist", startX + col1 + col2 + col3 + col4 + 10, y + 25, paint);
-
             canvas.drawRect(startX, y, endX, headerBottom, borderPaint);
             y += rowHeight;
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
@@ -315,7 +491,7 @@ ActivityOrderRegisterBinding binding;
                     rowHeightAdjusted = wrappedName.size() * 20;
                 }
 
-                // Stockist name (wrapped to 2 lines max)
+                // Stockist name (wrapped)
                 String[] stockistLines = stockistName.split(" ", 2);
                 canvas.drawText(stockistLines[0], startX + col1 + col2 + col3 + col4 + 10, y + 20, paint);
                 if (stockistLines.length > 1) {
@@ -332,7 +508,6 @@ ActivityOrderRegisterBinding binding;
 
             pdfDocument.finishPage(page);
         }
-
         try {
             pdfDocument.writeTo(new FileOutputStream(file));
             Toast.makeText(this, "PDF Saved Successfully", Toast.LENGTH_SHORT).show();
@@ -390,6 +565,5 @@ ActivityOrderRegisterBinding binding;
             Toast.makeText(this, "No PDF Viewer Installed", Toast.LENGTH_SHORT).show();
         }
     }
-
 
 }

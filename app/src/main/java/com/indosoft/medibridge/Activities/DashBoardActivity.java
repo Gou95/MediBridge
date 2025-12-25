@@ -8,8 +8,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -28,47 +31,84 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.InstallStatus;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.indosoft.medibridge.Adapter.ExpiryListAdapter;
 import com.indosoft.medibridge.Fragment.HomeFragment;
 import com.indosoft.medibridge.Fragment.MyCartFragment;
 import com.indosoft.medibridge.Fragment.OrderFragment;
 import com.indosoft.medibridge.Fragment.ProfileFragment;
 import com.indosoft.medibridge.Fragment.UrgentCartFragment;
+import com.indosoft.medibridge.Model.OrderDetailsResponse;
 import com.indosoft.medibridge.R;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
+import com.indosoft.medibridge.ViewModel.OrderDetailsViewModel;
 import com.indosoft.medibridge.databinding.ActivityDashBoardBinding;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class DashBoardActivity extends AppCompatActivity {
     ActivityDashBoardBinding binding;
     private boolean isReceiverRegistered = false;
-
     private int urgentBadgeCount = 0;
     private int cartCount = 0;
+    ExpiryListAdapter expiryListAdapter;
+    ArrayList<OrderDetailsResponse> expiryList = new ArrayList<>();
+    OrderDetailsViewModel viewModel;
+    private static final int MY_UPDATE_REQUEST_CODE = 101;
+    AppUpdateManager appUpdateManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityDashBoardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         bottomNavigation();
         //logFCM();
         userSession();
+        checkPlanExpiry();
+        checkForUpdate();
+
+        if (!isPopupAlreadyShownToday()) {
+            showPopup();
+        } else {
+            // Popup already shown today → Direct dashboard show kare
+            binding.fragmentContainer.setVisibility(View.VISIBLE);
+            binding.bottomNavigation.setVisibility(View.VISIBLE);
+        }
 
         if (!isNetworkConnected()) {
             showNoConnectionView();
@@ -87,6 +127,7 @@ public class DashBoardActivity extends AppCompatActivity {
                 handledFragment = true;
             }
         }
+
 
         
         if (!handledFragment && savedInstanceState == null) {
@@ -119,7 +160,116 @@ public class DashBoardActivity extends AppCompatActivity {
             }
         }
         initializeBadge();
+      //  showPopup();
     }
+
+    private void showPopup() {
+
+        viewModel = new ViewModelProvider(this).get(OrderDetailsViewModel.class);
+        viewModel.init(this);
+        viewModel.getOrderDetailsData(AppSession.getInstance(this).getValue(Constants.RELAILER_ID));
+
+        View view = LayoutInflater.from(this).inflate(R.layout.show_expiry_list, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setView(view);
+        builder.setCancelable(false); // ❌ Back press block
+
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        ImageView cancel = view.findViewById(R.id.img_cancle);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_expiry);
+        MaterialButton button = view.findViewById(R.id.btn_ok);
+
+        expiryListAdapter = new ExpiryListAdapter(this, expiryList);
+        recyclerView.setAdapter(expiryListAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // ✅ CANCEL → Aaj ke liye popup band
+        cancel.setOnClickListener(v -> {
+            savePopupShownToday();   // ✅ Date Save
+            dialog.dismiss();
+            finishAffinity();       // ✅ App Close
+        });
+
+        // ✅ OK → Aaj ke liye popup band + Dashboard open
+        button.setOnClickListener(v -> {
+            savePopupShownToday();  // ✅ Date Save
+            dialog.dismiss();
+
+            binding.fragmentContainer.setVisibility(View.VISIBLE);
+            binding.bottomNavigation.setVisibility(View.VISIBLE);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment(), "HomeFragment")
+                    .commit();
+
+            binding.bottomNavigation.setSelectedItemId(R.id.home);
+        });
+
+        viewModel.getLiveData().observe(this, orderDetailsResponses -> {
+
+            if (orderDetailsResponses == null || orderDetailsResponses.isEmpty()) {
+                savePopupShownToday();
+                dialog.dismiss();
+
+                binding.fragmentContainer.setVisibility(View.VISIBLE);
+                binding.bottomNavigation.setVisibility(View.VISIBLE);
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new HomeFragment(), "HomeFragment")
+                        .commit();
+
+                binding.bottomNavigation.setSelectedItemId(R.id.home);
+                return;
+            }
+
+            String currentMonthYear = getCurrentMonthYear(); // ✅ 08-2025 format
+
+            expiryList.clear();
+
+            for (OrderDetailsResponse item : orderDetailsResponses) {
+
+                String expiryMonth = item.getExpiryMonth(); // ✅ "10-2025"
+
+                if (expiryMonth != null && expiryMonth.equals(currentMonthYear)) {
+                    expiryList.add(item);  // ✅ Sirf current month ka data add hoga
+                }
+            }
+
+            // ✅ Agar current month ka koi data nahi mila → popup mat dikhao
+            if (expiryList.isEmpty()) {
+                savePopupShownToday();
+                dialog.dismiss();
+
+                binding.fragmentContainer.setVisibility(View.VISIBLE);
+                binding.bottomNavigation.setVisibility(View.VISIBLE);
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new HomeFragment(), "HomeFragment")
+                        .commit();
+
+                binding.bottomNavigation.setSelectedItemId(R.id.home);
+                return;
+            }
+
+            // ✅ Sirf current month wala data popup me dikhega
+            expiryListAdapter.notifyDataSetChanged();
+        });
+
+
+        dialog.show();
+    }
+
+    private String getCurrentMonthYear() {
+        Calendar calendar = Calendar.getInstance();
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int year = calendar.get(Calendar.YEAR);
+        return String.format(Locale.getDefault(), "%02d-%d", month, year);
+        // return month + "/" + year;
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         if (newConfig.fontScale > 1.0f) {
@@ -206,7 +356,7 @@ public class DashBoardActivity extends AppCompatActivity {
         binding.noConnectionLayout.setVisibility(View.VISIBLE);
         binding.fragmentContainer.setVisibility(View.GONE);
         binding.bottomNavigation.setVisibility(View.GONE);
-//        binding.frameLayout.setVisibility(View.GONE); // Hide the floating button
+        getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.white));
     }
     private void hideNoConnectionView() {
         binding.noConnectionLayout.setVisibility(View.GONE);
@@ -275,7 +425,18 @@ public class DashBoardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        checkPlanExpiry();
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        if (appUpdateManager != null) {
+            appUpdateManager.getAppUpdateInfo()
+                    .addOnSuccessListener(appUpdateInfo -> {
+                        if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                            // Complete update automatically
+                            appUpdateManager.completeUpdate();
+                         }
+                    });
+        }
         if (!isReceiverRegistered) {
             registerReceiver(networkReceiver, filter);
             isReceiverRegistered = true;
@@ -334,12 +495,6 @@ public class DashBoardActivity extends AppCompatActivity {
         return urgentBadgeCount;
     }
 
-    public void clearMycartBadge() {
-        binding.bottomNavigation.removeBadge(R.id.myCart);
-        cartCount = 0;
-        AppSession.getInstance(this).setValue(Constants.CART_COUNT, "0");
-    }
-
     public void clearUrgentBadge() {
         binding.bottomNavigation.removeBadge(R.id.urgent);
         urgentBadgeCount = 0;
@@ -361,77 +516,98 @@ public class DashBoardActivity extends AppCompatActivity {
         updateUrgentBadge(urgentBadgeCount);
     }
 
-    private void showFreePlanActivatedPopup() {
-        boolean isPopupShown = AppSession.getInstance(this).getBoolean(Constants.POPUP_SHOWN, false);
-        boolean hasPaidPlan = AppSession.getInstance(this).getBoolean(Constants.PLAN_SELECTED + "_" + AppSession.getInstance(this).getValue(Constants.RELAILER_ID), false);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
 
-        // If the user has a paid plan, do not show the popup.
-        if (isPopupShown || hasPaidPlan) {
-            return;
+        setIntent(intent);
+
+
+        if (intent.hasExtra("CART_BADGE_COUNT")) {
+            int cartCount = intent.getIntExtra("CART_BADGE_COUNT", 0);
+            updateBadgeCounter(cartCount); // your method to update cart badge
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View view = LayoutInflater.from(this).inflate(R.layout.free_subscription, null);
-        builder.setView(view);
+        if (intent.hasExtra("URGENT_BADGE_COUNT")) {
+            int urgentCount = intent.getIntExtra("URGENT_BADGE_COUNT", 0);
+            updateUrgentBadge(urgentCount); // your method to update urgent badge
+        }
+    }
+    private void checkPlanExpiry() {
+        String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
 
-        AlertDialog dialog = builder.create();
-        dialog.setCancelable(false);
+        long expiryTime = AppSession.getInstance(this)
+                .getLong(Constants.PLAN_EXPIRY_DATE + "_" + retailerId, 0);
 
-        view.findViewById(R.id.popup_yes).setOnClickListener(v -> {
-            dialog.dismiss();
+        if (expiryTime == 0) return;
 
-            // Mark the popup as shown
-            AppSession.getInstance(DashBoardActivity.this).setBoolean(Constants.POPUP_SHOWN, true); // Using setBoolean instead of setValue for boolean
+        long currentTime = System.currentTimeMillis();
 
-            // Proceed with showing the HomeFragment
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, new HomeFragment(), "HomeFragment")
-                    .commit();
+        if (currentTime > expiryTime) {
+            AppSession.getInstance(this).setBoolean(Constants.PLAN_SELECTED + "_" + retailerId, false);
+            AppSession.getInstance(this).setBoolean(Constants.FREE_PLAN_USED + "_" + retailerId, true);
+
+            AppSession.getInstance(this).clear();
+
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+
+    private void checkForUpdate() {
+        appUpdateManager = AppUpdateManagerFactory.create(this);
+
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+
+                try {
+                    // Force update (IMMEDIATE) - user cannot skip
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            AppUpdateType.IMMEDIATE,
+                            this,
+                            MY_UPDATE_REQUEST_CODE
+                    );
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            }
         });
-
-        dialog.show();
-    }
-//    private void handleIntent(Intent intent) {
-//        if (intent == null) return;
-//
-//        int updatedCart = intent.getIntExtra("CART_BADGE_COUNT", -1);
-//        int updatedUrgent = intent.getIntExtra("URGENT_BADGE_COUNT", -1);
-//        boolean showOrder = intent.getBooleanExtra("SHOW_ORDER_FRAGMENT", false);
-//        boolean showProfile = intent.getBooleanExtra("SHOW_PROFILE_FRAGMENT", false);
-//        boolean showHome = intent.getBooleanExtra("SHOW_HOME_FRAGMENT", false);
-//
-//        if (updatedCart != -1) updateBadgeCounter(updatedCart);
-//        if (updatedUrgent != -1) updateUrgentBadge(updatedUrgent);
-//
-//        if (showOrder) {
-//            switchFragment(new OrderFragment(), "OrderFragment");
-//            binding.bottomNavigation.setSelectedItemId(R.id.order);
-//        } else if (showProfile) {
-//            switchFragment(new ProfileFragment(), "ProfileFragment");
-//            binding.bottomNavigation.setSelectedItemId(R.id.profile);
-//        } else if (showHome) {
-//            switchFragment(new HomeFragment(), "HomeFragment");
-//            binding.bottomNavigation.setSelectedItemId(R.id.home);
-//        }
-//    }
-@Override
-protected void onNewIntent(Intent intent) {
-    super.onNewIntent(intent);
-
-    setIntent(intent);
-
-
-    if (intent.hasExtra("CART_BADGE_COUNT")) {
-        int cartCount = intent.getIntExtra("CART_BADGE_COUNT", 0);
-        updateBadgeCounter(cartCount); // your method to update cart badge
     }
 
-    if (intent.hasExtra("URGENT_BADGE_COUNT")) {
-        int urgentCount = intent.getIntExtra("URGENT_BADGE_COUNT", 0);
-        updateUrgentBadge(urgentCount); // your method to update urgent badge
-    }
-}
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == MY_UPDATE_REQUEST_CODE) {
+            if (resultCode != RESULT_OK) {
+                // ⚠️ User cancelled update → Force again
+                checkForUpdate();
+
+            }
+        }
+    }
+    private boolean isPopupAlreadyShownToday() {
+
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        String lastDate = AppSession.getInstance(this)
+                .getValue("POPUP_LAST_DATE");
+
+        return today.equals(lastDate);   // true = aaj already dikha chuka
+    }
+    private void savePopupShownToday() {
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        AppSession.getInstance(this)
+                .setValue("POPUP_LAST_DATE", today);
+    }
 
 }
 

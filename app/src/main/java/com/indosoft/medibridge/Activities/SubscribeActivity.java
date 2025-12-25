@@ -154,7 +154,7 @@ public class SubscribeActivity extends AppCompatActivity implements PaymentResul
     }
     private void startPayment(int amount, String planId) {
         Checkout checkout = new Checkout();
-        checkout.setKeyID("rzp_test_i8Yg1uX2gMasnU");
+        checkout.setKeyID("rzp_live_hkuBztPfIkJjjs");
 
         try {
             JSONObject options = new JSONObject();
@@ -172,9 +172,17 @@ public class SubscribeActivity extends AppCompatActivity implements PaymentResul
     }
 
     @Override
-    public void onPaymentError(int i, String s) {
-        Toast.makeText(this, "Payment Failed! Please try again.", Toast.LENGTH_LONG).show();
+    public void onPaymentError(int code, String response) {
+        Toast.makeText(this, "Payment Failed! Redirecting to login...", Toast.LENGTH_LONG).show();
+
+        AppSession.getInstance(this).clear(); // If you want to log out the user completely
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear all back stack
+        startActivity(intent);
+        finish();
     }
+
 
     private void updateSubscription(String planName, int planDuration) {
         Calendar calendar = Calendar.getInstance();

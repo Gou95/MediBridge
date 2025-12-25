@@ -9,5 +9,6 @@
     android:autoSizeStepGranularity="1sp"
     android:textColor="@color/black"
     android:padding="10dp"
+    android:fontFamily="@font/poppins"
     android:importantForAccessibility="no"
     android:includeFontPadding="false"/>

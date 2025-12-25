@@ -15,55 +15,46 @@ import java.util.List;
 public class MedicineViewModel extends ViewModel {
 
     private Context context;
-
-    private MutableLiveData<String> isFailed = new MutableLiveData<>();
-
-    private MutableLiveData<Boolean> isConnecting = new MutableLiveData<>();
-
-    private MutableLiveData<List<MedicineListResponse>> responseMutableLiveData;
-
+    private final MutableLiveData<List<MedicineListResponse.Datum>> medicineLiveData =
+            new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
+    private final MutableLiveData<String> error = new MutableLiveData<>();
 
     private MedicineRepository repository;
 
-    public LiveData<String> getIsFailed(){
-        return isFailed;
-    }
-
-    public LiveData<Boolean>getIsConnecting(){
-        return isConnecting;
-
-
-    }
-
-    public LiveData<List<MedicineListResponse>>getLiveData(){
-        if (responseMutableLiveData == null){
-            responseMutableLiveData = new MutableLiveData<>();
-        }
-
-        return responseMutableLiveData;
-    }
-    public void init(Context context){
+    public void init(Context context) {
         this.context = context;
-        if (responseMutableLiveData == null){
-            return;
-        }
         repository = MedicineRepository.getInstance();
     }
-    MedicineListListener listener = new MedicineListListener() {
-        @Override
-        public void onSuccess(List<MedicineListResponse> response) {
-            responseMutableLiveData.setValue(response);
-        }
 
-        @Override
-        public void onError(String error) {
-            isFailed.setValue(error);
-        }
-    };
-    public void getMedicineData() {
-        isConnecting.setValue(true);  // Show loading state
-        repository = MedicineRepository.getInstance();
-        repository.getItemsData(context, listener);
+    public LiveData<List<MedicineListResponse.Datum>> getLiveData() {
+        return medicineLiveData;
+    }
 
+    public LiveData<Boolean> getLoading() {
+        return loading;
+    }
+
+    public LiveData<String> getError() {
+        return error;
+    }
+
+    // ✅ SEARCH CALL
+    public void searchMedicine(String query) {
+        loading.setValue(true);
+
+        repository.searchMedicine( query, new MedicineListListener() {
+            @Override
+            public void onSuccess(List<MedicineListResponse.Datum> response) {
+                loading.setValue(false);
+                medicineLiveData.setValue(response);
+            }
+
+            @Override
+            public void onError(String err) {
+                loading.setValue(false);
+                error.setValue(err);
+            }
+        });
     }
 }

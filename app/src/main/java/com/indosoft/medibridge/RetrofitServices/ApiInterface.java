@@ -1,7 +1,9 @@
 package com.indosoft.medibridge.RetrofitServices;
 
+import com.indosoft.medibridge.Body.AddBillBody;
 import com.indosoft.medibridge.Body.AddressUpdateBody;
 import com.indosoft.medibridge.Body.AddtoCartBody;
+import com.indosoft.medibridge.Body.CashMemoAddBody;
 import com.indosoft.medibridge.Body.ExitMobileBody;
 import com.indosoft.medibridge.Body.ExpiryRegisterBody;
 import com.indosoft.medibridge.Body.PosAddBody;
@@ -16,7 +18,12 @@ import com.indosoft.medibridge.Body.UserUpdateBody;
 import com.indosoft.medibridge.Model.AddressUpdateResponse;
 import com.indosoft.medibridge.Model.AddtoCartResponse;
 import com.indosoft.medibridge.Model.CardListResponse;
+import com.indosoft.medibridge.Model.CashMemoItemDetailsResponse;
+import com.indosoft.medibridge.Model.CashMemoListResponse;
+import com.indosoft.medibridge.Model.CashMemoPdfResponse;
+import com.indosoft.medibridge.Model.CashMemodetailsResponse;
 import com.indosoft.medibridge.Model.CityDealerResponse;
+import com.indosoft.medibridge.Model.CompanyResponse;
 import com.indosoft.medibridge.Model.DealersResponse;
 import com.indosoft.medibridge.Model.DeleteCartResponse;
 import com.indosoft.medibridge.Model.DeliveryDayResponse;
@@ -38,6 +45,8 @@ import com.indosoft.medibridge.Model.OrderRegisterResponse;
 import com.indosoft.medibridge.Model.OrderResponse;
 import com.indosoft.medibridge.Model.OtpResponse;
 import com.indosoft.medibridge.Model.PlansResponse;
+import com.indosoft.medibridge.Model.PosAllListResponse;
+import com.indosoft.medibridge.Model.PosDetailsResponse;
 import com.indosoft.medibridge.Model.ProceedOrderResponse;
 import com.indosoft.medibridge.Model.QuantityChangeResponse;
 import com.indosoft.medibridge.Model.RecentStockitsResponse;
@@ -47,6 +56,7 @@ import com.indosoft.medibridge.Model.SignUpResponse;
 import com.indosoft.medibridge.Model.StateCityResponse;
 import com.indosoft.medibridge.Model.StockistListResponse;
 import com.indosoft.medibridge.Model.StockitsResponse;
+import com.indosoft.medibridge.Model.TotalSalesResponse;
 import com.indosoft.medibridge.Model.UnitResponse;
 import com.indosoft.medibridge.Model.UrgentCartResponse;
 import com.indosoft.medibridge.Model.UrgentDeleteResponse;
@@ -62,6 +72,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -69,51 +80,40 @@ import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface ApiInterface {
-
     @GET("state.php")
     Call<List<CardListResponse>> cartList();
-
     @GET("state.php")
     Call<List<IndiaStateResponse>> stateList();
-
     @GET("dealers.php")
     Call<List<DealersResponse>> dealersList();
-
     @GET("uom.php")
     Call<List<UnitResponse>> unitList();
-
     @GET("items.php")
-    Call<List<MedicineListResponse>> medicineList();
+    Call<MedicineListResponse> medicineList(@Query("search") String search);
 
+    //@GET("items.php")
+//Call<List<MedicineListResponse>> searchMedicine(
+//        @Query("q") String query,
+//        @Query("page") int page
+//);
     @GET("users.php")
     Call<List<GetSignUpUserResponse>> getUserList();
-
     @GET("showcart.php")
     Call<List<ShowCartResponse>> showGetCartList();
-
     @FormUrlEncoded
     @POST("city.php")
     Call<List<StateCityResponse>> cityList(@Field("state_id") String state_id);
-
     @POST("showcart.php")
     Call<List<ShowCartResponse>> showCartList(@Query("retailer_id") String retailer_id);
-
-
     @POST("login_verify.php")
     Call<LoginResponse> loginRes(@Query("retailer_phone") String retailer_phone, @Query("retailer_password") String retailer_password);
-
     @POST("users.php")
     Call<SignUpResponse> getRegisterRes(@Body SignUpBody body);
-
     @POST("cart.php")
     Call<AddtoCartResponse> getAddToCartRes(@Body AddtoCartBody body);
-
-
     @PUT("users.php")
     Call<UserUpdateResponse> updateUsers(@Query("retailer_id") String retailer_id,
                                          @Body UserUpdateBody body);
-
-
     @PUT("showcart.php")
     Call<UrgentCartResponse> urgentCart(@Query("cart_id") String cart_id);
 
@@ -194,8 +194,10 @@ public interface ApiInterface {
     Call<List<ExpiryListResponse>> getExpiryList();
     @POST("expiryregister.php")
     Call<SignUpResponse> expiryRegister(@Body ExpiryRegisterBody body);
+
     @PUT("expiryregister.php")
-    Call<SignUpResponse> registerExpiry(@Body RegisterExpiryBody body);
+    Call<SignUpResponse> registerExpiry(@Query("retailer_id") String retailer_id,@Query("product_id") String product_id,
+                                        @Query("order_items_id") String order_items_id,@Body RegisterExpiryBody body);
 
     @POST("unlistedproducts.php")
     Call<SignUpResponse> unlistedMedicine(@Body UnlistedBody body);
@@ -214,6 +216,7 @@ public interface ApiInterface {
     );
     @POST("stockistlist.php")
     Call<List<StockistListResponse>> stockistList(@Query("city_id") String city_id);
+
     @PUT("retailerorderdetails.php")
     Call<SignUpResponse> getOrderStatus(@Query("order_items_id") String order_items_id, @Query("order_status") String order_status);
 
@@ -228,9 +231,45 @@ public interface ApiInterface {
    // pos sale api
     @POST("pos_cart.php")
     Call<SignUpResponse> posAdd(@Query("retailer_id") String retailer_id, @Body PosAddBody body);
-
     @PUT("pos_cart.php")
     Call<SignUpResponse> posUpdate(@Query("id") String id, @Body PosUpdateBody body);
     @GET("pos_cart.php")
     Call<List<GetPosProductResponse>> getPosList(@Query("retailer_id") String retailer_id);
+    @GET("poscard.php")
+    Call<List<PosDetailsResponse>> posList(@Query("retailer_id") String retailer_id);
+    @GET("poscard_details.php")
+    Call<List<PosAllListResponse>>allPosList(@Query("retailer_id") String retailer_id,@Query("addtime") String addtime);
+    @POST("cashmemo_cart.php")
+    Call<SignUpResponse> addMedicine(@Query("retailer_id") String retailer_id, @Body CashMemoAddBody body);
+    @PUT("cashmemo_cart.php")
+    Call<SignUpResponse> updateMedicine(@Query("id") String id, @Body CashMemoAddBody body);
+    @GET("cashmemo_cart.php")
+    Call<List<CashMemoListResponse>> getMedicine(@Query("retailer_id") String retailer_id);
+    @POST("save_cashmemo.php")
+    Call<SignUpResponse> addBill(@Query("retailer_id") String retailer_id, @Body AddBillBody body);
+    @GET("print_bill.php")
+    Call<List<CashMemoPdfResponse>> generatePdf(@Query("sale_id") String sale_id);
+    @GET("dealers_company.php")
+    Call<List<CompanyResponse>> getCompany(@Query("dealer_id") String dealer_id);
+    @GET("cashmemosummary.php")
+    Call<List<CashMemodetailsResponse>>getCashMemoDetails(@Query("retailer_id") String retailer_id);
+
+    @GET("cashmemodetails.php")
+    Call<List<CashMemoItemDetailsResponse>> getItemsList(@Query("retailer_id") String retailer_id,@Query("bill_no") String bill_no);
+
+    @Headers("Content-Type: application/json")
+    @PUT("cashmemodetails.php")
+    Call<SignUpResponse> updateItems(
+            @Query("retailer_id") String retailer_id,
+            @Query("id") String id,
+            @Body CashMemoAddBody body
+    );
+    @DELETE("cashmemodetails.php")
+    Call<SignUpResponse>deleteItems(@Query("id") String id);
+
+    @DELETE("delete_cart.php")
+    Call<SignUpResponse>deleteAllCart(@Query("retailer_id") String retailer_id);
+    @GET("dailysalesamount.php")
+    Call<List<TotalSalesResponse>> getTotal(@Query("retailer_id") String dealer_id);
 }
+
