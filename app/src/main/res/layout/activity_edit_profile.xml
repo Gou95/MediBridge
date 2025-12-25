@@ -8,6 +8,7 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true"
     tools:context=".Activities.EditProfileActivity">
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -45,7 +46,7 @@
                     android:autoSizeMinTextSize="14sp"
                     android:autoSizeMaxTextSize="16sp"
                     android:autoSizeStepGranularity="1sp"
-                    android:fontFamily="@font/gotham_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:layout_centerVertical="true"
                     android:importantForAccessibility="no"
                     android:includeFontPadding="false"
@@ -82,7 +83,7 @@
                         android:autoSizeMinTextSize="16sp"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="20dp"
                         android:importantForAccessibility="no"
@@ -115,7 +116,7 @@
                         android:autoSizeMinTextSize="16sp"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="20dp"
                         android:importantForAccessibility="no"
@@ -131,7 +132,7 @@
                         android:layout_marginTop="20dp"
                         android:inputType="text"
                         android:imeOptions="actionNext"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:paddingLeft="10dp"
                         android:autoSizeTextType="uniform"
                         android:autoSizeMinTextSize="14sp"
@@ -149,7 +150,7 @@
                         android:autoSizeMinTextSize="16sp"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="10dp"
                         android:importantForAccessibility="no"
@@ -165,7 +166,7 @@
                         android:layout_marginTop="20dp"
                         android:paddingLeft="10dp"
                         android:imeOptions="actionNext"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:inputType="textEmailAddress"
                         android:layout_marginBottom="10dp"
                         android:autoSizeTextType="uniform"
@@ -183,7 +184,7 @@
                         android:autoSizeMinTextSize="16sp"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="10dp"
                         android:importantForAccessibility="no"
@@ -203,7 +204,7 @@
                         android:autoSizeMinTextSize="16sp"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:paddingLeft="10dp"
                         android:layout_marginBottom="10dp"
                         android:importantForAccessibility="no"
@@ -222,7 +223,7 @@
                         android:autoSizeMinTextSize="16sp"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="10dp"
                         android:importantForAccessibility="no"
@@ -237,13 +238,14 @@
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="20dp"
                         android:paddingLeft="10dp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:imeOptions="actionNext"
                         android:layout_marginBottom="10dp"
                         android:autoSizeTextType="uniform"
                         android:autoSizeMinTextSize="14sp"
                         android:autoSizeMaxTextSize="16sp"
-                        android:autoSizeStepGranularity="1sp"/>
+                        android:autoSizeStepGranularity="1sp"
+                        android:maxLength="18"/>
 
 
                     <TextView
@@ -255,7 +257,7 @@
                         android:autoSizeMinTextSize="16sp"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="10dp"
                         android:importantForAccessibility="no"
@@ -270,13 +272,14 @@
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="20dp"
                         android:paddingLeft="10dp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:imeOptions="actionNext"
                         android:layout_marginBottom="10dp"
                         android:autoSizeTextType="uniform"
                         android:autoSizeMinTextSize="14sp"
                         android:autoSizeMaxTextSize="16sp"
-                        android:autoSizeStepGranularity="1sp"/>
+                        android:autoSizeStepGranularity="1sp"
+                        android:maxLength="15"/>
 
 
                     <RelativeLayout
@@ -354,7 +357,7 @@
                             android:autoSizeMinTextSize="16sp"
                             android:autoSizeMaxTextSize="18sp"
                             android:autoSizeStepGranularity="1sp"
-                            android:fontFamily="@font/gotham_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:gravity="center"
                             android:importantForAccessibility="no"
                             android:includeFontPadding="false"/>

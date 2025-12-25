@@ -2,9 +2,12 @@ package com.indosoft.medibridge.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -61,6 +64,7 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
         holder.serial.setText(String.valueOf(position+1)+".");
         holder.unlisted.setText(response.getUnlistedMedicines());
         holder.expiryMonth.setText("Expiry: "+ response.getExpiryMonth());
+        holder.batchNo.setText(response.getBatchNo());
 
         if ("UNLISTED MEDICINES".equals(response.getProductName())){
             holder.unlisted.setVisibility(View.VISIBLE);
@@ -75,14 +79,17 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
             holder.imgTick.setVisibility(View.VISIBLE);
             holder.registerExpiry.setVisibility(View.VISIBLE);
             holder.imgNotPedStatus.setVisibility(View.GONE);
+            holder.linearBatchNo.setVisibility(View.VISIBLE);
         } else if ("Not Received".equalsIgnoreCase(orderStatus)) {
             holder.imgTick.setVisibility(View.GONE);
             holder.registerExpiry.setVisibility(View.GONE);
             holder.imgNotPedStatus.setVisibility(View.VISIBLE);
+            holder.linearBatchNo.setVisibility(View.GONE);
         } else {
             holder.imgTick.setVisibility(View.GONE);
             holder.registerExpiry.setVisibility(View.GONE);
             holder.imgNotPedStatus.setVisibility(View.GONE);
+            holder.linearBatchNo.setVisibility(View.GONE);
         }
 
         // ✅ Set onClick for Ped (Recieved)
@@ -121,6 +128,7 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
             intent.putExtra("stockistId", response.getDealerId());
             intent.putExtra("orderItemsId", response.getOrderItemsId());
             intent.putExtra("expiry", response.getExpiryMonth());
+            intent.putExtra("batch", response.getBatchNo());
             expiryLauncher.launch(intent);  // ✅ Use launcher instead of direct startActivity
         });
 
@@ -144,26 +152,49 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
         }
         holder.status.setTextColor(textColor);
         holder.button.setOnClickListener(v -> {
-            int position1 = holder.getAdapterPosition(); // Store the position before any operation
-            if (position1 != RecyclerView.NO_POSITION) {
+            View popupView = LayoutInflater.from(context).inflate(R.layout.popup_layout, null);
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+            builder.setView(popupView);
+
+            TextView title = popupView.findViewById(R.id.popup_title);
+            TextView btnYes = popupView.findViewById(R.id.popup_confirm);
+            TextView btnNo = popupView.findViewById(R.id.popup_cancel);
+
+            TextView productName = popupView.findViewById(R.id.popup_product_name);
+            TextView message = popupView.findViewById(R.id.popup_message);
+
+            title.setText("Are you sure cancel this item?");
+            productName.setText(response.getProductName());
+            message.setText("This action cannot be undone.");
+
+            android.app.AlertDialog dialog = builder.create();
+            dialog.setCancelable(false);
+            dialog.show();
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            btnNo.setOnClickListener(view -> dialog.dismiss());
+
+            btnYes.setOnClickListener(view -> {
                 int orderItemsId = Integer.parseInt(response.getOrderItemsId());
                 sign.deleteOrder(String.valueOf(orderItemsId));
 
                 sign.getLiveData().observe((LifecycleOwner) context, signUpResponse -> {
                     if (signUpResponse != null && "Medicine deleted successfully".equals(signUpResponse.getMessage())) {
-                        // Check if the position is still valid
-                        if (position1 < list.size()) {
+                        int position1 = holder.getAdapterPosition();
+                        if (position1 != RecyclerView.NO_POSITION && position1 < list.size()) {
                             list.remove(position1);
                             notifyItemRemoved(position1);
                             notifyItemRangeChanged(position1, list.size());
                             Toast.makeText(context, "Item deleted successfully", Toast.LENGTH_SHORT).show();
                         }
+                        dialog.dismiss();
                     } else {
                         Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
                     }
                 });
-            }
+            });
         });
+
 
     }
     private void updateButtonVisibility(ViewHolder holder, String status) {
@@ -185,10 +216,11 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView medicine,unitName,unitQty,stockist,delivary,status ,serial,time,unlisted,expiry,expiryMonth;
-        LinearLayout linearLayout,registerExpiry;
+        TextView medicine,unitName,unitQty,stockist,delivary,status ,serial,time,unlisted,expiryMonth,batchNo;
+        LinearLayout linearLayout,registerExpiry,linearBatchNo;
         FrameLayout boxPed, boxNotPed;
         ImageView imgTick, imgNotPedStatus;
+        Button expiry;
 
 
         MaterialButton button;
@@ -213,6 +245,8 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
             button = itemView.findViewById(R.id.btn_all_cancelItem);
             expiryMonth = itemView.findViewById(R.id.txt_all_expiryMonth);
             registerExpiry = itemView.findViewById(R.id.linear_all_expiry);
+            linearBatchNo = itemView.findViewById(R.id.linear_all_batchNo);
+            batchNo = itemView.findViewById(R.id.txt_all_batchNo);
         }
     }
 }

@@ -19,8 +19,8 @@
 
             <ImageView
                 android:id="@+id/img_logo"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/logomedi"
                 android:layout_centerVertical="true"/>
 
@@ -37,7 +37,7 @@
                     android:layout_height="wrap_content"
                     android:text="Paracetamol"
                     android:textColor="@color/black"
-                    android:fontFamily="@font/gotham_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="14sp"
                     android:autoSizeMaxTextSize="16sp"
@@ -54,7 +54,7 @@
                     android:autoSizeMinTextSize="14sp"
                     android:autoSizeMaxTextSize="16sp"
                     android:autoSizeStepGranularity="1sp"
-                    android:fontFamily="@font/gotham_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:layout_marginTop="5dp"
                     android:importantForAccessibility="no"
                     android:includeFontPadding="false"
@@ -63,10 +63,10 @@
 
                 <LinearLayout
                     android:id="@+id/linearUnit"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="5dp"
+                   android:layout_marginTop="5dp"
                     android:gravity="center_vertical">
 
 
@@ -76,7 +76,7 @@
                         android:layout_height="wrap_content"
                         android:text="Unit :"
                         android:textColor="@color/black"
-                      android:fontFamily="@font/gotham_bold"
+                      android:fontFamily="@font/poppins_semibold"
                         android:autoSizeTextType="uniform"
                         android:autoSizeMinTextSize="14sp"
                         android:autoSizeMaxTextSize="16sp"
@@ -93,7 +93,7 @@
                         android:autoSizeMinTextSize="14sp"
                         android:autoSizeMaxTextSize="16sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:importantForAccessibility="no"
                         android:includeFontPadding="false"
                         />
@@ -102,12 +102,80 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+
+                    >
+                    <RadioButton
+                        android:id="@+id/radio_urgent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Urgent"
+                        android:fontFamily="@font/poppins"
+                        android:textColor="@color/black"
+                        />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="end"
+                        >
+
+                        <ImageView
+                            android:id="@+id/img_delete"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/delete"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="20dp"
+                            />
+
+
+                        <ImageView
+                            android:id="@+id/img_sub"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/minus"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="20dp"
+                            android:visibility="gone"/>
+
+                        <TextView
+                            android:id="@+id/txt_number"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="20dp"
+                            android:text="1"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:textColor="@color/black"
+                            android:autoSizeMaxTextSize="16sp"
+                            android:autoSizeMinTextSize="14sp"
+                            android:autoSizeStepGranularity="1sp"
+                            android:autoSizeTextType="uniform"
+                            android:importantForAccessibility="no"
+                            android:includeFontPadding="false"/>
+
+                        <ImageView
+                            android:id="@+id/img_add"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/add"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="20dp"/>
+
+                    </LinearLayout>
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/unlistedMedicine"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                   android:fontFamily="@font/gotham_bold"
+                   android:fontFamily="@font/poppins_semibold"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="14sp"
                     android:autoSizeMaxTextSize="16sp"
@@ -132,74 +200,7 @@
 
         </RelativeLayout>
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:layout_marginTop="5dp"
-    android:gravity="center_vertical"
-    >
-    <RadioButton
-        android:id="@+id/radio_urgent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Urgent"
-        android:fontFamily="@font/gothambook"
-        android:textColor="@color/black"
-        android:layout_marginStart="20dp"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
 
-        >
-
-        <ImageView
-            android:id="@+id/img_delete"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:src="@drawable/delete"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="20dp"
-            />
-
-
-        <ImageView
-            android:id="@+id/img_sub"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:src="@drawable/minus"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="20dp"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/txt_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="20dp"
-            android:text="1"
-            android:fontFamily="@font/gotham_bold"
-            android:textColor="@color/black"
-            android:autoSizeMaxTextSize="18sp"
-            android:autoSizeMinTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:autoSizeTextType="uniform"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-        <ImageView
-            android:id="@+id/img_add"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:src="@drawable/add"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="20dp"/>
-
-    </LinearLayout>
-</LinearLayout>
 
 
         <RadioGroup

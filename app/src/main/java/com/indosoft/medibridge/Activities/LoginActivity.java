@@ -1,11 +1,14 @@
 package com.indosoft.medibridge.Activities;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -14,14 +17,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.indosoft.medibridge.Body.UpdateStatusBody;
 import com.indosoft.medibridge.Model.GetSignUpUserResponse;
 import com.indosoft.medibridge.Model.LoginResponse;
 import com.indosoft.medibridge.R;
@@ -32,21 +37,17 @@ import com.indosoft.medibridge.ViewModel.GetSignUpUserViewModel;
 import com.indosoft.medibridge.ViewModel.LoginViewModel;
 import com.indosoft.medibridge.databinding.ActivityLoginBinding;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
 public class LoginActivity extends AppCompatActivity {
-ActivityLoginBinding binding;
+
+    ActivityLoginBinding binding;
     boolean isPasswordVisible = false;
     LoginViewModel loginViewModel;
+    GetSignUpUserViewModel signUpViewModel;
     ArrayList<GetSignUpUserResponse> getAllUserList = new ArrayList<>();
-    GetSignUpUserViewModel sign;
     private boolean isReceiverRegistered = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,84 +56,77 @@ ActivityLoginBinding binding;
 
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         loginViewModel.init(this);
-        sign = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
-        sign.init(this);
-        sign.getAllSignUPData();
-        initClicks();
-        attachObservers();
-        startNetworkService();
-        checkSubscriptionStatus();
 
+        signUpViewModel = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
+        signUpViewModel.init(this);
+        signUpViewModel.getAllSignUPData();
+
+        initClicks();
+        observeSignUpData();
+        startNetworkService();
+        checkSubscriptionStatusOnLaunch();
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN |
+                        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        );
     }
 
-    private void checkSubscriptionStatus() {
-        String isFirstLogin = AppSession.getInstance(this).getValue(Constants.IS_FIRST_LOGIN);
-        String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
+    private void checkSubscriptionStatusOnLaunch() {
+        AppSession session = AppSession.getInstance(this);
+        String isFirstLogin = session.getValue(Constants.IS_FIRST_LOGIN);
+        String status = session.getValue(Constants.RETAILER_STATUS);
 
-        if ("true".equals(isFirstLogin) && retailerId != null && !retailerId.isEmpty()) {
-            navigateToDashboard();
+        if ("true".equals(isFirstLogin)) {
+            if ("Active".equalsIgnoreCase(status)) {
+                navigateToDashboard();
+            } else {
+                showSubscriptionExpiredDialog();
+            }
         }
     }
 
-    private void attachObservers() {
-        sign.getLiveData().observe(this, responses -> {
+    private void observeSignUpData() {
+        signUpViewModel.getLiveData().observe(this, responses -> {
             if (responses != null) {
                 getAllUserList.clear();
                 getAllUserList.addAll(responses);
-            }
-            else {
-                Log.e("LoginActivity", "Sign-up response is null or empty");
-            }
-        });
-
-        loginViewModel.getLiveData().observe(this, loginResponses -> {
-            if (loginResponses != null) {
-                AppSession.getInstance(this).setValue(Constants.IS_FIRST_LOGIN, "true");
-
-                navigateToDashboard();
             } else {
-                Toast.makeText(this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();
+                Log.e("LoginActivity", "Sign-up response is null");
             }
         });
     }
-    private void startNetworkService() {
-        Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
-        startService(networkServiceIntent);
-        Log.d("LoginActivity", "NetworkCheckService started");
-    }
-
 
     private void initClicks() {
         binding.txtForgetpass.setPaintFlags(binding.txtForgetpass.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         binding.btnLogin.setOnClickListener(v -> {
-            String enteredMobile = binding.edtMobile.getText().toString().trim();
-            String enteredPassword = binding.edtPassword.getText().toString().trim();
+            String mobile = binding.edtMobile.getText().toString().trim();
+            String password = binding.edtPassword.getText().toString().trim();
 
-            if (enteredMobile.isEmpty()) {
+            if (mobile.isEmpty()) {
                 Toast.makeText(this, "Enter mobile number", Toast.LENGTH_SHORT).show();
-            } else if (enteredPassword.isEmpty()) {
+            } else if (password.isEmpty()) {
                 Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show();
             } else {
-                validateCredentials(enteredMobile, enteredPassword);
+                validateCredentials(mobile, password);
+
+
             }
         });
 
         binding.txtForgetpass.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), ForgetPasswordActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this, ForgetPasswordActivity.class));
         });
 
         binding.btnSignup.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this, SignUpActivity.class));
         });
 
         binding.imgEye.setOnClickListener(v -> togglePasswordVisibility());
     }
+
     private void togglePasswordVisibility() {
         isPasswordVisible = !isPasswordVisible;
-
         if (isPasswordVisible) {
             binding.edtPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
             binding.imgEye.setImageResource(R.drawable.eye);
@@ -147,52 +141,111 @@ ActivityLoginBinding binding;
             Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        binding.btnLogin.setEnabled(false);
-
         loginViewModel.getLoginResData(mobile, password);
-
         loginViewModel.getLiveData().observe(this, loginResponse -> {
-            binding.btnLogin.setEnabled(true);
+            loginViewModel.getLiveData().removeObservers(this);
+            if (loginResponse != null) {
+                String msg = loginResponse.getMessage();
 
-            if (loginResponse != null && loginResponse.getData() != null) {
-                String apiPhone = loginResponse.getData().getRetailerPhone();
-                String apiPassword = password;
+                switch (msg) {
+                    case "Login successful":
+                          saveSessionData(loginResponse, password);
+                        break;
 
-                if (mobile.equals(apiPhone)) {
-                    // Save basic login session data
-                    AppSession appSession = AppSession.getInstance(this);
-                    appSession.setValue(Constants.RELAILER_ID, String.valueOf(loginResponse.getData().getRetailerId()));
-                    appSession.setValue(Constants.RELAILER_NAME, loginResponse.getData().getRetailerName());
-                    appSession.setValue(Constants.RELAILER_PASSWORD, password);
-                    appSession.setValue(Constants.RELAILER_PHONE, apiPhone);
-                    appSession.setValue(Constants.RETAILER_STATUS, loginResponse.getData().getStatus());
+                    case "Incorrect password":
+                        Toast.makeText(this, loginResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        break;
 
-                    // 👇 Find the signed up user in getAllUserList by retailer ID
-                    String retailerId = String.valueOf(loginResponse.getData().getRetailerId());
-                    for (GetSignUpUserResponse user : getAllUserList) {
-                        if (user.getRetailerId().equals(retailerId)) {
-                            // Save these three values to session
-                            appSession.setValue(Constants.Email, user.getRetailerEmail());
-                            appSession.setValue(Constants.STATE_ID, user.getStateId());
-                            appSession.setValue(Constants.CITY_ID, user.getCityId());
-                            break; // Found, break loop
-                        }
-                    }
+                    case "Incorrect mobile number":
+                        Toast.makeText(this, loginResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        break;
 
-                    navigateToDashboard();
-                } else {
-                    Toast.makeText(this, "Incorrect mobile number or password", Toast.LENGTH_SHORT).show();
+                    default:
+                        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                        break;
                 }
             } else {
-                Toast.makeText(this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
+    private void saveSessionData(LoginResponse response, String password) {
+        AppSession session = AppSession.getInstance(this);
+        String retailerId = String.valueOf(response.getData().getRetailerId());
 
+        session.setValue(Constants.RELAILER_ID, retailerId);
+        session.setValue(Constants.RELAILER_NAME, response.getData().getRetailerName());
+        session.setValue(Constants.RELAILER_PHONE, response.getData().getRetailerPhone());
+        session.setValue(Constants.RELAILER_PASSWORD, password);
+        session.setValue(Constants.RETAILER_STATUS, response.getData().getStatus());
+        session.setValue(Constants.EXPIRY_DATE, response.getData().getSubsExpiryDate());
+        
 
+        for (GetSignUpUserResponse user : getAllUserList) {
+            if (user.getRetailerId().equals(retailerId)) {
+                session.setValue(Constants.Email, user.getRetailerEmail());
+                session.setValue(Constants.STATE_ID, user.getStateId());
+                session.setValue(Constants.CITY_ID, user.getCityId());
+                break;
+            }
+        }
 
+        session.setValue(Constants.IS_FIRST_LOGIN, "true");
 
+        if ("Active".equalsIgnoreCase(response.getData().getStatus())) {
+            navigateToDashboard();
+        } else {
+            showSubscriptionExpiredDialog();
+        }
+    }
+
+    private void showSubscriptionExpiredDialog() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View popupView = inflater.inflate(R.layout.popup_layout, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
+        builder.setView(popupView);
+        builder.setCancelable(false);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        TextView title = popupView.findViewById(R.id.popup_title);
+        TextView message = popupView.findViewById(R.id.popup_message);
+        TextView confirm = popupView.findViewById(R.id.popup_confirm);
+        TextView cancel = popupView.findViewById(R.id.popup_cancel);
+        TextView productName = popupView.findViewById(R.id.popup_product_name);
+
+        String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
+
+        title.setText("Retailer Information");
+      //  productName.setText("Retailer ID: " + retailerId);
+        message.setText("Your plan has expired. Please renew to continue.");
+
+        confirm.setText("Renew Now");
+        confirm.setOnClickListener(v -> {
+            dialog.dismiss();
+            Toast.makeText(this, "Redirecting to Payment...", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, SubscribeActivity.class));
+        });
+
+        cancel.setOnClickListener(v -> {
+            dialog.dismiss();
+
+        });
+    }
+
+    private void navigateToDashboard() {
+        Intent intent = new Intent(this, DashBoardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void startNetworkService() {
+        Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
+        startService(networkServiceIntent);
+    }
 
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -202,32 +255,34 @@ ActivityLoginBinding binding;
                 NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
                 return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
             } else {
-
                 return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
             }
         }
         return false;
     }
+
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (isNetworkConnected()) {
-
                 reloadData();
-            } else {
-
             }
         }
     };
+
+    private void reloadData() {
+        new Handler().postDelayed(() -> {
+            // You can refresh some data here if needed
+        }, 5000);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         if (!isReceiverRegistered) {
-            registerReceiver(networkReceiver, filter);
+            registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
             isReceiverRegistered = true;
         }
-
     }
 
     @Override
@@ -238,23 +293,6 @@ ActivityLoginBinding binding;
             isReceiverRegistered = false;
         }
     }
-    private void reloadData() {
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-            }
-        }, 5000);
-    }
-
-
-    private void navigateToDashboard() {
-        Intent intent = new Intent(this, DashBoardActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
-    }
-
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

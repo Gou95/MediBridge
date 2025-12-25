@@ -6,6 +6,7 @@
         android:id="@+id/home"
         android:title="Home"
         android:icon="@drawable/baseline_home"
+
          /> <!-- Optional: 'ifRoom' shows icon when there's room -->
 
 
@@ -14,7 +15,6 @@
         android:title="Urgent Cart"
         android:icon="@drawable/baseline_emergency"
         android:actionLayout="@layout/custom_action_item"
-        app:showAsAction="always"
 
         />
     <item

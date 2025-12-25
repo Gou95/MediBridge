@@ -34,7 +34,7 @@
             android:autoSizeMinTextSize="14sp"
             android:autoSizeMaxTextSize="16sp"
             android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:layout_centerVertical="true"
             android:importantForAccessibility="no"
             android:includeFontPadding="false"
@@ -43,6 +43,13 @@
 
             />
 
+        <ImageView
+            android:id="@+id/img_addStockist"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/add"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"/>
 
 
     </RelativeLayout>
@@ -66,11 +73,11 @@
             android:drawableStart="@drawable/baseline_search"
             android:hint="search by stockist "
             android:textColorHint="@color/green"
-            android:fontFamily="@font/gothambold"
+            android:fontFamily="@font/poppins"
             android:paddingStart="20dp"
             android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="16sp"
-            android:autoSizeMaxTextSize="18sp"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeMaxTextSize="16sp"
             android:autoSizeStepGranularity="1sp"
             android:drawablePadding="10dp"
             android:completionThreshold="1"

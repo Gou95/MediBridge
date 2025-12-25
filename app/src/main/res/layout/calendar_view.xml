@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@drawable/company_background"
+    android:padding="20dp">
 
     <DatePicker
         android:id="@+id/datePicker"
@@ -17,7 +18,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end"
-        android:layout_marginTop="16dp">
+        >
 
         <TextView
             android:id="@+id/txt_cancel"
@@ -26,7 +27,7 @@
             android:text="Cancel"
             android:textSize="20sp"
             android:textColor="@color/green"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:autoSizeTextType="uniform"
             android:autoSizeStepGranularity="1sp"
             android:layout_weight="1"
@@ -40,7 +41,7 @@
             android:layout_height="wrap_content"
             android:text="Ok"
             android:textColor="@color/green"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:layout_marginStart="40dp"
             android:autoSizeTextType="uniform"
             android:textSize="20sp"

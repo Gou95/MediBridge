@@ -47,8 +47,6 @@ public class PosListAdapter extends RecyclerView.Adapter<PosListAdapter.ViewHold
     String selectUnitId;
     SignUpViewModel sign;
     UnitViewModel unitViewModel;
-
-
     OnPosUpdatedListener updateListener;
 
     public PosListAdapter(Context context, ArrayList<GetPosProductResponse> list, SignUpViewModel sign, OnPosUpdatedListener updateListener) {
@@ -194,7 +192,7 @@ public class PosListAdapter extends RecyclerView.Adapter<PosListAdapter.ViewHold
 
                 sign.getLiveData().observe((LifecycleOwner) context, signUpResponse -> {
                     if (signUpResponse != null) {
-                        Toast.makeText(context, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(context, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
 

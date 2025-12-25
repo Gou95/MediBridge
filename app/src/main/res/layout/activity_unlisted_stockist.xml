@@ -43,7 +43,7 @@
                     android:autoSizeMinTextSize="14sp"
                     android:autoSizeMaxTextSize="16sp"
                     android:autoSizeStepGranularity="1sp"
-                    android:fontFamily="@font/gotham_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:layout_marginHorizontal="20dp"
                     android:layout_centerVertical="true"
                     android:gravity="center"
@@ -110,7 +110,7 @@
                         android:autoSizeMinTextSize="16sp"
                         android:autoSizeMaxTextSize="18sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="20dp"
                         android:importantForAccessibility="no"
@@ -124,7 +124,7 @@
                         android:background="@drawable/edit_background"
                         android:layout_marginHorizontal="20dp"
                         android:layout_marginTop="20dp"
-                        android:fontFamily="@font/gothambook"
+                        android:fontFamily="@font/poppins_semibold"
                         android:paddingLeft="10dp"
                         android:hint="enter stockist name"
                         android:layout_marginBottom="10dp"
@@ -199,7 +199,7 @@
                             android:layout_gravity="center"
                             android:hint="select State"
                             android:inputType="text"
-                            android:fontFamily="@font/gothambook"
+                            android:fontFamily="@font/poppins_semibold"
                             android:textColorHint="@color/black"
                             />
                     </LinearLayout>
@@ -233,7 +233,7 @@
                             android:layout_gravity="center"
                             android:hint="select city"
                             android:inputType="text"
-                            android:fontFamily="@font/gothambook"
+                            android:fontFamily="@font/poppins_semibold"
                             android:textColorHint="@color/black"
                             />
 
@@ -251,7 +251,7 @@
                         android:layout_marginTop="20dp"
                         android:inputType="text"
                         android:imeOptions="actionNext"
-                        android:fontFamily="@font/gothambook"
+                        android:fontFamily="@font/poppins_semibold"
                         android:paddingLeft="10dp"
                         android:hint="enter address"
                         android:layout_marginBottom="10dp"
@@ -284,7 +284,7 @@
                             android:autoSizeStepGranularity="1sp"
                             android:importantForAccessibility="no"
                             android:includeFontPadding="false"
-                            android:fontFamily="@font/gotham_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:gravity="center"/>
 
 

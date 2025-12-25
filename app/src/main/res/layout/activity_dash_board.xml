@@ -17,6 +17,7 @@
         android:id="@+id/noConnectionLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         android:visibility="gone">
 
         <ImageView
@@ -38,6 +39,7 @@
             android:autoSizeMaxTextSize="18sp"
             android:autoSizeStepGranularity="1sp"
             android:layout_below="@id/noConnectionImage"
+            android:fontFamily="@font/poppins"
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 
@@ -46,14 +48,18 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:background="@color/white"
         app:itemIconTint="@color/green"
         app:itemTextColor="@color/green"
-        app:menu="@menu/bottom_items"
+        app:itemTextAppearanceActive="@style/BottomNavTextStyle"
+        app:itemTextAppearanceInactive="@style/BottomNavTextStyle"
         app:labelVisibilityMode="labeled"
-        android:layout_gravity="bottom"/>
+        app:menu="@menu/bottom_items"
+        app:itemIconSize="25dp"/>
+
 
     <!-- Semi-transparent background -->
 

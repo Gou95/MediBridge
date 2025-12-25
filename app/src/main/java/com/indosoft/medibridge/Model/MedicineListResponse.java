@@ -3,72 +3,134 @@ package com.indosoft.medibridge.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class MedicineListResponse {
-    @SerializedName("product_id")
+
+    @SerializedName("page")
     @Expose
-    private String productId;
-    @SerializedName("product_name")
+    private Integer page;
+    @SerializedName("limit")
     @Expose
-    private String productName;
-    @SerializedName("company_id")
+    private Integer limit;
+    @SerializedName("total")
     @Expose
-    private Object companyId;
-    @SerializedName("supplier_name")
+    private Integer total;
+    @SerializedName("total_pages")
     @Expose
-    private Object supplierName;
-    @SerializedName("unit_id")
+    private Integer totalPages;
+    @SerializedName("data")
     @Expose
-    private Object unitId;
-    @SerializedName("unit_name")
-    @Expose
-    private Object unitName;
+    private List<Datum> data;
 
-    public String getProductId() {
-        return productId;
+    public Integer getPage() {
+        return page;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
+    public void setPage(Integer page) {
+        this.page = page;
     }
 
-    public String getProductName() {
-        return productName;
+    public Integer getLimit() {
+        return limit;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setLimit(Integer limit) {
+        this.limit = limit;
     }
 
-    public Object getCompanyId() {
-        return companyId;
+    public Integer getTotal() {
+        return total;
     }
 
-    public void setCompanyId(Object companyId) {
-        this.companyId = companyId;
+    public void setTotal(Integer total) {
+        this.total = total;
     }
 
-    public String getSupplierName() {
-        return (String) supplierName;
+    public Integer getTotalPages() {
+        return totalPages;
     }
 
-    public void setSupplierName(Object supplierName) {
-        this.supplierName = supplierName;
+    public void setTotalPages(Integer totalPages) {
+        this.totalPages = totalPages;
     }
 
-    public Object getUnitId() {
-        return unitId;
+    public List<Datum> getData() {
+        return data;
     }
 
-    public void setUnitId(Object unitId) {
-        this.unitId = unitId;
+    public void setData(List<Datum> data) {
+        this.data = data;
     }
+    public class Datum {
 
-    public Object getUnitName() {
-        return unitName;
-    }
+        @SerializedName("product_id")
+        @Expose
+        private Integer productId;
+        @SerializedName("product_name")
+        @Expose
+        private String productName;
+        @SerializedName("company_id")
+        @Expose
+        private Integer companyId;
+        @SerializedName("supplier_name")
+        @Expose
+        private String supplierName;
+        @SerializedName("unit_id")
+        @Expose
+        private Integer unitId;
+        @SerializedName("unit_name")
+        @Expose
+        private String unitName;
 
-    public void setUnitName(Object unitName) {
-        this.unitName = unitName;
+        public Integer getProductId() {
+            return productId;
+        }
+
+        public void setProductId(Integer productId) {
+            this.productId = productId;
+        }
+
+        public String getProductName() {
+            return productName;
+        }
+
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
+
+        public Integer getCompanyId() {
+            return companyId;
+        }
+
+        public void setCompanyId(Integer companyId) {
+            this.companyId = companyId;
+        }
+
+        public String getSupplierName() {
+            return supplierName;
+        }
+
+        public void setSupplierName(String supplierName) {
+            this.supplierName = supplierName;
+        }
+
+        public Integer getUnitId() {
+            return unitId;
+        }
+
+        public void setUnitId(Integer unitId) {
+            this.unitId = unitId;
+        }
+
+        public String getUnitName() {
+            return unitName;
+        }
+
+        public void setUnitName(String unitName) {
+            this.unitName = unitName;
+        }
+
     }
 
 }

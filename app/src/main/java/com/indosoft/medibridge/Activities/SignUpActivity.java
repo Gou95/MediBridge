@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -24,6 +26,7 @@ import android.text.style.StyleSpan;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
@@ -98,7 +101,11 @@ public class SignUpActivity extends AppCompatActivity {
         onAttachObservers();
         startNetworkService();
         setupSpannableText();
-        Toast.makeText(this, ""+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN), Toast.LENGTH_SHORT).show();
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN |
+                        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        );
+       // Toast.makeText(this, ""+AppSession.getInstance(this).getValue(Constants.FCM_TOKEN), Toast.LENGTH_SHORT).show();
     }
     private void setupSpannableText() {
         String text = "I accept and agree to the Terms & Conditions and privacy policy";
@@ -346,7 +353,7 @@ public class SignUpActivity extends AppCompatActivity {
         message.setText("Do you accept the Terms & Conditions and Privacy Policy?");
 
         AlertDialog dialog = builder.create();
-
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         cancel.setOnClickListener(v -> {
             dialog.dismiss();
         });

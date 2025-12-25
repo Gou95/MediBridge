@@ -1,7 +1,5 @@
 package com.indosoft.medibridge.Session;
 
-
-
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -10,7 +8,6 @@ import com.google.gson.JsonSyntaxException;
 
 public class AppSession {
     private static AppSession instance;
-
     private final SharedPreferences sharedPreferences;
 
     private AppSession(Context context) {
@@ -28,11 +25,11 @@ public class AppSession {
         sharedPreferences.edit().clear().apply();
     }
 
-    public String setValue(String key, String value) {
+    // ✅ return type ko void kar diya
+    public void setValue(String key, String value) {
         if (key != null && value != null) {
             sharedPreferences.edit().putString(key, value).apply();
         }
-        return key;
     }
 
     public String getValue(String key) {
@@ -46,7 +43,7 @@ public class AppSession {
     }
 
     public boolean getBoolean(String key, boolean defaultValue) {
-        return key != null && sharedPreferences.getBoolean(key, defaultValue);
+        return key != null ? sharedPreferences.getBoolean(key, defaultValue) : defaultValue;
     }
 
     public void putObject(String key, Object obj) {
@@ -69,19 +66,13 @@ public class AppSession {
         }
     }
 
-
     public void putLong(String key, long value) {
         if (key != null) {
             sharedPreferences.edit().putLong(key, value).apply();
         }
     }
 
-    // ✅ Method to retrieve long values (for expiry timestamps)
     public long getLong(String key, long defaultValue) {
         return key != null ? sharedPreferences.getLong(key, defaultValue) : defaultValue;
     }
-
-
-
-
 }

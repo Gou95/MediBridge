@@ -43,7 +43,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:autoSizeTextType="uniform"
                         android:autoSizeMinTextSize="14sp"
                         android:autoSizeMaxTextSize="16sp"
@@ -64,7 +64,7 @@
                         android:autoSizeMinTextSize="14sp"
                         android:autoSizeMaxTextSize="16sp"
                         android:autoSizeStepGranularity="1sp"
-                        android:fontFamily="@font/gotham_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
                         android:importantForAccessibility="no"
@@ -117,7 +117,7 @@
                     android:autoSizeMaxTextSize="16sp"
                     android:autoSizeStepGranularity="1sp"
                     android:inputType="text"
-                    android:fontFamily="@font/gothambook"
+                    android:fontFamily="@font/poppins_semibold"
                     android:completionThreshold="1"
                     />
 
@@ -149,7 +149,8 @@
                 android:inputType="textMultiLine"
                 android:maxLines="5"
                 android:scrollbars="vertical"
-                android:overScrollMode="always"/>
+                android:overScrollMode="always"
+                    android:fontFamily="@font/poppins"/>
             </com.google.android.material.textfield.TextInputLayout>
 
 

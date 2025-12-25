@@ -28,7 +28,7 @@
                 android:autoSizeMinTextSize="14sp"
                 android:autoSizeMaxTextSize="16sp"
                 android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
                 android:importantForAccessibility="no"
                 android:includeFontPadding="false"/>
@@ -41,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
                 android:autoSizeTextType="uniform"
                 android:autoSizeMinTextSize="14sp"
@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:textColor="@color/black"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="14sp"
@@ -77,7 +77,7 @@
                 android:id="@+id/txt_all_OrderUnitName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/purple_700"
                 android:autoSizeTextType="uniform"
                 android:autoSizeMinTextSize="14sp"
@@ -91,7 +91,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
                 android:autoSizeTextType="uniform"
                 android:autoSizeMinTextSize="14sp"
@@ -108,7 +108,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="14sp"
             android:autoSizeMaxTextSize="16sp"
@@ -127,7 +127,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:text="Stockist Name :"
                 android:textColor="@color/black"
                 android:autoSizeTextType="uniform"
@@ -142,7 +142,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
                 android:autoSizeTextType="uniform"
                 android:autoSizeMinTextSize="14sp"
@@ -164,7 +164,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:text="Delivery Day :"
                 android:textColor="@color/black"
                 android:autoSizeTextType="uniform"
@@ -179,7 +179,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/black"
                 android:autoSizeTextType="uniform"
                 android:autoSizeMinTextSize="14sp"
@@ -202,7 +202,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:text="Order Status :"
                 android:textColor="@color/black"
                 android:autoSizeTextType="uniform"
@@ -217,7 +217,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:fontFamily="@font/gotham_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:textColor="@color/yellow"
                 android:autoSizeTextType="uniform"
                 android:autoSizeMinTextSize="14sp"
@@ -256,7 +256,7 @@
         app:cornerRadius="20dp"
         android:textAllCaps="false"
         android:gravity="center"
-        android:fontFamily="@font/gotham_bold"
+        android:fontFamily="@font/poppins_semibold"
         android:autoSizeTextType="uniform"
         android:autoSizeMinTextSize="12sp"
         android:autoSizeMaxTextSize="13sp"
@@ -268,7 +268,7 @@
         />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp">
@@ -283,7 +283,7 @@
             android:autoSizeMinTextSize="14sp"
             android:autoSizeMaxTextSize="16sp"
             android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:layout_gravity="center_vertical"
             android:importantForAccessibility="no"
             android:includeFontPadding="false"/>
@@ -316,7 +316,7 @@
             android:autoSizeMinTextSize="14sp"
             android:autoSizeMaxTextSize="16sp"
             android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:layout_gravity="center_vertical"
             android:importantForAccessibility="no"
             android:includeFontPadding="false"/>
@@ -351,23 +351,18 @@
         android:orientation="horizontal"
         android:visibility="gone">
 
-        <TextView
+        <Button
             android:id="@+id/txt_all_expiry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Register Expiry "
             android:textColor="@color/red"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
             android:maxLines="1"
             android:layout_weight="1"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"
+            android:backgroundTint="@color/platinum"
 
             />
 
@@ -375,12 +370,12 @@
             android:id="@+id/txt_all_expiryMonth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/green"
+            android:textColor="@color/black"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="14sp"
             android:autoSizeMaxTextSize="16sp"
             android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="20dp"
             android:maxLines="1"
@@ -391,6 +386,77 @@
     </LinearLayout>
 
 
+    <LinearLayout
+        android:id="@+id/linear_all_batchNo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+       >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="14sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeStepGranularity="1sp"
+            android:fontFamily="@font/poppins_semibold"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:maxLines="1"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+
+            />
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_weight="1">
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="10dp"
+        android:autoSizeMaxTextSize="16sp"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/poppins_semibold"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:text="Batch No :"
+        android:textColor="@color/black"
+
+        />
+
+    <TextView
+        android:id="@+id/txt_all_batchNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeMaxTextSize="16sp"
+        android:autoSizeStepGranularity="1sp"
+        android:fontFamily="@font/poppins_semibold"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="5dp"
+        android:maxLines="1"
+        android:text=""
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"
+        />
+
+</LinearLayout>
+
+    </LinearLayout>
 
 
     <View

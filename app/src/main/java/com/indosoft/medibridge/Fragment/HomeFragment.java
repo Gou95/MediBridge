@@ -1,5 +1,8 @@
 package com.indosoft.medibridge.Fragment;
 
+import static android.app.Activity.RESULT_OK;
+
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -7,12 +10,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -20,6 +26,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Handler;
+import android.os.Looper;
+import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -51,9 +59,13 @@ import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.indosoft.medibridge.Activities.AllOrdersActivity;
 import com.indosoft.medibridge.Activities.CartActivity;
+import com.indosoft.medibridge.Activities.CashMemoActivity;
+import com.indosoft.medibridge.Activities.CashMemoDetailsActivity;
 import com.indosoft.medibridge.Activities.DashBoardActivity;
+import com.indosoft.medibridge.Activities.ExpensiveActivity;
 import com.indosoft.medibridge.Activities.ExpiryListActivity;
 import com.indosoft.medibridge.Activities.HelpActivity;
+import com.indosoft.medibridge.Activities.LoginActivity;
 import com.indosoft.medibridge.Activities.NotificationActivity;
 import com.indosoft.medibridge.Activities.OrderRegisterActivity;
 import com.indosoft.medibridge.Activities.ExpiryRegisterActivity;
@@ -64,9 +76,11 @@ import com.indosoft.medibridge.Activities.SubscribeActivity;
 import com.indosoft.medibridge.Activities.UnlistedStockistActivity;
 import com.indosoft.medibridge.Activities.ViewAllStockistActivity;
 import com.indosoft.medibridge.Adapter.RecentStockitsAdapter;
+import com.indosoft.medibridge.Adapter.SearchAdapter;
 import com.indosoft.medibridge.Body.AddtoCartBody;
 import com.indosoft.medibridge.Body.UnlistedBody;
 import com.indosoft.medibridge.Model.CityDealerResponse;
+import com.indosoft.medibridge.Model.GetSignUpUserResponse;
 import com.indosoft.medibridge.Model.LastStockitsResponse;
 import com.indosoft.medibridge.Model.MedicineListResponse;
 import com.indosoft.medibridge.Model.NotificationResponse;
@@ -78,6 +92,7 @@ import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.AddtoCartViewModel;
 import com.indosoft.medibridge.ViewModel.CityDealerViewModel;
+import com.indosoft.medibridge.ViewModel.GetSignUpUserViewModel;
 import com.indosoft.medibridge.ViewModel.LastStockitsViewModel;
 import com.indosoft.medibridge.ViewModel.MedicineViewModel;
 import com.indosoft.medibridge.ViewModel.NotificationViewModel;
@@ -86,18 +101,25 @@ import com.indosoft.medibridge.ViewModel.SignUpViewModel;
 import com.indosoft.medibridge.ViewModel.UnitViewModel;
 import com.indosoft.medibridge.databinding.FragmentHomeBinding;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class HomeFragment extends Fragment {
-
     FragmentHomeBinding binding;
     private ImageSlider imageSlider;
     ArrayList<UnitResponse> unitList = new ArrayList<>();
-    ArrayList<MedicineListResponse> itemList = new ArrayList<>();
+    ArrayList<MedicineListResponse.Datum> itemList = new ArrayList<>();
+    private final List<MedicineListResponse.Datum> masterList = new ArrayList<>(); // ALL DATA
+    private final List<MedicineListResponse.Datum> filteredList = new ArrayList<>();
+    private SearchAdapter searchAdapter;
     ArrayList<RecentStockitsResponse> recentList = new ArrayList<>();
     UnitViewModel unitViewModel;
     MedicineViewModel medicineViewModel;
@@ -106,17 +128,22 @@ public class HomeFragment extends Fragment {
     LastStockitsViewModel lastStockitsViewModel;
     RecentStockitsViewModel recentStockitsViewModel;
     NotificationViewModel notificationViewModel;
+    GetSignUpUserViewModel viewModel;
     SignUpViewModel sign;
     private ArrayList<NotificationResponse> list = new ArrayList<>();
     String selectDealerId;
     String selectUnitId;
     RecentStockitsAdapter adapter;
-    private HashMap<String, String> productMap = new HashMap<>();
+    HashMap<String, MedicineListResponse.Datum> productMap = new HashMap<>();
     private HashMap<String, String> dealerMap = new HashMap<>();
     private HashMap<String, String> unitNameToIdMap = new HashMap<>();
     int notificationCount;
+    private String currentQuery = "";
+    private ArrayList<String> fullProductNameList = new ArrayList<>();
+    private boolean isMedicineLoaded = false;
+    private boolean isItemSelected = false;
+
     private boolean isReceiverRegistered = false;
-    int cartCount = 0;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -131,7 +158,10 @@ public class HomeFragment extends Fragment {
         cartViewModel.init(requireContext());
         sign = new ViewModelProvider(this).get(SignUpViewModel.class);
         sign.init(requireContext());
-        medicineViewModel.getMedicineData();
+        viewModel = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
+        viewModel.init(getContext());
+        viewModel.getAllSignUPData();
+        medicineViewModel.searchMedicine("");
         imageSlider = binding.imageSlider;
         onAttachObservers();
         startNetworkCheckService();
@@ -146,40 +176,56 @@ public class HomeFragment extends Fragment {
         binding.horizontalRecyclerView.setLayoutManager(layoutManager);
         binding.horizontalRecyclerView.setAdapter(adapter);
 
+        binding.txtRemainingDay.setText(AppSession.getInstance(getContext()).getValue(Constants.SUBSCRIPTION_PLAN_NAME));
 
-        AutoCompleteTextView autoSearch = binding.autoSearch;
-        SpannableString hint = new SpannableString("search medicines for demand");
-        hint.setSpan(new RelativeSizeSpan(0.9f), 0, hint.length(), 0);
-        autoSearch.setHint(hint);
+        searchAdapter = new SearchAdapter(item -> {
 
+            binding.etSearch.setText("");
+            binding.rvSearch.setVisibility(View.GONE);
+
+            // ✅ Product ID
+            AppSession.getInstance(requireContext())
+                    .setValue(Constants.PRODUCT_ID, String.valueOf(item.getProductId()));
+
+            // ✅ Unit ID & Name (IMPORTANT)
+            AppSession.getInstance(requireContext())
+                    .setValue(Constants.UNIT_ID, String.valueOf(item.getUnitId()));
+
+            AppSession.getInstance(requireContext())
+                    .setValue(Constants.UNIT_NAME, item.getUnitName());
+
+            showPopup(item.getProductName(), item.getSupplierName());
+        });
+
+
+        binding.rvSearch.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvSearch.setAdapter(searchAdapter);
 
         return binding.getRoot();
     }
-
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
-        medicineViewModel.getLiveData().observe(getViewLifecycleOwner(), medicineListResponses -> {
-            binding.swipeRefreshLayout.setRefreshing(false);
-            if (medicineListResponses != null && !medicineListResponses.isEmpty()) {
-                itemList.clear();
-                itemList.addAll(medicineListResponses);
-                List<String> productNameList = new ArrayList<>();
-                productMap.clear();
-                for (MedicineListResponse response : medicineListResponses) {
-                    if (response != null && response.getProductId() != null) {
-                        productNameList.add(response.getProductName());
-                        productMap.put(response.getProductName(), response.getProductId());
-                        AppSession.getInstance(getContext()).setValue(Constants.PRODUCT_ID, response.getProductId());
+        medicineViewModel.getLiveData().observe(getViewLifecycleOwner(), list -> {
 
-                    }
-                }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.dropdown_items, productNameList);
-                binding.autoSearch.setAdapter(adapter);
-
-            } else {
-                Log.e("HomeFragment", "Medicine data is null or empty");
+            // ✅ Agar user ne search hi nahi ki
+            if (currentQuery == null || currentQuery.isEmpty()) {
+                binding.rvSearch.setVisibility(View.GONE);
+                return;
             }
+
+            if (list == null || list.isEmpty()) {
+                binding.rvSearch.setVisibility(View.GONE);
+                return;
+            }
+
+            searchAdapter.submitList(list);
+            binding.rvSearch.setVisibility(View.VISIBLE);
         });
+
+
+
+
+
         recentStockitsViewModel.getLiveData().observe(getViewLifecycleOwner(), responses -> {
             binding.swipeRefreshLayout.setRefreshing(false);
             if (responses != null && !responses.isEmpty()) {
@@ -194,11 +240,11 @@ public class HomeFragment extends Fragment {
             binding.swipeRefreshLayout.setRefreshing(false);
             if (responses != null && !responses.isEmpty()) {
                 notificationCount = responses.size();
-               // updateNotificationBadge(notificationCount);
+                // updateNotificationBadge(notificationCount);
                 list.clear();
                 list.addAll(responses);
             } else {
-              //  updateNotificationBadge(0); // Hide the badge if no notifications
+                //  updateNotificationBadge(0); // Hide the badge if no notifications
             }
         });
         cartViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
@@ -206,12 +252,12 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getContext(), response.getMessage(), Toast.LENGTH_SHORT).show();
                 String cartCountStr = AppSession.getInstance(getContext()).getValue(Constants.CART_COUNT);
                 int cartCount = (cartCountStr == null || cartCountStr.isEmpty()) ? 0 : Integer.parseInt(cartCountStr);
-               cartCount++;
+                cartCount++;
                 AppSession.getInstance(getContext()).setValue(Constants.CART_COUNT, String.valueOf(cartCount));
                 if (getActivity() instanceof DashBoardActivity) {
                     ((DashBoardActivity) getActivity()).updateBadgeCounter(cartCount);
                 }
-               // updateCartBadgeCount(cartCount);
+                // updateCartBadgeCount(cartCount);
 
             }
         });
@@ -224,249 +270,94 @@ public class HomeFragment extends Fragment {
                 if (getActivity() instanceof DashBoardActivity) {
                     ((DashBoardActivity) getActivity()).updateBadgeCounter(cartCount);
                 }
-               // updateCartBadgeCount(cartCount);
+                // updateCartBadgeCount(cartCount);
             }
         });
+        viewModel.getLiveData().observe(getViewLifecycleOwner(), getSignUpUserResponses -> {
+            if (getSignUpUserResponses != null) {
+                String currentRetailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
+
+                for (GetSignUpUserResponse response : getSignUpUserResponses) {
+                    if (response.getRetailerId().equals(currentRetailerId)) {
+
+
+                        String savedPlanName = AppSession.getInstance(getContext())
+                                .getValue(Constants.SUBSCRIPTION_PLAN_NAME + "_" + currentRetailerId);
+                        if (savedPlanName != null && !savedPlanName.isEmpty()) {
+                            binding.txtRemainingDay.setText(savedPlanName);
+                        } else {
+                            //  binding.txtSubsPlan.setText("No Plan Selected");
+                        }
+
+                        String expiryDateStr = response.getSubsExpiryDate(); // format: "2025-06-20"
+                        if (expiryDateStr != null && !expiryDateStr.isEmpty()) {
+                            long expiryMillis = convertDateToMillis(expiryDateStr);
+                            long remainingDays = calculateDaysDifference(expiryMillis);
+
+                            if (remainingDays >= 0) {
+                                binding.txtRemainingDay.setText("Days Left" +" "+":"+remainingDays);
+                            } else {
+                                binding.txtRemainingDay.setText("Expired");
+                                binding.txtRemainingDay.setText("Expired " + Math.abs(remainingDays) + " days ago");
+
+                                sign.expiryStatus(currentRetailerId);
+                                AppSession.getInstance(getContext()).clear();
+
+                                Intent intent = new Intent(getContext(), LoginActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                                requireActivity().finish();
+                                return;
+                            }
+                        } else {
+                            binding.txtRemainingDay.setText("No expiry date available");
+                        }
+
+                        break;
+                    }
+                }
+            }
+        });
+
     }
-    private void showPopup(String selectedProductName, String supplierName) {
-        unitViewModel = new ViewModelProvider(this).get(UnitViewModel.class);
-        unitViewModel.init(requireContext());
-        cityDealerViewModel = new ViewModelProvider(this).get(CityDealerViewModel.class);
-        cityDealerViewModel.init(requireContext());
-        lastStockitsViewModel = new ViewModelProvider(this).get(LastStockitsViewModel.class);
-        lastStockitsViewModel.init(requireContext());
-        unitViewModel.getUnits();
-        View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.search_list_layout, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setView(popupView);
-        AlertDialog dialog = builder.create();
-        TextView txtItemDetails = popupView.findViewById(R.id.txt_medicineName);
-        txtItemDetails.setText(selectedProductName);
-        TextView companyNm = popupView.findViewById(R.id.txt_conpanyName);
-        companyNm.setText(supplierName);
-        TextView txtNumber = popupView.findViewById(R.id.txt_number);
-        TextView txtUnitName = popupView.findViewById(R.id.txt_unitName);
-        ImageView imgSub = popupView.findViewById(R.id.img_sub);
-        ImageView imgAdd = popupView.findViewById(R.id.img_add);
-        ImageView imgCancel = popupView.findViewById(R.id.img_cancle);
-        CardView addCart = popupView.findViewById(R.id.btn_addCart);
-        Spinner unitSpn = popupView.findViewById(R.id.spinner_unit);
-        AutoCompleteTextView dealerName = popupView.findViewById(R.id.auto_dealerName);
-        unitViewModel.getLiveData().observe(getViewLifecycleOwner(), unitResponses -> {
-            if (unitResponses != null && !unitResponses.isEmpty()) {
-                unitList.clear();
-                unitList.addAll(unitResponses);
-                List<String> unitNames = new ArrayList<>();
-                unitNameToIdMap.clear();
-                for (UnitResponse unit : unitList) {
-                    unitNames.add(unit.getUnitName());
-                    unitNameToIdMap.put(unit.getUnitName(), unit.getUnitId());
-                    AppSession.getInstance(getContext()).setValue(Constants.UNIT_ID, unit.getUnitId());
-                }
-                ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, unitNames);
-                unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                unitSpn.setAdapter(unitAdapter);
-                String selectedUnitName = getUnitForProduct(selectedProductName);
-                if (selectedUnitName != null) {
-                    txtUnitName.setText(selectedUnitName);
-                    selectUnitId = unitNameToIdMap.get(selectedUnitName);
-                } else {
-                    txtUnitName.setText("Unit not available");
-                    Log.e("UnitError", "No unit name found for product: " + selectedProductName);
-                }
-                unitSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        selectUnitId = unitList.get(position).getUnitId();
-                        txtUnitName.setText(selectedUnitName);
-                    }
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });
-                txtUnitName.setOnClickListener(v -> {
-                    txtUnitName.setVisibility(View.GONE);
-                    unitSpn.setVisibility(View.VISIBLE);
-                    unitSpn.performClick();
-                });
-            }
-        });
-        String currentProductId = AppSession.getInstance(getContext()).getValue(Constants.PRODUCT_ID);
-        String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
-        lastStockitsViewModel.lastStockitsData(retailerId, currentProductId);
-        lastStockitsViewModel.getLiveData().observe(getViewLifecycleOwner(), lastStockitsResponses -> {
-            if (lastStockitsResponses != null) {
-                for (LastStockitsResponse response : lastStockitsResponses) {
-                    dealerName.setText(response.getDealerName());
-                    selectDealerId = response.getDealerId();
-                    AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, selectDealerId);
-                }
-            }
-        });
-        cityDealerViewModel.cityDealerData(AppSession.getInstance(getActivity()).getValue(Constants.CITY_ID));
-        cityDealerViewModel.getLiveData().observe(getViewLifecycleOwner(), cityDealerResponses -> {
-            if (cityDealerResponses != null) {
-                List<String> stockitsList = new ArrayList<>();
-                dealerMap.clear();
-                for (CityDealerResponse response : cityDealerResponses) {
-                    if (response != null && response.getDealerId() != null) {
-                        stockitsList.add(response.getDealerName());
-                        dealerMap.put(response.getDealerName(), response.getDealerId());
-                    }
-                }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.dealer_items, stockitsList);
-                dealerName.setAdapter(adapter);
-                dealerName.setOnClickListener(v -> {
-                    dealerName.setText("");
-                    if (dealerName.getText().toString().isEmpty()) {
-                        selectDealerId = null;
-                        AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, null);
-                    }
-                });
-                dealerName.setOnItemClickListener((parent, view, position, id) -> {
-                    String selectedDealerName = parent.getItemAtPosition(position).toString();
-                    selectDealerId = dealerMap.get(selectedDealerName);
-                    AppSession.getInstance(requireContext()).setValue(Constants.DEALER_ID, selectDealerId);
-                    dealerName.setText(selectedDealerName);
-                });
-            }
-        });
-        addCart.setOnClickListener(v -> {
-            String product_id = AppSession.getInstance(requireContext()).getValue(Constants.PRODUCT_ID);
-            String quantity = txtNumber.getText().toString();
-            String dealerId = selectDealerId; // ho sakta hai null
-            String unitId = selectUnitId;
-
-            if (product_id == null || product_id.isEmpty()) {
-                Toast.makeText(requireContext(), "Please select a product", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (unitId == null || unitId.isEmpty()) {
-                Toast.makeText(requireContext(), "Please select a unit", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (quantity == null || quantity.isEmpty() || Integer.parseInt(quantity) <= 0) {
-                Toast.makeText(requireContext(), "Please select a valid quantity greater than 0", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            AddtoCartBody body = new AddtoCartBody();
-            body.setDealerId(dealerId != null ? dealerId : ""); // null ki jagah blank string bhej rahe hain
-            body.setUnit(unitId);
-            body.setProductId(product_id);
-            body.setQty(quantity);
-            body.setRetailerId(AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID));
-
-            cartViewModel.getAddToCardData(body);
-
-            if (dialog != null && dialog.isShowing()) {
-                dialog.dismiss();
-            }
-        });
-
-//        addCart.setOnClickListener(v -> {
-//            String product_id = AppSession.getInstance(requireContext()).getValue(Constants.PRODUCT_ID);
-//            String quantity = txtNumber.getText().toString();
-//            String dealerId = selectDealerId;
-//            String unitId = selectUnitId;
-//            if (dealerId == null || dealerId.isEmpty()) {
-//                Toast.makeText(requireContext(), "Please select a dealer", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//            if (product_id == null || product_id.isEmpty()) {
-//                Toast.makeText(requireContext(), "Please select a product", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//            if (unitId == null || unitId.isEmpty()) {
-//                Toast.makeText(requireContext(), "Please select a unit", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//            if (quantity == null || quantity.isEmpty() || Integer.parseInt(quantity) <= 0) {
-//                Toast.makeText(requireContext(), "Please select a valid quantity greater than 0", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//            AddtoCartBody body = new AddtoCartBody();
-//            body.setDealerId(dealerId);
-//            body.setUnit(unitId);
-//            body.setProductId(product_id);
-//            body.setQty(quantity);
-//            body.setRetailerId(AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID));
-//            cartViewModel.getAddToCardData(body);
-//            if (dialog != null && dialog.isShowing()) {
-//                dialog.dismiss();
-//            }
-//
-//        });
-        AtomicInteger number = new AtomicInteger();
-        try {
-            number.set(Integer.parseInt(txtNumber.getText().toString()));
-        } catch (NumberFormatException e) {
-            txtNumber.setText("1");
-        }
-        imgSub.setOnClickListener(v -> {
-            if (number.get() > 1) {
-                number.getAndDecrement();
-                txtNumber.setText(String.valueOf(number.get()));
-            }
-        });
-        imgAdd.setOnClickListener(v -> {
-            number.getAndIncrement();
-            txtNumber.setText(String.valueOf(number.get()));
-        });
-        imgCancel.setOnClickListener(v -> dialog.dismiss());
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setGravity(Gravity.TOP);
-            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-            layoutParams.copyFrom(window.getAttributes());
-            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            window.setAttributes(layoutParams);
-        }
-        dialog.show();
-    }
-
-    private void setUpImageSlider() {
-        ArrayList<SlideModel> imageList = new ArrayList<>();
-        imageList.add(new SlideModel(R.drawable.slides_4, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_5, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_6, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_7 , ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slide_1, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slide_2, ScaleTypes.FIT));
-        imageList.add(new SlideModel(R.drawable.slides_3 , ScaleTypes.FIT));
-        imageSlider.setImageList(imageList, ScaleTypes.CENTER_CROP);
-        imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
-    }
-
     @SuppressLint("ResourceAsColor")
     private void initCliks() {
-        binding.autoSearch.setOnItemClickListener(this::onProductSelected);
-        binding.autoSearch.addTextChangedListener(new TextWatcher() {
-            private Handler handler = new Handler();
-            private Runnable inputFinishChecker;
+        binding.etSearch.addTextChangedListener(new TextWatcher() {
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            private final Handler handler = new Handler(Looper.getMainLooper());
+            private Runnable runnable;
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (inputFinishChecker != null) {
-                    handler.removeCallbacks(inputFinishChecker);
-                }
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
+                handler.removeCallbacksAndMessages(null);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                String enteredText = s.toString().trim();
 
-                inputFinishChecker = () -> {
-                    if (!enteredText.isEmpty() && !productMap.containsKey(enteredText)) {
-                      //  Toast.makeText(getContext(), "This product is not in the list. Please select unlisted medicine.", Toast.LENGTH_SHORT).show();
-                    }
-                };
+                currentQuery = s.toString().trim();   // ✅ IMPORTANT
 
-                handler.postDelayed(inputFinishChecker, 2000); // 1 second delay
+                if (currentQuery.isEmpty()) {
+                    binding.rvSearch.setVisibility(View.GONE);
+                    searchAdapter.submitList(new ArrayList<>());
+                    return;
+                }
+
+                runnable = () -> medicineViewModel.searchMedicine(currentQuery);
+                handler.postDelayed(runnable, 300);
+            }
+        });
+
+        binding.imgVoice.setOnClickListener(v -> {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US"); // ya "hi-IN" agar Hindi chahiye
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak medicine name...");
+            try {
+                startActivityForResult(intent, 1001);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
 
@@ -485,20 +376,19 @@ public class HomeFragment extends Fragment {
         });
 
         binding.cardExpiryRegister.setOnClickListener(v -> launchActivity(ExpiryRegisterActivity.class));
-        binding.cardUnlistedStockist.setOnClickListener(v -> launchActivity(UnlistedStockistActivity.class));
+        // binding.cardUnlistedStockist.setOnClickListener(v -> launchActivity(UnlistedStockistActivity.class));
         binding.cardExpiryList.setOnClickListener(v -> launchActivity(ExpiryListActivity.class));
         binding.cardStockistList.setOnClickListener(v -> launchActivity(StockistActivity.class));
         binding.cardAllOrders.setOnClickListener(v -> launchActivity(AllOrdersActivity.class));
         binding.cardPos.setOnClickListener(v -> launchActivity(PosActivity.class));
         binding.cardPosDetail.setOnClickListener(v -> launchActivity(PosDetailActivity.class));
+        binding.cardCashMemo.setOnClickListener(v -> launchActivity(CashMemoActivity.class));
+        binding.cardCashMemoDetails.setOnClickListener(v -> launchActivity(CashMemoDetailsActivity.class));
         Glide.with(this)
                 .asGif()
                 .load(R.drawable.help) // or use a URL or File
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(binding.imgNotification);
-
-
-
         TextView title = binding.txtTitle;
         TextView title1 = binding.txtFeatures;
         SpannableString spannable = new SpannableString("Recent Stockists");
@@ -524,52 +414,338 @@ public class HomeFragment extends Fragment {
         spannable2.setSpan(new ForegroundColorSpan(red), 8, welcomeText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Name
 
         title2.setText(spannable2);
-
     }
-    private void onProductSelected(AdapterView<?> parent, View view, int position, long id) {
-        String selectedProductName = parent.getItemAtPosition(position).toString();
-        String selectedProductId = productMap.get(selectedProductName);
+    private void setUpImageSlider() {
+        ArrayList<SlideModel> imageList = new ArrayList<>();
+        imageList.add(new SlideModel(R.drawable.slides_4, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_5, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_6, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_7 , ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slide_1, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slide_2, ScaleTypes.FIT));
+        imageList.add(new SlideModel(R.drawable.slides_3 , ScaleTypes.FIT));
+        imageSlider.setImageList(imageList, ScaleTypes.CENTER_CROP);
+        imageSlider.setSlideAnimation(AnimationTypes.ZOOM_OUT);
+    }
 
-        if (selectedProductId != null) {
-            if (selectedProductId.equals("1680")) {
-                unlistedShowPopup(selectedProductName);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
+            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (result != null && result.size() > 0) {
+                String spokenText = result.get(0);
+               // binding.autoSearch.setText(spokenText);
+               // searchMedicine(spokenText);
+            }
+        }
+    }
+    private void showPopup(String selectedProductName, String supplierName) {
+
+        // 🔹 Session se saved unit read karo
+        String savedUnitId =
+                AppSession.getInstance(getContext()).getValue(Constants.UNIT_ID);
+
+        String savedUnitName =
+                AppSession.getInstance(getContext()).getValue(Constants.UNIT_NAME);
+
+        selectDealerId = null;
+        selectUnitId = null;
+        AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, null);
+
+        unitViewModel = new ViewModelProvider(this).get(UnitViewModel.class);
+        unitViewModel.init(requireContext());
+
+        cityDealerViewModel = new ViewModelProvider(this).get(CityDealerViewModel.class);
+        cityDealerViewModel.init(requireContext());
+
+        lastStockitsViewModel = new ViewModelProvider(this).get(LastStockitsViewModel.class);
+        lastStockitsViewModel.init(requireContext());
+
+        unitViewModel.getUnits();
+
+        View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.search_list_layout, null);
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(popupView)
+                .create();
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        TextView txtItemDetails = popupView.findViewById(R.id.txt_medicineName);
+        TextView companyNm = popupView.findViewById(R.id.txt_conpanyName);
+        TextView txtNumber = popupView.findViewById(R.id.txt_number);
+        TextView txtUnitName = popupView.findViewById(R.id.txt_unitName);
+
+        ImageView imgSub = popupView.findViewById(R.id.img_sub);
+        ImageView imgAdd = popupView.findViewById(R.id.img_add);
+        ImageView imgCancel = popupView.findViewById(R.id.img_cancle);
+
+        CardView addCart = popupView.findViewById(R.id.btn_addCart);
+        Spinner unitSpn = popupView.findViewById(R.id.spinner_unit);
+        AutoCompleteTextView dealerName = popupView.findViewById(R.id.auto_dealerName);
+
+        txtItemDetails.setText(selectedProductName);
+        companyNm.setText(supplierName);
+        txtNumber.setText("1");
+
+        // ===================== ✅ UNIT OBSERVER =====================
+        unitViewModel.getLiveData().observe(getViewLifecycleOwner(), unitResponses -> {
+
+            if (unitResponses == null || unitResponses.isEmpty()) return;
+
+            unitList.clear();
+            unitList.addAll(unitResponses);
+
+            List<String> unitNames = new ArrayList<>();
+            unitNameToIdMap.clear();
+
+            for (UnitResponse unit : unitList) {
+                unitNames.add(unit.getUnitName());
+                unitNameToIdMap.put(unit.getUnitName(), unit.getUnitId());
+            }
+
+            ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(
+                    requireContext(),
+                    android.R.layout.simple_spinner_item,
+                    unitNames
+            );
+            unitAdapter.setDropDownViewResource(
+                    android.R.layout.simple_spinner_dropdown_item);
+
+            unitSpn.setAdapter(unitAdapter);
+
+            // ✅ AUTO SELECT UNIT FROM SESSION
+            if (savedUnitId != null) {
+                for (int i = 0; i < unitList.size(); i++) {
+                    if (unitList.get(i).getUnitId().equals(savedUnitId)) {
+                        unitSpn.setSelection(i);
+                        txtUnitName.setText(savedUnitName);
+                        selectUnitId = savedUnitId;
+                        break;
+                    }
+                }
+
+                unitSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        selectUnitId = unitList.get(position).getUnitId();
+                        txtUnitName.setText(unitList.get(position).getUnitName());
+                    }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {}
+                });
+
+                txtUnitName.setOnClickListener(v -> {
+                    txtUnitName.setVisibility(View.GONE);
+                    unitSpn.setVisibility(View.VISIBLE);
+                    unitSpn.performClick();
+                });
+            }
+        });
+
+        // ===================== ✅ LAST STOCKIST (ONLY IF PRESENT) =====================
+        String currentProductId = AppSession.getInstance(getContext()).getValue(Constants.PRODUCT_ID);
+        String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
+
+        lastStockitsViewModel.lastStockitsData(retailerId, currentProductId);
+        lastStockitsViewModel.getLiveData().observe(getViewLifecycleOwner(), lastStockitsResponses -> {
+
+            // ✅ Always clear first
+            selectDealerId = null;
+            dealerName.setText("");
+            AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, null);
+
+            if (lastStockitsResponses != null && !lastStockitsResponses.isEmpty()) {
+                LastStockitsResponse response = lastStockitsResponses.get(0);
+                dealerName.setText(response.getDealerName());
+                selectDealerId = response.getDealerId();
+                AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, selectDealerId);
+            }
+        });
+
+        // ===================== ✅ CITY DEALER LIST =====================
+        cityDealerViewModel.cityDealerData(AppSession.getInstance(getActivity()).getValue(Constants.CITY_ID));
+        cityDealerViewModel.getLiveData().observe(getViewLifecycleOwner(), cityDealerResponses -> {
+            if (cityDealerResponses != null) {
+
+                List<String> stockitsList = new ArrayList<>();
+                dealerMap.clear();
+
+                for (CityDealerResponse response : cityDealerResponses) {
+                    if (response != null && response.getDealerId() != null) {
+                        stockitsList.add(response.getDealerName());
+                        dealerMap.put(response.getDealerName(), response.getDealerId());
+                    }
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        requireContext(),
+                        R.layout.dealer_items,
+                        stockitsList
+                );
+                dealerName.setAdapter(adapter);
+
+                dealerName.setOnClickListener(v -> {
+                    dealerName.setText("");
+                    selectDealerId = null;
+                    AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, null);
+                });
+
+                dealerName.setOnItemClickListener((parent, view, position, id) -> {
+                    String selectedDealerName = parent.getItemAtPosition(position).toString();
+                    selectDealerId = dealerMap.get(selectedDealerName);
+                    AppSession.getInstance(getContext()).setValue(Constants.DEALER_ID, selectDealerId);
+                    dealerName.setText(selectedDealerName);
+                });
+            }
+        });
+
+        // ===================== ✅ ADD TO CART =====================
+        addCart.setOnClickListener(v -> {
+
+            String product_id = AppSession.getInstance(requireContext())
+                    .getValue(Constants.PRODUCT_ID);
+
+            String quantityStr = txtNumber.getText().toString().trim();
+
+            // ✅ Product validation
+            if (product_id == null || product_id.isEmpty()) {
+                Toast.makeText(requireContext(), "Please select a product", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // ✅ Unit validation
+            if (selectUnitId == null || selectUnitId.isEmpty()) {
+                Toast.makeText(requireContext(), "Please select a unit", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // ✅ Quantity validation (SAFE PARSE)
+            int quantity;
+            try {
+                quantity = Integer.parseInt(quantityStr);
+                if (quantity <= 0) {
+                    Toast.makeText(requireContext(), "Quantity must be greater than 0", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(requireContext(), "Invalid quantity", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // ✅ FINAL BODY (ONLY LOCAL DEALER ID)
+            AddtoCartBody body = new AddtoCartBody();
+
+            body.setDealerId(selectDealerId == null ? "" : selectDealerId);  // ✅ PERFECT FIX
+            body.setUnit(selectUnitId);
+            body.setProductId(product_id);
+            body.setQty(String.valueOf(quantity));
+            body.setRetailerId(
+                    AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID)
+            );
+
+            // ✅ API Call
+            cartViewModel.getAddToCardData(body);
+
+            // ✅ Dialog safety close
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        });
+
+
+
+        // ===================== ✅ QTY HANDLING =====================
+        AtomicInteger number = new AtomicInteger(1);
+
+        imgSub.setOnClickListener(v -> {
+            if (number.get() > 1) {
+                number.getAndDecrement();
+                txtNumber.setText(String.valueOf(number.get()));
+            }
+        });
+
+        imgAdd.setOnClickListener(v -> {
+            number.getAndIncrement();
+            txtNumber.setText(String.valueOf(number.get()));
+        });
+
+        imgCancel.setOnClickListener(v -> dialog.dismiss());
+
+        // ===================== ✅ WINDOW POSITION =====================
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setGravity(Gravity.TOP);
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            layoutParams.copyFrom(window.getAttributes());
+            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            window.setAttributes(layoutParams);
+        }
+
+        dialog.show();
+    }
+
+    private void startNetworkCheckService() {
+        Intent serviceIntent = new Intent(getContext(), NetworkCheckService.class);
+        requireActivity().startService(serviceIntent);
+    }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
             } else {
-                AppSession.getInstance(getContext()).setValue(Constants.PRODUCT_ID, selectedProductId);
-                String supplierName = getSupplierNameForProduct(selectedProductId);
-                showPopup(selectedProductName, supplierName);
-            }
-            binding.autoSearch.setText("");
-        }
-    }
 
-    private String getSupplierNameForProduct(String productId) {
-        for (MedicineListResponse medicine : itemList) {
-            if (medicine.getProductId().equals(productId)) {
-                return medicine.getSupplierName();
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
             }
         }
-        return "Supplier not available";
+        return false;
     }
-    private String getUnitForProduct(String productName) {
-        for (MedicineListResponse medicine : itemList) {
-            if (medicine.getProductName().equalsIgnoreCase(productName)) {
-               // Toast.makeText(getContext(), medicine.getProductId(), Toast.LENGTH_SHORT).show();
-                return (String) medicine.getUnitName();
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+                reloadData();
+            } else {
             }
+        }};
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!isReceiverRegistered) {
+            getActivity().registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            isReceiverRegistered = true;
         }
-        return null;
 
     }
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        if (newConfig.fontScale > 1.0f) {
-            newConfig.fontScale = 1.0f;
-            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+    public void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            getActivity().unregisterReceiver(networkReceiver);  // Unregister receiver only if registered
+            isReceiverRegistered = false;
         }
-        super.onConfigurationChanged(newConfig);
+    }
+    private void reloadData() {
+        if (!isNetworkConnected()) return;
+
+        isMedicineLoaded = false; // reset
+
+        medicineViewModel.searchMedicine("");
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//            }
+//        }, 500);
+    }
+    private void launchActivity(Class<?> activityClass) {
+        Intent intent = new Intent(getContext(), activityClass);
+        startActivity(intent);
     }
 
-    @SuppressLint("MissingInflatedId")
     private void unlistedShowPopup(String selectedProductName) {
         cityDealerViewModel = new ViewModelProvider(this).get(CityDealerViewModel.class);
         cityDealerViewModel.init(requireContext());
@@ -644,65 +820,40 @@ public class HomeFragment extends Fragment {
 
         dialog.show();
     }
-
-
-
-    private void startNetworkCheckService() {
-        Intent serviceIntent = new Intent(getContext(), NetworkCheckService.class);
-        requireActivity().startService(serviceIntent);
-    }
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Network network = cm.getActiveNetwork();
-                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
-                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-            } else {
-
-                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
-            }
-        }
-        return false;
-    }
-    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (isNetworkConnected()) {
-                reloadData();
-            } else {
-            }
-        }};
     @Override
-    public void onResume() {
-        super.onResume();
-        if (!isReceiverRegistered) {
-            getActivity().registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-            isReceiverRegistered = true;
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.fontScale > 1.0f) {
+            newConfig.fontScale = 1.0f;
+            getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
         }
-
+        super.onConfigurationChanged(newConfig);
     }
+
+    private long convertDateToMillis(String dateStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date date = sdf.parse(dateStr);
+            return date != null ? date.getTime() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    private long calculateDaysDifference(long expiryMillis) {
+        try {
+            long currentTime = System.currentTimeMillis();
+            long diffInMillis = expiryMillis - currentTime;
+            return TimeUnit.MILLISECONDS.toDays(diffInMillis);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1; // Error case
+        }
+    }
+
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (isReceiverRegistered) {
-            getActivity().unregisterReceiver(networkReceiver);  // Unregister receiver only if registered
-            isReceiverRegistered = false;
-        }
+    public void onStart() {
+        super.onStart();
+
     }
-    private void reloadData() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-            }
-        }, 5000);
-    }
-
-    private void launchActivity(Class<?> activityClass) {
-        Intent intent = new Intent(getContext(), activityClass);
-        startActivity(intent);
-    }
-
-
-
 }

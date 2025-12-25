@@ -12,195 +12,206 @@
         android:layout_height="match_parent"
         android:id="@+id/swipe_refresh_layout">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:fillViewport="true"
+            >
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="10dp"
-                android:padding="10dp">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-
-                <ImageView
-                    android:id="@+id/img_back"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/backarrow"
-                    android:layout_centerVertical="true"/>
-
-                <TextView
-                    android:id="@+id/txt_address"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Add Address"
-                    android:textColor="@color/black"
-                    android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="14sp"
-                    android:autoSizeMaxTextSize="16sp"
-                    android:autoSizeStepGranularity="1sp"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_centerVertical="true"
-                    android:gravity="center"
-                    android:importantForAccessibility="no"
-                    android:includeFontPadding="false"
-                    android:fontFamily="@font/gotham_bold"
-                    android:layout_marginTop="20dp"/>
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="10dp"
+                    android:padding="10dp">
+
+
+                    <ImageView
+                        android:id="@+id/img_back"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/backarrow"
+                        android:layout_centerVertical="true"/>
+
+                    <TextView
+                        android:id="@+id/txt_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Add Address"
+                        android:textColor="@color/black"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_centerVertical="true"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:layout_marginTop="20dp"/>
 
 
 
-            </RelativeLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="16sp"
-                android:autoSizeMaxTextSize="18sp"
-                android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
-                android:text="State"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/black"
-                android:importantForAccessibility="no"
-                android:includeFontPadding="false"/>
-
-
-
-
-            <TextView
-                android:id="@+id/txt_state"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="16sp"
-                android:autoSizeMaxTextSize="18sp"
-                android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/edit_background"
-                android:textColor="@color/black"
-                android:gravity="center_vertical"
-                android:paddingLeft="10dp"
-                android:importantForAccessibility="no"
-                android:includeFontPadding="false"/>
-
-
-            <TextView
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="14sp"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
-                android:text="City"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/black"/>
-
-            <TextView
-                android:id="@+id/txt_city"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="14sp"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/edit_background"
-                android:textColor="@color/black"
-                android:gravity="center_vertical"
-                android:paddingLeft="10dp"/>
-
-            <TextView
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="16sp"
-                android:autoSizeMaxTextSize="18sp"
-                android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
-                android:text="Permanent Address"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/black"
-                android:importantForAccessibility="no"
-                android:includeFontPadding="false"/>
-
-            <EditText
-                android:id="@+id/edt_permanent"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="14sp"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/edit_background"
-                android:textColor="@color/black"
-                android:gravity="center_vertical"
-                android:paddingLeft="10dp"/>
-
-
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btn_submit"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginHorizontal="20dp"
-                app:cardCornerRadius="20dp"
-                android:layout_marginTop="25dp"
-                app:cardBackgroundColor="@color/green"
-                android:layout_marginBottom="10dp"
-                >
+                </RelativeLayout>
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Submit"
-                    android:textColor="@color/white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="16sp"
                     android:autoSizeMaxTextSize="18sp"
                     android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="State"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/black"
                     android:importantForAccessibility="no"
-                    android:includeFontPadding="false"
-                    android:gravity="center"
-                    android:fontFamily="@font/gotham_bold"/>
+                    android:includeFontPadding="false"/>
 
 
-            </androidx.cardview.widget.CardView>
 
 
-            <ImageView
-                android:id="@+id/img_map"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/map"
-                android:layout_marginTop="20dp"
-                android:scaleType="fitXY"
-                android:layout_marginHorizontal="20dp"/>
+                <TextView
+                    android:id="@+id/txt_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="16sp"
+                    android:autoSizeMaxTextSize="18sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/edit_background"
+                    android:textColor="@color/black"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/map_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="20dp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="City"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/txt_city"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/edit_background"
+                    android:textColor="@color/black"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"/>
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="16sp"
+                    android:autoSizeMaxTextSize="18sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="Permanent Address"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/black"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
+
+                <EditText
+                    android:id="@+id/edt_permanent"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/edit_background"
+                    android:textColor="@color/black"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"/>
 
 
-        </LinearLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/btn_submit"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="20dp"
+                    app:cardCornerRadius="20dp"
+                    android:layout_marginTop="25dp"
+                    app:cardBackgroundColor="@color/green"
+                    android:layout_marginBottom="10dp"
+                    >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Submit"
+                        android:textColor="@color/white"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="16sp"
+                        android:autoSizeMaxTextSize="18sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:importantForAccessibility="no"
+                        android:includeFontPadding="false"
+                        android:gravity="center"
+                        android:fontFamily="@font/poppins_semibold"/>
+
+
+                </androidx.cardview.widget.CardView>
+
+
+                <ImageView
+                    android:id="@+id/img_map"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/map"
+                    android:layout_marginTop="20dp"
+                    android:scaleType="fitXY"
+                    android:layout_marginHorizontal="20dp"/>
+
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/map_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="20dp" />
+
+
+            </LinearLayout>
+
+
+        </ScrollView>
+
+
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

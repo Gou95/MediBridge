@@ -3,6 +3,7 @@ package com.indosoft.medibridge.Activities;
 import android.app.AlertDialog;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
@@ -165,6 +166,7 @@ setDefaultDates();
                 .setView(calendarView)
                 .create();
         dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         calendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             Calendar cal = Calendar.getInstance();

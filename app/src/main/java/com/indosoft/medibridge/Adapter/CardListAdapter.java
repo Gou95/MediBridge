@@ -2,6 +2,8 @@ package com.indosoft.medibridge.Adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -141,6 +143,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
             TextView yes = popupView.findViewById(R.id.popup_confirm);
             TextView no = popupView.findViewById(R.id.popup_cancel);
             AlertDialog dialog = builder.setView(popupView).setCancelable(false).create();
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             title.setText("Confirm Urgent Day");
             message.setText("Do you want to move this product");
             showCartViewModel.getLiveData().observe((LifecycleOwner) context, showCartResponses -> {

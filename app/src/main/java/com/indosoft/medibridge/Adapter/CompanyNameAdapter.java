@@ -1,4 +1,4 @@
-package com.indosoft.medibridgestockist.Adapter;
+package com.indosoft.medibridge.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,8 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.indosoft.medibridgestockist.Model.CompanyResponse;
-import com.indosoft.medibridgestockist.R;
+import com.indosoft.medibridge.Model.CompanyResponse;
+import com.indosoft.medibridge.R;
 
 import java.util.ArrayList;
 
@@ -26,13 +26,13 @@ public class CompanyNameAdapter extends RecyclerView.Adapter<CompanyNameAdapter.
 
     @NonNull
     @Override
-    public CompanyNameAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.company_list,parent,false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CompanyNameAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CompanyResponse response = list.get(position);
         holder.companyName.setText(response.getCompanyName());
     }

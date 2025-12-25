@@ -4,19 +4,26 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class RegisterExpiryBody {
-
+    @SerializedName("batch_no")
+    @Expose
+    private String batchNo;
     @SerializedName("expiry_month")
     @Expose
     private String expiryMonth;
-    @SerializedName("retailer_id")
+    @SerializedName("stock")
     @Expose
-    private String retailerId;
-    @SerializedName("order_items_id")
+    private String stock;
+    @SerializedName("dealer_id")
     @Expose
-    private String orderItemsId;
-    @SerializedName("product_id")
-    @Expose
-    private String productId;
+    private String dealerId;
+
+    public String getBatchNo() {
+        return batchNo;
+    }
+
+    public void setBatchNo(String batchNo) {
+        this.batchNo = batchNo;
+    }
 
     public String getExpiryMonth() {
         return expiryMonth;
@@ -26,28 +33,19 @@ public class RegisterExpiryBody {
         this.expiryMonth = expiryMonth;
     }
 
-    public String getRetailerId() {
-        return retailerId;
+    public String getStock() {
+        return stock;
     }
 
-    public void setRetailerId(String retailerId) {
-        this.retailerId = retailerId;
+    public void setStock(String stock) {
+        this.stock = stock;
     }
 
-    public String getOrderItemsId() {
-        return orderItemsId;
+    public String getDealerId() {
+        return dealerId;
     }
 
-    public void setOrderItemsId(String orderItemsId) {
-        this.orderItemsId = orderItemsId;
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
     }
-
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
 }

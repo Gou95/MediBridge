@@ -10,15 +10,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.indosoft.medibridge.Model.ExpiryListResponse;
+import com.indosoft.medibridge.Model.OrderDetailsResponse;
 import com.indosoft.medibridge.R;
 
 import java.util.ArrayList;
 
 public class ExpiryListAdapter extends RecyclerView.Adapter<ExpiryListAdapter.ViewHolder> {
     Context context;
-    ArrayList<ExpiryListResponse> list;
+    ArrayList<OrderDetailsResponse> list;
 
-    public ExpiryListAdapter(Context context, ArrayList<ExpiryListResponse> list) {
+    public ExpiryListAdapter(Context context, ArrayList<OrderDetailsResponse> list) {
         this.context = context;
         this.list = list;
     }
@@ -32,11 +33,11 @@ public class ExpiryListAdapter extends RecyclerView.Adapter<ExpiryListAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ExpiryListAdapter.ViewHolder holder, int position) {
-        ExpiryListResponse response = list.get(position);
+        OrderDetailsResponse response = list.get(position);
         holder.product.setText(response.getProductName());
         holder.batch.setText(response.getBatchNo());
         holder.dealer.setText(response.getDealerName());
-        holder.stock.setText(response.getStock());
+        holder.stock.setText(response.getOrderQty());
         holder.time.setText(response.getExpiryMonth());
         holder.serial.setText(String.valueOf(position +1)+":");
 
@@ -47,7 +48,7 @@ public class ExpiryListAdapter extends RecyclerView.Adapter<ExpiryListAdapter.Vi
         return list.size();
     }
 
-    public void updateList(ArrayList<ExpiryListResponse> filterList) {
+    public void updateList(ArrayList<OrderDetailsResponse> filterList) {
         this.list = filterList;
         notifyDataSetChanged();
     }

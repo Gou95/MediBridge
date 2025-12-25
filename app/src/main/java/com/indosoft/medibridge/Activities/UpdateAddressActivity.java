@@ -80,6 +80,7 @@ public class UpdateAddressActivity extends AppCompatActivity implements OnMapRea
         onAttachObservers();
         startNetworkService();
 
+        showCurrentLocationOnMap();
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
     }
 

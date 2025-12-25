@@ -1,4 +1,4 @@
-package com.indosoft.medibridgestockist.ViewModel;
+package com.indosoft.medibridge.ViewModel;
 
 import android.content.Context;
 
@@ -6,12 +6,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.indosoft.medibridgestockist.Listener.CityListener;
-import com.indosoft.medibridgestockist.Listener.CompanyListener;
-import com.indosoft.medibridgestockist.Model.CityResponse;
-import com.indosoft.medibridgestockist.Model.CompanyResponse;
-import com.indosoft.medibridgestockist.Repository.CityRepository;
-import com.indosoft.medibridgestockist.Repository.CompanyRepository;
+import com.indosoft.medibridge.Listener.CompanyListener;
+import com.indosoft.medibridge.Model.CompanyResponse;
+import com.indosoft.medibridge.Repository.CompanyRepository;
 
 import java.util.List;
 

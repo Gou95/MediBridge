@@ -1,6 +1,6 @@
-package com.indosoft.medibridgestockist.Listener;
+package com.indosoft.medibridge.Listener;
 
-import com.indosoft.medibridgestockist.Model.CompanyResponse;
+import com.indosoft.medibridge.Model.CompanyResponse;
 
 import java.util.List;
 

@@ -2,6 +2,8 @@ package com.indosoft.medibridge.Activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -50,6 +52,7 @@ public class AllOrdersActivity extends AppCompatActivity {
     ArrayList<OrderDetailsResponse> list = new ArrayList<>();
     AllOrdersListAdapter adapter;
     OrderDetailsViewModel viewModel;
+
     SignUpViewModel sign;
     private String startDateSelected = null;
     private String lastDateSelected = null;
@@ -76,6 +79,7 @@ public class AllOrdersActivity extends AppCompatActivity {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         String productId = result.getData().getStringExtra("productId");
                         String expiryMonth = result.getData().getStringExtra("expiryMonth");
+                        String batch = result.getData().getStringExtra("batch");
 
                         for (OrderDetailsResponse item : list) {
                             if (item.getProductId().equals(productId)) {
@@ -111,7 +115,7 @@ public class AllOrdersActivity extends AppCompatActivity {
             openCalendarDialog("last");
         });
         TextView title = binding.txtOrder;
-        SpannableString spannable = new SpannableString("All Orders");
+        SpannableString spannable = new SpannableString("All Demands");
         int blue = ContextCompat.getColor(this, R.color.blue_light);
         int red = ContextCompat.getColor(this, R.color.orange_dark);
         spannable.setSpan(new ForegroundColorSpan(blue), 0, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -143,6 +147,7 @@ public class AllOrdersActivity extends AppCompatActivity {
                 .setView(calendarView)
                 .create();
         dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         calendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             Calendar cal = Calendar.getInstance();
@@ -213,10 +218,13 @@ public class AllOrdersActivity extends AppCompatActivity {
         if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
             String productId = data.getStringExtra("productId");
             String expiryMonth = data.getStringExtra("expiryMonth");
+            String batch = data.getStringExtra("batch");
 
             for (OrderDetailsResponse item : list) {
                 if (item.getProductId().equals(productId)) {
                     item.setExpiryMonth(expiryMonth);
+                    item.setBatchNo(batch);
+
                     break;
                 }
             }

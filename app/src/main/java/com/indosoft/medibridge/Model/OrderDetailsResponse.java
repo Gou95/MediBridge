@@ -49,7 +49,9 @@ public class OrderDetailsResponse {
     @SerializedName("expiry_month")
     @Expose
     private String expiryMonth;
-
+    @SerializedName("batch_no")
+    @Expose
+    private String batchNo;
     boolean isPed;
     boolean isNotPed;
 
@@ -186,6 +188,13 @@ public class OrderDetailsResponse {
 
     public void setExpiryMonth(String expiryMonth) {
         this.expiryMonth = expiryMonth;
+    }
+    public String getBatchNo() {
+        return batchNo;
+    }
+
+    public void setBatchNo(String batchNo) {
+        this.batchNo = batchNo;
     }
 
 }

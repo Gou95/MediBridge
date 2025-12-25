@@ -1,15 +1,13 @@
-package com.indosoft.medibridgestockist.Repository;
+package com.indosoft.medibridge.Repository;
 
 import android.content.Context;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.indosoft.medibridgestockist.Listener.CityListener;
-import com.indosoft.medibridgestockist.Listener.CompanyListener;
-import com.indosoft.medibridgestockist.Model.CityResponse;
-import com.indosoft.medibridgestockist.Model.CompanyResponse;
-import com.indosoft.medibridgestockist.RetrofitServices.ApiInterface;
-import com.indosoft.medibridgestockist.RetrofitServices.RetrofitService;
+import com.indosoft.medibridge.Listener.CompanyListener;
+import com.indosoft.medibridge.Model.CompanyResponse;
+import com.indosoft.medibridge.RetrofitServices.ApiInterface;
+import com.indosoft.medibridge.RetrofitServices.RetrofitService;
 
 import java.util.List;
 

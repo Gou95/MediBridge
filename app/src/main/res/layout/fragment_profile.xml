@@ -1,298 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:fillViewport="true"
     android:fitsSystemWindows="true"
     tools:context=".Fragment.ProfileFragment">
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-
-       >
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/img_profile"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/profile"
-          />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="MediBro"
-                android:textColor="@color/black"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="14sp"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
-                android:importantForAccessibility="no"
-                android:includeFontPadding="false"/>
-
-            <TextView
-                android:id="@+id/txt_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:fontFamily="@font/gotham_bold"
-                android:textColor="@color/black"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="14sp"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeStepGranularity="1sp"
-                android:importantForAccessibility="no"
-                android:includeFontPadding="false"/>
-
-        </LinearLayout>
-
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:orientation="vertical"
-        android:padding="10dp">
-
-
-        <TextView
-            android:id="@+id/txt_editProfile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/baseline_edit"
-            android:drawablePadding="10dp"
-            android:fontFamily="@font/gotham_bold"
-            android:text="Edit Profile"
-            android:textColor="@color/dark_gray"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/grey" />
-
-
-        <TextView
-            android:id="@+id/txt_address"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/baseline_area_chart"
-            android:drawablePadding="10dp"
-            android:text="Address"
-            android:textColor="@color/dark_gray"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/grey" />
-
-        <TextView
-            android:id="@+id/txt_changePass"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/baseline_key"
-            android:drawablePadding="10dp"
-            android:text="Change Password"
-            android:textColor="@color/dark_gray"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/grey" />
-
-
-        <TextView
-            android:id="@+id/txt_TermsCndition"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/terms"
-            android:drawablePadding="10dp"
-            android:text="Terms &amp; Conditions"
-            android:textColor="	@color/dark_gray"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/grey" />
-
-        <TextView
-            android:id="@+id/txt_privacyPolicy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/privacy"
-            android:drawablePadding="10dp"
-            android:text="Privacy Policy"
-            android:textColor="@color/dark_gray"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/grey" />
-        <TextView
-            android:id="@+id/txt_plan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/planning"
-            android:drawablePadding="10dp"
-            android:text="Select Plans"
-            android:textColor="@color/dark_gray"
-            android:gravity="center_vertical"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/grey" />
-
-        <TextView
-            android:id="@+id/txt_invoice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/download"
-            android:drawablePadding="10dp"
-            android:text="Download Invoice"
-            android:textColor="@color/dark_gray"
-            android:gravity="center_vertical"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/grey" />
-
-        <TextView
-            android:id="@+id/txt_logout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/baseline_logout"
-            android:drawablePadding="10dp"
-            android:text="Logout"
-            android:textColor="@color/dark_gray"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="14sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeStepGranularity="1sp"
-            android:fontFamily="@font/gotham_bold"
-            android:importantForAccessibility="no"
-            android:includeFontPadding="false"/>
-
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/grey" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            android:visibility="gone">
+            android:padding="10dp"
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" Subscription Plan :"
-                android:textColor="@color/green"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="14sp"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
-                android:importantForAccessibility="no"
-                android:includeFontPadding="false"
+            >
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_profile"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/profile"
                 />
 
-            <TextView
-                android:id="@+id/txt_subs_plan"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/gotham_bold"
-                android:textColor="@color/green"
-                android:autoSizeTextType="uniform"
-                android:autoSizeMinTextSize="14sp"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeStepGranularity="1sp"
-                android:layout_marginStart="5dp"
-                android:importantForAccessibility="no"
-                android:includeFontPadding="false"/>
+                android:layout_marginStart="10dp"
+                android:layout_gravity="center"
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/txt_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MediBro"
+                    android:textColor="@color/black"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
+                <TextView
+                    android:id="@+id/txt_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textColor="@color/black"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
+
+            </LinearLayout>
 
 
 
@@ -301,43 +70,307 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            android:padding="10dp">
+
 
             <TextView
-
-                android:layout_width="wrap_content"
+                android:id="@+id/txt_editProfile"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Remaining Subscription Days :"
+                android:drawableLeft="@drawable/baseline_edit"
+                android:drawablePadding="10dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Edit Profile"
                 android:textColor="@color/dark_gray"
                 android:autoSizeTextType="uniform"
                 android:autoSizeMinTextSize="14sp"
                 android:autoSizeMaxTextSize="16sp"
                 android:autoSizeStepGranularity="1sp"
-                android:fontFamily="@font/gotham_bold"
                 android:importantForAccessibility="no"
-                android:includeFontPadding="false"
-              />
+                android:includeFontPadding="false"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+
 
             <TextView
-                android:id="@+id/txt_subs_days"
-                android:layout_width="wrap_content"
+                android:id="@+id/txt_address"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/gotham_bold"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/baseline_area_chart"
+                android:drawablePadding="10dp"
+                android:text="Address"
                 android:textColor="@color/dark_gray"
                 android:autoSizeTextType="uniform"
                 android:autoSizeMinTextSize="14sp"
                 android:autoSizeMaxTextSize="16sp"
                 android:autoSizeStepGranularity="1sp"
-                android:layout_marginStart="5dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+
+            <TextView
+                android:id="@+id/txt_changePass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/baseline_key"
+                android:drawablePadding="10dp"
+                android:text="Change Password"
+                android:textColor="@color/dark_gray"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+
+
+            <TextView
+                android:id="@+id/txt_TermsCndition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/terms"
+                android:drawablePadding="10dp"
+                android:text="Terms &amp; Conditions"
+                android:textColor="	@color/dark_gray"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+
+            <TextView
+                android:id="@+id/txt_privacyPolicy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/privacy"
+                android:drawablePadding="10dp"
+                android:text="Privacy Policy"
+                android:textColor="@color/dark_gray"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+            <TextView
+                android:id="@+id/txt_plan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/planning"
+                android:drawablePadding="10dp"
+                android:text="Select Plans"
+                android:textColor="@color/dark_gray"
+                android:gravity="center_vertical"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+
+            <TextView
+                android:id="@+id/txt_invoice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/download"
+                android:drawablePadding="10dp"
+                android:text="Download Invoice"
+                android:textColor="@color/dark_gray"
+                android:gravity="center_vertical"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+
+            <TextView
+                android:id="@+id/txt_aboutUs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/about"
+                android:drawablePadding="10dp"
+                android:text="About Us"
+                android:textColor="@color/dark_gray"
+                android:gravity="center_vertical"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:importantForAccessibility="no"
+                android:includeFontPadding="false"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+            <TextView
+                android:id="@+id/txt_logout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/baseline_logout"
+                android:drawablePadding="10dp"
+                android:text="Logout"
+                android:textColor="@color/dark_gray"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp"
+                android:fontFamily="@font/poppins_semibold"
                 android:importantForAccessibility="no"
                 android:includeFontPadding="false"/>
 
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/grey" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" Subscription Plan :"
+                    android:textColor="@color/green"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
+                    />
+
+                <TextView
+                    android:id="@+id/txt_subs_plan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textColor="@color/green"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:layout_marginStart="5dp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
 
 
+
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remaining Subscription Days :"
+                    android:textColor="@color/dark_gray"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"
+                    />
+
+                <TextView
+                    android:id="@+id/txt_subs_days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:textColor="@color/dark_gray"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:layout_marginStart="5dp"
+                    android:importantForAccessibility="no"
+                    android:includeFontPadding="false"/>
+
+
+
+
+
+            </LinearLayout>
 
         </LinearLayout>
 
+
     </LinearLayout>
-</LinearLayout>
+
+
+</ScrollView>
