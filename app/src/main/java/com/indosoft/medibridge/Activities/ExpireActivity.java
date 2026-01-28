@@ -1,11 +1,19 @@
 package com.indosoft.medibridge.Activities;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -25,6 +33,7 @@ import com.indosoft.medibridge.Body.RegisterExpiryBody;
 import com.indosoft.medibridge.Model.ProductItem;
 import com.indosoft.medibridge.Model.StockistListResponse;
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.SignUpViewModel;
@@ -43,6 +52,7 @@ public class ExpireActivity extends AppCompatActivity {
     private String oderitemsId = null;
     ArrayList<StockistListResponse> list = new ArrayList<>();
     StockistListViewModel stockistListViewModel;
+    boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +81,7 @@ public class ExpireActivity extends AppCompatActivity {
         binding.edtBatchNo.setText(batch);
         onAttachObservers();
         initClicks();
+        startNetworkService();
 //        getWindow().setSoftInputMode(
 //                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN |
 //                        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
@@ -219,5 +230,56 @@ public class ExpireActivity extends AppCompatActivity {
             getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
         }
         super.onConfigurationChanged(newConfig);
+    }
+    private void startNetworkService() {
+        Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
+        startService(networkServiceIntent);
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+                reloadData();
+            }
+        }
+    };
+
+    private void reloadData() {
+        new Handler().postDelayed(() -> {
+            // You can refresh some data here if needed
+        }, 1000);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            isReceiverRegistered = true;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
     }
 }

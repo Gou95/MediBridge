@@ -254,25 +254,66 @@ SignUpViewModel sign;
 
     }
     private void logout() {
-        String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
 
-        boolean hasPlan = AppSession.getInstance(getContext()).getBoolean(Constants.PLAN_SELECTED + "_" + retailerId, false);
-        long expiry = AppSession.getInstance(getContext()).getLong(Constants.PLAN_EXPIRY_DATE + "_" + retailerId, 0);
-        String planName = AppSession.getInstance(getContext()).getValue(Constants.SUBSCRIPTION_PLAN_NAME + "_" + retailerId);
+        String retailerId = AppSession.getInstance(getContext())
+                .getValue(Constants.RELAILER_ID);
 
-        Log.d("Logout", "Saving Plan Data: " + planName + " Expiry: " + expiry);
+        // 🔒 SAVE POPUP FLAG BEFORE CLEAR
+        boolean popupShown = AppSession.getInstance(getContext())
+                .getBoolean("FREE_PLAN_POPUP_SHOWN_" + retailerId, false);
 
+        boolean hasPlan = AppSession.getInstance(getContext())
+                .getBoolean(Constants.PLAN_SELECTED + "_" + retailerId, false);
+
+        long expiry = AppSession.getInstance(getContext())
+                .getLong(Constants.PLAN_EXPIRY_DATE + "_" + retailerId, 0);
+
+        String planName = AppSession.getInstance(getContext())
+                .getValue(Constants.SUBSCRIPTION_PLAN_NAME + "_" + retailerId);
+
+        // ❌ CLEAR SESSION
         AppSession.getInstance(getContext()).clear();
 
-        AppSession.getInstance(getContext()).setBoolean(Constants.PLAN_SELECTED + "_" + retailerId, hasPlan);
-        AppSession.getInstance(getContext()).putLong(Constants.PLAN_EXPIRY_DATE + "_" + retailerId, expiry);
-        AppSession.getInstance(getContext()).setValue(Constants.SUBSCRIPTION_PLAN_NAME + "_" + retailerId, planName);
+        // ✅ RESTORE REQUIRED DATA
+        AppSession.getInstance(getContext())
+                .setBoolean("FREE_PLAN_POPUP_SHOWN_" + retailerId, popupShown);
 
+        AppSession.getInstance(getContext())
+                .setBoolean(Constants.PLAN_SELECTED + "_" + retailerId, hasPlan);
+
+        AppSession.getInstance(getContext())
+                .putLong(Constants.PLAN_EXPIRY_DATE + "_" + retailerId, expiry);
+
+        AppSession.getInstance(getContext())
+                .setValue(Constants.SUBSCRIPTION_PLAN_NAME + "_" + retailerId, planName);
+
+        // 🚀 GO TO LOGIN
         Intent intent = new Intent(getContext(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         requireActivity().finishAffinity();
     }
+
+    //    private void logout() {
+//        String retailerId = AppSession.getInstance(getContext()).getValue(Constants.RELAILER_ID);
+//
+//        boolean hasPlan = AppSession.getInstance(getContext()).getBoolean(Constants.PLAN_SELECTED + "_" + retailerId, false);
+//        long expiry = AppSession.getInstance(getContext()).getLong(Constants.PLAN_EXPIRY_DATE + "_" + retailerId, 0);
+//        String planName = AppSession.getInstance(getContext()).getValue(Constants.SUBSCRIPTION_PLAN_NAME + "_" + retailerId);
+//
+//        Log.d("Logout", "Saving Plan Data: " + planName + " Expiry: " + expiry);
+//
+//        AppSession.getInstance(getContext()).clear();
+//
+//        AppSession.getInstance(getContext()).setBoolean(Constants.PLAN_SELECTED + "_" + retailerId, hasPlan);
+//        AppSession.getInstance(getContext()).putLong(Constants.PLAN_EXPIRY_DATE + "_" + retailerId, expiry);
+//        AppSession.getInstance(getContext()).setValue(Constants.SUBSCRIPTION_PLAN_NAME + "_" + retailerId, planName);
+//
+//        Intent intent = new Intent(getContext(), LoginActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(intent);
+//        requireActivity().finishAffinity();
+//    }
     private long convertDateToMillis(String dateStr) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());

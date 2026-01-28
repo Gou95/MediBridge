@@ -151,7 +151,7 @@ public class PosDetailActivity extends AppCompatActivity {
             public void run() {
 
             }
-        }, 5000);
+        }, 1000);
     }
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

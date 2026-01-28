@@ -184,7 +184,7 @@ public class SignUpActivity extends AppCompatActivity {
                 binding.edtCity.setAdapter(cityAdapter);
                 binding.edtCity.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parentView, View view, int position, long id) {
+                      public void onItemClick(AdapterView<?> parentView, View view, int position, long id) {
                         String selectedCity = (String) parentView.getItemAtPosition(position);
                         Log.d("City Selected", selectedCity);
                         StateCityResponse city = getCityByName(selectedCity);
@@ -272,7 +272,7 @@ public class SignUpActivity extends AppCompatActivity {
             signbody.setCityId(Integer.parseInt(cityId));
             signbody.setFcmId(AppSession.getInstance(this).getValue(Constants.FCM_TOKEN));
             Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DAY_OF_YEAR, 60);
+            calendar.add(Calendar.DAY_OF_YEAR, 90);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             String expiryDate = dateFormat.format(calendar.getTime());
@@ -442,7 +442,7 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void run() {
             }
-        }, 5000);
+        }, 1000);
     }
     private void logFCM(){
         FirebaseMessaging.getInstance().getToken()

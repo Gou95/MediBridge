@@ -551,6 +551,6 @@ public class RecentStockistActivity extends AppCompatActivity {
             @Override
             public void run() {
             }
-        }, 5000);
+        }, 1000);
     }
 }

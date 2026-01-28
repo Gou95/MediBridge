@@ -366,7 +366,7 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void run() {
             }
-        }, 5000);
+        }, 1000);
     }
 
     private void showImagePickerDialog() {

@@ -148,7 +148,7 @@
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rv_search"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="200dp"
                             android:visibility="gone"
                             android:layout_marginTop="8dp"
                             android:overScrollMode="never"
@@ -299,6 +299,7 @@
                 android:textColor="@color/white"
                 android:fontFamily="@font/poppins_semibold"
                 />
+
 
             <TextView
                 android:id="@+id/txt_totalAmount"

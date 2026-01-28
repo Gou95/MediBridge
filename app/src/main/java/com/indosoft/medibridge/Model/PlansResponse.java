@@ -13,6 +13,9 @@ public class PlansResponse {
     @SerializedName("subscription_charges")
     @Expose
     private String subscriptionCharges;
+    @SerializedName("trial_period")
+    @Expose
+    private String trialPeriod;
 
     public String getId() {
         return id;
@@ -37,5 +40,34 @@ public class PlansResponse {
     public void setSubscriptionCharges(String subscriptionCharges) {
         this.subscriptionCharges = subscriptionCharges;
     }
+
+    public String getTrialPeriod() {
+        return trialPeriod;
+    }
+
+    public void setTrialPeriod(String trialPeriod) {
+        this.trialPeriod = trialPeriod;
+    }
+    public int getMonths() {
+        // Example: "3 Months Subscription" → 3
+        try {
+            return Integer.parseInt(subscriptionName.split(" ")[0]);
+        } catch (Exception e) {
+            return 1; // fallback
+        }
+    }
+
+    public int getMonthlyCharge() {
+        try {
+            return Integer.parseInt(subscriptionCharges);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public int getTotalAmount() {
+        return getMonths() * getMonthlyCharge();
+    }
+
 
 }

@@ -30,6 +30,10 @@
         <color name="colorPrimaryDark">#000000</color>
         <color name="colorAccent">#03DAC5</color>
 
+    <color name="blue">#1565C0</color>
+    <color name="orange_medium">#F57C00</color>
+    <color name="light_blue">#039BE5</color>
+
 
 
 

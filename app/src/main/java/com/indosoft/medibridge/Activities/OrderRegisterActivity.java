@@ -326,7 +326,7 @@ ActivityOrderRegisterBinding binding;
             @Override
             public void run() {
             }
-        }, 5000);
+        }, 1000);
     }
     private void generateInvoicePdf(ArrayList<OrderRegisterResponse> todayList) {
         if (list == null || list.isEmpty()) {

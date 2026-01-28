@@ -2,9 +2,18 @@ package com.indosoft.medibridge.Activities;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -40,6 +49,7 @@ import com.indosoft.medibridge.Model.IndiaStateResponse;
 import com.indosoft.medibridge.Model.StateCityResponse;
 import com.indosoft.medibridge.Model.StockistListResponse;
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.CityViewModel;
@@ -58,13 +68,13 @@ public class StockistActivity extends AppCompatActivity {
     ArrayList<StockistListResponse> originalList = new ArrayList<>();
     StockistListViewModel viewModel;
     StockistListAdapter adapter;
-    CompanyNameAdapter companyNameAdapter;
     CompanyViewModel companyViewModel;
     StatesViewModel statesViewModel;
     CityViewModel cityViewModel;
     ArrayList<IndiaStateResponse> stateList = new ArrayList<>();
     ArrayList<StateCityResponse> cityList = new ArrayList<>();
     SignUpViewModel sign;
+    boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +89,7 @@ public class StockistActivity extends AppCompatActivity {
         String cityId = AppSession.getInstance(this).getValue(Constants.CITY_ID);
         viewModel.stockitsList(cityId);
         onAttachObservers();
+        startNetworkService();
         initClicks();
 
         adapter = new StockistListAdapter(this,list,companyViewModel);
@@ -198,7 +209,7 @@ public class StockistActivity extends AppCompatActivity {
                         if (state != null) {
                             String stateId = state.getId();
                             Log.d("State ID", "Selected State ID: " + stateId);
-                            //  AppSession.getInstance(UnlistedStockistActivity.this).setValue(Constants.STATE_ID, stateId);
+                             AppSession.getInstance(StockistActivity.this).setValue(Constants.STATE_ID, stateId);
                             cityViewModel.getCityData(stateId);
                         }
                     }
@@ -322,15 +333,43 @@ public class StockistActivity extends AppCompatActivity {
 
         cancel.setOnClickListener(v -> dialog.dismiss() );
         stockistName.addTextChangedListener(new TextWatcher() {
+            private boolean isEditing;
+
             @Override
             public void afterTextChanged(Editable s) {
+
                 if (isDealerAlreadyExists(s.toString().trim())) {
                     stockistName.setError("Dealer already exists");
+                } else {
+                    stockistName.setError(null);
                 }
+
+                if (isEditing) return;
+                isEditing = true;
+
+                int cursorPos = stockistName.getSelectionStart();
+                String original = s.toString();
+
+                String formatted = capitalizeEachWordPreserveSpace(original);
+
+                if (!formatted.equals(original)) {
+                    stockistName.setText(formatted);
+
+                    int newCursorPos = Math.min(cursorPos, formatted.length());
+                    stockistName.setSelection(newCursorPos);
+                }
+
+                isEditing = false;
             }
+
+            @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
+
+
 
         dialog.show();
 
@@ -361,4 +400,89 @@ public class StockistActivity extends AppCompatActivity {
         }
         return null;
     }
+    private void startNetworkService() {
+        Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
+        startService(networkServiceIntent);
+        Log.d("LoginActivity", "NetworkCheckService started");
+    }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
+
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+
+                reloadData();
+            } else {
+
+            }
+        }
+    };
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, filter);
+            isReceiverRegistered = true;
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+    private void reloadData() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 1000);
+    }
+    private String capitalizeEachWordPreserveSpace(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        boolean endsWithSpace = input.endsWith(" ");
+
+        String[] words = input.trim().toLowerCase().split("\\s+");
+        StringBuilder builder = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                builder.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1))
+                        .append(" ");
+            }
+        }
+
+        if (!builder.toString().isEmpty()) {
+            builder.setLength(builder.length() - 1); // last space remove
+        }
+
+        if (endsWithSpace) {
+            builder.append(" "); // user ka space wapas add
+        }
+
+        return builder.toString();
+    }
+
+
 }

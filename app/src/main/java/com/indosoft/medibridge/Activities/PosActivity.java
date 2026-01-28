@@ -82,14 +82,10 @@ public class PosActivity extends AppCompatActivity {
     PosListAdapter adapter;
     ArrayList<UnitResponse> unitList = new ArrayList<>();
     ArrayList<GetPosProductResponse> list = new ArrayList<>();
-    ArrayList<MedicineListResponse.Datum> itemList = new ArrayList<>();
-    HashMap<String, MedicineListResponse.Datum> productMap = new HashMap<>();
     private HashMap<String, String> unitNameToIdMap = new HashMap<>();
     SearchAdapter searchAdapter;
-    private ArrayList<String> fullProductNameList = new ArrayList<>();
     String selectUnitId;
     private String currentQuery = "";
-    private boolean isMedicineLoaded = false;
     private boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,11 +121,9 @@ public class PosActivity extends AppCompatActivity {
             binding.etSearch.setText("");
             binding.rvSearch.setVisibility(View.GONE);
 
-            // ✅ Product ID
             AppSession.getInstance(this)
                     .setValue(Constants.PRODUCT_ID, String.valueOf(item.getProductId()));
 
-            // ✅ Unit ID & Name (IMPORTANT)
             AppSession.getInstance(this)
                     .setValue(Constants.UNIT_ID, String.valueOf(item.getUnitId()));
 
@@ -191,7 +185,6 @@ public class PosActivity extends AppCompatActivity {
         binding.swipeRefreshLayout.setRefreshing(true);
         medicineViewModel.getLiveData().observe(this, list -> {
 
-            // ✅ Agar user ne search hi nahi ki
             if (currentQuery == null || currentQuery.isEmpty()) {
                 binding.rvSearch.setVisibility(View.GONE);
                 return;
@@ -255,10 +248,8 @@ public class PosActivity extends AppCompatActivity {
             ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (result != null && result.size() > 0) {
                 String spokenText = result.get(0); // user jo bola
+                binding.etSearch.setText(spokenText);
 
-                // Ab aap is text ko apni medicine list me search kar sakte ho
-                //binding.autoMedi.setText(spokenText);
-              //  searchMedicine(spokenText);
             }
         }
     }
@@ -463,7 +454,7 @@ public class PosActivity extends AppCompatActivity {
             public void run() {
 
             }
-        }, 5000);
+        }, 1000);
     }
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

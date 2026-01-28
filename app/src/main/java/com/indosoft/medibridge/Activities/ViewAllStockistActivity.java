@@ -170,7 +170,7 @@ public class ViewAllStockistActivity extends AppCompatActivity {
             @Override
             public void run() {
             }
-        }, 5000);
+        }, 1000);
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
