@@ -116,9 +116,6 @@ public class HomeFragment extends Fragment {
     FragmentHomeBinding binding;
     private ImageSlider imageSlider;
     ArrayList<UnitResponse> unitList = new ArrayList<>();
-    ArrayList<MedicineListResponse.Datum> itemList = new ArrayList<>();
-    private final List<MedicineListResponse.Datum> masterList = new ArrayList<>(); // ALL DATA
-    private final List<MedicineListResponse.Datum> filteredList = new ArrayList<>();
     private SearchAdapter searchAdapter;
     ArrayList<RecentStockitsResponse> recentList = new ArrayList<>();
     UnitViewModel unitViewModel;
@@ -134,15 +131,11 @@ public class HomeFragment extends Fragment {
     String selectDealerId;
     String selectUnitId;
     RecentStockitsAdapter adapter;
-    HashMap<String, MedicineListResponse.Datum> productMap = new HashMap<>();
     private HashMap<String, String> dealerMap = new HashMap<>();
     private HashMap<String, String> unitNameToIdMap = new HashMap<>();
     int notificationCount;
     private String currentQuery = "";
-    private ArrayList<String> fullProductNameList = new ArrayList<>();
     private boolean isMedicineLoaded = false;
-    private boolean isItemSelected = false;
-
     private boolean isReceiverRegistered = false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -221,11 +214,6 @@ public class HomeFragment extends Fragment {
             searchAdapter.submitList(list);
             binding.rvSearch.setVisibility(View.VISIBLE);
         });
-
-
-
-
-
         recentStockitsViewModel.getLiveData().observe(getViewLifecycleOwner(), responses -> {
             binding.swipeRefreshLayout.setRefreshing(false);
             if (responses != null && !responses.isEmpty()) {
@@ -435,7 +423,7 @@ public class HomeFragment extends Fragment {
             ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (result != null && result.size() > 0) {
                 String spokenText = result.get(0);
-               // binding.autoSearch.setText(spokenText);
+                binding.etSearch.setText(spokenText);
                // searchMedicine(spokenText);
             }
         }

@@ -1,15 +1,22 @@
 package com.indosoft.medibridge.Activities;
 
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -24,6 +31,7 @@ import com.indosoft.medibridge.Adapter.CashMemoItemsAdapter;
 import com.indosoft.medibridge.Model.CashMemoItemDetailsResponse;
 import com.indosoft.medibridge.Model.CashMemoPdfResponse;
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.CashMemoItemDetailsViewModel;
@@ -47,6 +55,7 @@ public class CashMemoListActivity extends AppCompatActivity {
     SignUpViewModel sign;
     String retailerId;
     String billNo;
+    boolean isReceiverRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +92,7 @@ public class CashMemoListActivity extends AppCompatActivity {
 
         // ✅ Initial load
         refreshList();
-
+        startNetworkService();
         initClicks();
     }
 
@@ -358,6 +367,58 @@ public class CashMemoListActivity extends AppCompatActivity {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, "No PDF viewer found", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void startNetworkService() {
+        Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
+        startService(networkServiceIntent);
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+                reloadData();
+            }
+        }
+    };
+
+    private void reloadData() {
+        new Handler().postDelayed(() -> {
+            // You can refresh some data here if needed
+        }, 1000);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            isReceiverRegistered = true;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
         }
     }
 }

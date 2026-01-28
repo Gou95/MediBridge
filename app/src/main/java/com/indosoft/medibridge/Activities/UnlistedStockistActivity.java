@@ -80,6 +80,7 @@ ActivityUnlistedStockistBinding binding;
         onAttachObservers();
         intiClicks();
         logFCM();
+
     }
     private void intiClicks() {
         binding.imgBack.setOnClickListener(v -> onBackPressed());
@@ -304,7 +305,7 @@ ActivityUnlistedStockistBinding binding;
             @Override
             public void run() {
             }
-        }, 5000);
+        }, 1000);
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

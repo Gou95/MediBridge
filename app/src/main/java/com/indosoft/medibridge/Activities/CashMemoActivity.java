@@ -68,6 +68,7 @@ import com.indosoft.medibridge.Model.GetPosProductResponse;
 import com.indosoft.medibridge.Model.MedicineListResponse;
 import com.indosoft.medibridge.Model.UnitResponse;
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.CashMemoListViewModel;
@@ -102,17 +103,11 @@ public class CashMemoActivity extends AppCompatActivity {
     ArrayList<UnitResponse> unitList = new ArrayList<>();
     ArrayList<CashMemoPdfResponse> pdfList = new ArrayList<>();
     ArrayList<CashMemoListResponse> list = new ArrayList<>();
-    ArrayList<MedicineListResponse.Datum> itemList = new ArrayList<>();
-  //  private HashMap<String, Integer> productMap = new HashMap<>();
-  HashMap<String, MedicineListResponse.Datum> productMap = new HashMap<>();
-    // ProductId -> Rate
     private HashMap<String, String> productRateMap = new HashMap<>();
     private HashMap<String, String> unitNameToIdMap = new HashMap<>();
    SearchAdapter searchAdapter;
-    private ArrayList<String> fullProductNameList = new ArrayList<>();
-    String retailerId;
+   String retailerId;
     String selectUnitId;
-    private boolean isMedicineLoaded = false;
     private String currentQuery = "";
     private boolean isReceiverRegistered = false;
     @Override
@@ -140,6 +135,8 @@ public class CashMemoActivity extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         initClicks();
         onAttachObservers();
+        startNetworkService();
+
         binding.edtDocterNm.setText("Dr. ");
         binding.edtDocterNm.setSelection(binding.edtDocterNm.getText().length());
 
@@ -171,7 +168,6 @@ public class CashMemoActivity extends AppCompatActivity {
         binding.swipeRefreshLayout.setRefreshing(true);
         medicineViewModel.getLiveData().observe(this, list -> {
 
-            // ✅ Agar user ne search hi nahi ki
             if (currentQuery == null || currentQuery.isEmpty()) {
                 binding.rvSearch.setVisibility(View.GONE);
                 return;
@@ -650,7 +646,8 @@ public class CashMemoActivity extends AppCompatActivity {
         if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
             ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (result != null && result.size() > 0) {
-                String spokenText = result.get(0); // user jo bola
+                String spokenText = result.get(0);
+                binding.etSearch.setText(spokenText);
 
 
             }
@@ -881,6 +878,12 @@ public class CashMemoActivity extends AppCompatActivity {
             Toast.makeText(this, "No PDF viewer found", Toast.LENGTH_LONG).show();
         }
     }
+    private void startNetworkService() {
+        Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
+        startService(networkServiceIntent);
+    }
+
+
 
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
@@ -919,7 +922,7 @@ public class CashMemoActivity extends AppCompatActivity {
             public void run() {
 
             }
-        }, 5000);
+        }, 1000);
     }
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

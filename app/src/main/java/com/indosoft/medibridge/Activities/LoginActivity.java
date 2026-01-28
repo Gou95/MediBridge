@@ -273,7 +273,7 @@ public class LoginActivity extends AppCompatActivity {
     private void reloadData() {
         new Handler().postDelayed(() -> {
             // You can refresh some data here if needed
-        }, 5000);
+        }, 1000);
     }
 
     @Override

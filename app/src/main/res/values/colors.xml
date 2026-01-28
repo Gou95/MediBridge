@@ -24,5 +24,10 @@
     <color name="blue_light">#1C7DC0</color>
     <color name="orange_dark">#FF6633</color>
     <color name="platinum">#e5e4e2 </color>
+    <color name="blue">#1565C0</color>
+    <color name="orange_medium">#F57C00</color>
+    <color name="light_blue">#039BE5</color>
+
+
 
 </resources>

@@ -87,6 +87,7 @@ public class DashBoardActivity extends AppCompatActivity {
     ExpiryListAdapter expiryListAdapter;
     ArrayList<OrderDetailsResponse> expiryList = new ArrayList<>();
     OrderDetailsViewModel viewModel;
+    boolean isPopupFlow = false;
     private static final int MY_UPDATE_REQUEST_CODE = 101;
     AppUpdateManager appUpdateManager;
 
@@ -102,173 +103,136 @@ public class DashBoardActivity extends AppCompatActivity {
         checkPlanExpiry();
         checkForUpdate();
 
-        if (!isPopupAlreadyShownToday()) {
+//        String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
+//        boolean isPopupShown = AppSession.getInstance(this)
+//                .getBoolean("FREE_PLAN_POPUP_SHOWN_" + retailerId, false);
+//        if (shouldShowFreePlanPopup()){
+//            showPopup();
+//        }
+        if (shouldShowFreePlanPopup()) {
             showPopup();
         } else {
-            // Popup already shown today → Direct dashboard show kare
-            binding.fragmentContainer.setVisibility(View.VISIBLE);
-            binding.bottomNavigation.setVisibility(View.VISIBLE);
+            handleInitialFragment();
         }
+
 
         if (!isNetworkConnected()) {
             showNoConnectionView();
         } else {
             hideNoConnectionView();
         }
-        boolean openProfile = getIntent().getBooleanExtra("OPEN_PROFILE_FRAGMENT", false);
-        boolean handledFragment = false;
+        handleInitialFragment();
 
-        if (savedInstanceState == null) {
-            if (openProfile) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new ProfileFragment(), "ProfileFragment")
-                        .commit();
-                binding.bottomNavigation.setSelectedItemId(R.id.profile);
-                handledFragment = true;
-            }
-        }
-
-
-        
-        if (!handledFragment && savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, new HomeFragment(), "HomeFragment")
-                    .commit();
-            binding.bottomNavigation.setSelectedItemId(R.id.home);
-        }
-        Intent intent = getIntent();
-
-        if (intent != null) {
-            int updatedCart = intent.getIntExtra("CART_BADGE_COUNT", -1);
-            int updatedUrgent = intent.getIntExtra("URGENT_BADGE_COUNT", -1);
-            boolean showOrder = intent.getBooleanExtra("SHOW_ORDER_FRAGMENT", false);
-            boolean showHome = intent.getBooleanExtra("SHOW_HOME_FRAGMENT", false); // ✅ Add this line
-            boolean showProfile = intent.getBooleanExtra("SHOW_PROFILE_FRAGMENT", false);
-
-            if (updatedCart != -1) updateBadgeCounter(updatedCart);
-            if (updatedUrgent != -1) updateUrgentBadge(updatedUrgent);
-
-            if (showOrder) {
-                switchFragment(new OrderFragment(), "OrderFragment");
-                binding.bottomNavigation.setSelectedItemId(R.id.order);
-            }else if (showProfile) {
-                switchFragment(new ProfileFragment(), "ProfileFragment");
-                binding.bottomNavigation.setSelectedItemId(R.id.profile);
-            } else if (showHome) { // ✅ Show HomeFragment if coming from CartActivity
-                switchFragment(new HomeFragment(), "HomeFragment");
-                binding.bottomNavigation.setSelectedItemId(R.id.home);
-            }
-        }
         initializeBadge();
       //  showPopup();
     }
+    private void handleInitialFragment() {
+
+        if (getSupportFragmentManager().getFragments().size() > 0) return;
+
+        Intent intent = getIntent();
+
+        boolean openProfile = intent.getBooleanExtra("OPEN_PROFILE_FRAGMENT", false);
+        boolean showOrder = intent.getBooleanExtra("SHOW_ORDER_FRAGMENT", false);
+        boolean showHome = intent.getBooleanExtra("SHOW_HOME_FRAGMENT", false);
+
+        Fragment fragment;
+        String tag;
+        int navId;
+
+        if (openProfile) {
+            fragment = new ProfileFragment();
+            tag = "ProfileFragment";
+            navId = R.id.profile;
+
+        } else if (showOrder) {
+            fragment = new OrderFragment();
+            tag = "OrderFragment";
+            navId = R.id.order;
+
+        } else {
+            fragment = new HomeFragment();
+            tag = "HomeFragment";
+            navId = R.id.home;
+        }
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment, tag)
+                .commit();
+
+        binding.bottomNavigation.setSelectedItemId(navId);
+    }
+
 
     private void showPopup() {
 
-        viewModel = new ViewModelProvider(this).get(OrderDetailsViewModel.class);
-        viewModel.init(this);
-        viewModel.getOrderDetailsData(AppSession.getInstance(this).getValue(Constants.RELAILER_ID));
+        View view = LayoutInflater.from(this)
+                .inflate(R.layout.free_subscription, null);
 
-        View view = LayoutInflater.from(this).inflate(R.layout.show_expiry_list, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        TextView btnOk = view.findViewById(R.id.popup_yes);
 
-        builder.setView(view);
-        builder.setCancelable(false); // ❌ Back press block
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .setCancelable(false)
+                .create();
 
-        AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setBackgroundDrawable(
+                new ColorDrawable(Color.TRANSPARENT)
+        );
 
-        ImageView cancel = view.findViewById(R.id.img_cancle);
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_expiry);
-        MaterialButton button = view.findViewById(R.id.btn_ok);
+        btnOk.setOnClickListener(v -> {
 
-        expiryListAdapter = new ExpiryListAdapter(this, expiryList);
-        recyclerView.setAdapter(expiryListAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            String retailerId = AppSession.getInstance(this)
+                    .getValue(Constants.RELAILER_ID);
 
-        // ✅ CANCEL → Aaj ke liye popup band
-        cancel.setOnClickListener(v -> {
-            savePopupShownToday();   // ✅ Date Save
-            dialog.dismiss();
-            finishAffinity();       // ✅ App Close
-        });
+            // ✅ VERY IMPORTANT — popup permanently close
+            AppSession.getInstance(this)
+                    .setBoolean("FREE_PLAN_POPUP_SHOWN_" + retailerId, true);
 
-        // ✅ OK → Aaj ke liye popup band + Dashboard open
-        button.setOnClickListener(v -> {
-            savePopupShownToday();  // ✅ Date Save
             dialog.dismiss();
 
-            binding.fragmentContainer.setVisibility(View.VISIBLE);
-            binding.bottomNavigation.setVisibility(View.VISIBLE);
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment(), "HomeFragment")
-                    .commit();
-
-            binding.bottomNavigation.setSelectedItemId(R.id.home);
+            // ✅ popup ke baad fragment load
+            handleInitialFragment();
         });
-
-        viewModel.getLiveData().observe(this, orderDetailsResponses -> {
-
-            if (orderDetailsResponses == null || orderDetailsResponses.isEmpty()) {
-                savePopupShownToday();
-                dialog.dismiss();
-
-                binding.fragmentContainer.setVisibility(View.VISIBLE);
-                binding.bottomNavigation.setVisibility(View.VISIBLE);
-
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new HomeFragment(), "HomeFragment")
-                        .commit();
-
-                binding.bottomNavigation.setSelectedItemId(R.id.home);
-                return;
-            }
-
-            String currentMonthYear = getCurrentMonthYear(); // ✅ 08-2025 format
-
-            expiryList.clear();
-
-            for (OrderDetailsResponse item : orderDetailsResponses) {
-
-                String expiryMonth = item.getExpiryMonth(); // ✅ "10-2025"
-
-                if (expiryMonth != null && expiryMonth.equals(currentMonthYear)) {
-                    expiryList.add(item);  // ✅ Sirf current month ka data add hoga
-                }
-            }
-
-            // ✅ Agar current month ka koi data nahi mila → popup mat dikhao
-            if (expiryList.isEmpty()) {
-                savePopupShownToday();
-                dialog.dismiss();
-
-                binding.fragmentContainer.setVisibility(View.VISIBLE);
-                binding.bottomNavigation.setVisibility(View.VISIBLE);
-
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new HomeFragment(), "HomeFragment")
-                        .commit();
-
-                binding.bottomNavigation.setSelectedItemId(R.id.home);
-                return;
-            }
-
-            // ✅ Sirf current month wala data popup me dikhega
-            expiryListAdapter.notifyDataSetChanged();
-        });
-
 
         dialog.show();
     }
 
-    private String getCurrentMonthYear() {
-        Calendar calendar = Calendar.getInstance();
-        int month = calendar.get(Calendar.MONTH) + 1;
-        int year = calendar.get(Calendar.YEAR);
-        return String.format(Locale.getDefault(), "%02d-%d", month, year);
-        // return month + "/" + year;
+
+
+    private boolean shouldShowFreePlanPopup() {
+
+        String retailerId = AppSession.getInstance(this)
+                .getValue(Constants.RELAILER_ID);
+
+        if (retailerId == null || retailerId.isEmpty()) return false;
+
+        // 1️⃣ Already shown → no popup
+        boolean popupShown = AppSession.getInstance(this)
+                .getBoolean("FREE_PLAN_POPUP_SHOWN_" + retailerId, false);
+        if (popupShown) return false;
+
+        // 2️⃣ Paid plan user → no popup
+        boolean paidPlanSelected = AppSession.getInstance(this)
+                .getBoolean(Constants.PLAN_SELECTED + "_" + retailerId, false);
+        if (paidPlanSelected) return false;
+
+        // 3️⃣ Free plan marked used → no popup
+        boolean freePlanUsed = AppSession.getInstance(this)
+                .getBoolean(Constants.FREE_PLAN_USED + "_" + retailerId, false);
+        if (freePlanUsed) return false;
+
+        // 4️⃣ Expiry date must exist
+        long expiryTime = AppSession.getInstance(this)
+                .getLong(Constants.PLAN_EXPIRY_DATE + "_" + retailerId, 0);
+
+        if (expiryTime == 0) return false;
+
+        // 5️⃣ Expiry future me ho
+        return System.currentTimeMillis() < expiryTime;
     }
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -458,7 +422,7 @@ public class DashBoardActivity extends AppCompatActivity {
             public void run() {
 
             }
-        }, 5000);
+        }, 1000);
     }
 
     public void updateBadgeCounter(int count) {
@@ -534,25 +498,25 @@ public class DashBoardActivity extends AppCompatActivity {
         }
     }
     private void checkPlanExpiry() {
-        String retailerId = AppSession.getInstance(this).getValue(Constants.RELAILER_ID);
+
+        String retailerId = AppSession.getInstance(this)
+                .getValue(Constants.RELAILER_ID);
 
         long expiryTime = AppSession.getInstance(this)
                 .getLong(Constants.PLAN_EXPIRY_DATE + "_" + retailerId, 0);
 
         if (expiryTime == 0) return;
 
-        long currentTime = System.currentTimeMillis();
+        if (System.currentTimeMillis() > expiryTime) {
 
-        if (currentTime > expiryTime) {
-            AppSession.getInstance(this).setBoolean(Constants.PLAN_SELECTED + "_" + retailerId, false);
-            AppSession.getInstance(this).setBoolean(Constants.FREE_PLAN_USED + "_" + retailerId, true);
+            AppSession.getInstance(this)
+                    .setBoolean(Constants.FREE_PLAN_USED + "_" + retailerId, true);
 
-            AppSession.getInstance(this).clear();
+            AppSession.getInstance(this)
+                    .setBoolean(Constants.PLAN_SELECTED + "_" + retailerId, false);
 
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+            // ❌ Login mat bhejo
+            // ✅ Subscribe popup hi handle karega
         }
     }
 
@@ -608,6 +572,7 @@ public class DashBoardActivity extends AppCompatActivity {
         AppSession.getInstance(this)
                 .setValue("POPUP_LAST_DATE", today);
     }
+
 
 }
 

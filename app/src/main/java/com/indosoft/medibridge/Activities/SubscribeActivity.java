@@ -1,7 +1,15 @@
 package com.indosoft.medibridge.Activities;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -12,10 +20,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.indosoft.medibridge.Adapter.SubsCriptionAdapter;
 import com.indosoft.medibridge.Body.UpdateStatusBody;
+import com.indosoft.medibridge.Model.GetSignUpUserResponse;
 import com.indosoft.medibridge.Model.PlansResponse;
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
+import com.indosoft.medibridge.ViewModel.GetSignUpUserViewModel;
 import com.indosoft.medibridge.ViewModel.PlansViewModel;
 import com.indosoft.medibridge.ViewModel.SignUpViewModel;
 import com.indosoft.medibridge.databinding.ActivitySubscribeBinding;
@@ -39,10 +50,13 @@ import com.itextpdf.layout.element.Paragraph;
 public class SubscribeActivity extends AppCompatActivity implements PaymentResultListener {
     ActivitySubscribeBinding binding;
     PlansViewModel viewModel;
+    GetSignUpUserViewModel signUpViewModel;
     SignUpViewModel sign;
     SubsCriptionAdapter adapter;
     ArrayList<PlansResponse> list = new ArrayList<>();
+    ArrayList<GetSignUpUserResponse> getAllUserList = new ArrayList<>();
     private String planId;
+    boolean isReceiverRegistered = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +66,9 @@ public class SubscribeActivity extends AppCompatActivity implements PaymentResul
         viewModel.init(this);
         sign = new ViewModelProvider(this).get(SignUpViewModel.class);
         sign.init(this);
+        signUpViewModel = new ViewModelProvider(this).get(GetSignUpUserViewModel.class);
+        signUpViewModel.init(this);
+        signUpViewModel.getAllSignUPData();
         viewModel.plansList();
         onAttachObservers();
         adapter = new SubsCriptionAdapter(this,list);
@@ -69,6 +86,7 @@ public class SubscribeActivity extends AppCompatActivity implements PaymentResul
         }
 
         handlePlanVisibility();
+        startNetworkService();
 
 
     }
@@ -89,17 +107,46 @@ public class SubscribeActivity extends AppCompatActivity implements PaymentResul
                 adapter.notifyDataSetChanged();
             }
         });
+        signUpViewModel.getLiveData().observe(this, responses -> {
+            if (responses != null) {
+                getAllUserList.clear();
+                getAllUserList.addAll(responses);
+            } else {
+                Log.e("LoginActivity", "Sign-up response is null");
+            }
+        });
     }
     @Override
     public void onPaymentSuccess(String razorpayPaymentID) {
+
         Toast.makeText(this, "Payment Successful!", Toast.LENGTH_SHORT).show();
+
         int amount = getIntent().getIntExtra("amount", 0);
         String planId = getIntent().getStringExtra("planId");
+
+        String retailerId = AppSession.getInstance(this)
+                .getValue(Constants.RELAILER_ID);
+
+        // 1️⃣ Generate invoice
         generateInvoice(razorpayPaymentID, String.valueOf(amount));
+
+        // 2️⃣ Update subscription (session + server)
         updateSubscription(getPlanName(planId), getPlanDuration(planId));
-        startActivity(new Intent(this, DashBoardActivity.class));
+
+        // 3️⃣ 🔒 BLOCK FREE PLAN POPUP FOREVER
+        AppSession.getInstance(this)
+                .setBoolean("FREE_PLAN_POPUP_SHOWN_" + retailerId, true);
+
+        AppSession.getInstance(this)
+                .setBoolean(Constants.FREE_PLAN_USED + "_" + retailerId, true);
+
+        // 4️⃣ Go directly to Dashboard
+        Intent intent = new Intent(this, DashBoardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         finish();
     }
+
 
     private int getPlanDuration(String planId) {
         switch (planId) {
@@ -158,7 +205,7 @@ public class SubscribeActivity extends AppCompatActivity implements PaymentResul
 
         try {
             JSONObject options = new JSONObject();
-            options.put("name", "Medibro Pvt Ltd");
+            options.put("name", "MediBro Pvt Ltd");
             options.put("description", "Subscription Payment");
             options.put("currency", "INR");
             options.put("amount", amount * 100);  // Amount in paise
@@ -173,15 +220,45 @@ public class SubscribeActivity extends AppCompatActivity implements PaymentResul
 
     @Override
     public void onPaymentError(int code, String response) {
-        Toast.makeText(this, "Payment Failed! Redirecting to login...", Toast.LENGTH_LONG).show();
 
-        AppSession.getInstance(this).clear(); // If you want to log out the user completely
+        Toast.makeText(this,
+                "Payment failed. Please try again.",
+                Toast.LENGTH_LONG).show();
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear all back stack
-        startActivity(intent);
-        finish();
+        if (isRetailerActive()) {
+            // ✅ Status Active → Dashboard
+            Intent intent = new Intent(this, DashBoardActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+
+        } else {
+            // ❌ Status not Active → Login
+            AppSession.getInstance(this).clear();
+
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        }
     }
+
+
+    private boolean isRetailerActive() {
+
+        String retailerId = AppSession.getInstance(this)
+                .getValue(Constants.RELAILER_ID);
+
+        for (GetSignUpUserResponse user : getAllUserList) {
+            if (retailerId.equals(user.getRetailerId())) {
+
+                String status = user.getStatus(); // "Active"
+                return "Active".equalsIgnoreCase(status);
+            }
+        }
+        return false; // default inactive
+    }
+
 
 
     private void updateSubscription(String planName, int planDuration) {
@@ -239,5 +316,63 @@ public class SubscribeActivity extends AppCompatActivity implements PaymentResul
             getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
         }
         super.onConfigurationChanged(newConfig);
+    }
+
+    private void startNetworkService() {
+        Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
+        startService(networkServiceIntent);
+        Log.d("LoginActivity", "NetworkCheckService started");
+    }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
+
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+
+                reloadData();
+            } else {
+
+            }
+        }
+    };
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, filter);
+            isReceiverRegistered = true;
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
+    private void reloadData() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 1000);
     }
 }

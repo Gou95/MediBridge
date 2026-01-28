@@ -1,10 +1,19 @@
 package com.indosoft.medibridge.Activities;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -34,6 +43,7 @@ import com.indosoft.medibridge.Model.OrderRegisterResponse;
 import com.indosoft.medibridge.Model.RecievedOrderResponse;
 import com.indosoft.medibridge.Model.UnitResponse;
 import com.indosoft.medibridge.R;
+import com.indosoft.medibridge.Services.NetworkCheckService;
 import com.indosoft.medibridge.Session.AppSession;
 import com.indosoft.medibridge.Session.Constants;
 import com.indosoft.medibridge.ViewModel.CityDealerViewModel;
@@ -59,6 +69,7 @@ public class ExpiryRegisterActivity extends AppCompatActivity {
     ProductRecivedAdapter adapter;
     private String startDateSelected = null;
     private String lastDateSelected = null;
+    boolean isReceiverRegistered = false;
 
 
     @Override
@@ -75,13 +86,14 @@ public class ExpiryRegisterActivity extends AppCompatActivity {
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
         binding.swipeRefreshLayout.setRefreshing(false);
 
-        adapter = new ProductRecivedAdapter(this,list);
+        adapter = new ProductRecivedAdapter(this, list);
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         onAttachObservers();
         initClicks();
-setDefaultDates();
+        setDefaultDates();
+        startNetworkService();
 
     }
 
@@ -125,18 +137,19 @@ setDefaultDates();
     }
 
     private void filterByProductName(String product) {
-        if (product.isEmpty()){
+        if (product.isEmpty()) {
             adapter.updateList(list);
             return;
         }
         ArrayList<RecievedOrderResponse> filterList = new ArrayList<>();
-        for (RecievedOrderResponse response : list){
-            if (response.getProductName() !=null && response.getProductName().toLowerCase().contains(product.toLowerCase())){
+        for (RecievedOrderResponse response : list) {
+            if (response.getProductName() != null && response.getProductName().toLowerCase().contains(product.toLowerCase())) {
                 filterList.add(response);
             }
         }
         adapter.updateList(filterList);
     }
+
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
         recievedProductViewModel.getLiveData().observe(this, responses -> {
@@ -224,8 +237,6 @@ setDefaultDates();
     }
 
 
-
-
     private void setDefaultDates() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
@@ -237,6 +248,7 @@ setDefaultDates();
         startDateSelected = sdf.format(calendar.getTime());
         binding.txtStartDate.setText(startDateSelected);
     }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         if (newConfig.fontScale > 1.0f) {
@@ -246,5 +258,55 @@ setDefaultDates();
         super.onConfigurationChanged(newConfig);
     }
 
+    private void startNetworkService() {
+        Intent networkServiceIntent = new Intent(this, NetworkCheckService.class);
+        startService(networkServiceIntent);
+    }
 
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            } else {
+                return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+            }
+        }
+        return false;
+    }
+
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isNetworkConnected()) {
+                reloadData();
+            }
+        }
+    };
+
+    private void reloadData() {
+        new Handler().postDelayed(() -> {
+            // You can refresh some data here if needed
+        }, 1000);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isReceiverRegistered) {
+            registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            isReceiverRegistered = true;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver);
+            isReceiverRegistered = false;
+        }
+    }
 }

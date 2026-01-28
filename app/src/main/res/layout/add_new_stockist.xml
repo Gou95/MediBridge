@@ -178,6 +178,8 @@
                         android:autoSizeMaxTextSize="16sp"
                         android:autoSizeStepGranularity="1sp"
                         android:completionThreshold="1"
+                        android:inputType="textCapWords"
+
                         />
 
 
