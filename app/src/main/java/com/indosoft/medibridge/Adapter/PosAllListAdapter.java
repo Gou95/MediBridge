@@ -33,7 +33,13 @@ public class PosAllListAdapter extends RecyclerView.Adapter<PosAllListAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull PosAllListAdapter.ViewHolder holder, int position) {
         PosAllListResponse response = list.get(position);
-        holder.product.setText(response.getProductName());
+
+        if ("unlisted".equals(response.getSource())){
+            holder.product.setText(response.getProductName());
+        }else {
+            holder.product.setText(response.getProductName());
+        }
+
         holder.unitName.setText(response.getUnitName());
         holder.qty.setText(response.getQty());
         holder.amount.setText(response.getAmount());

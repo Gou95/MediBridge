@@ -35,7 +35,17 @@ public class StockitsListAdapter extends RecyclerView.Adapter<StockitsListAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         StockitsResponse response = list.get(position);
-        holder.mediName.setText(response.getProductName());
+
+        String name;
+
+        if (response.getProductName() != null && !response.getProductName().isEmpty()) {
+            name = response.getProductName();
+        } else if (response.getUnlistedMedicines() != null && !response.getUnlistedMedicines().isEmpty()) {
+            name = response.getUnlistedMedicines();
+        } else {
+            name = "N/A";
+        }
+        holder.mediName.setText(name);
         holder.unitNm.setText(response.getUnitName() + ":");
         holder.quantity.setText(response.getOrderQty());
         holder.orderNo.setText(response.getOrderNo());

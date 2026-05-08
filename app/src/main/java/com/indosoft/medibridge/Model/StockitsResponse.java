@@ -40,7 +40,7 @@ public class StockitsResponse {
     private String dealerName;
     @SerializedName("unlisted_medicines")
     @Expose
-    private Object unlistedMedicines;
+    private String unlistedMedicines;
 
     public String getOrderNo() {
         return orderNo;
@@ -130,11 +130,11 @@ public class StockitsResponse {
         this.dealerName = dealerName;
     }
 
-    public CharSequence getUnlistedMedicines() {
-        return (CharSequence) unlistedMedicines;
+    public String getUnlistedMedicines() {
+        return (String) unlistedMedicines;
     }
 
-    public void setUnlistedMedicines(Object unlistedMedicines) {
+    public void setUnlistedMedicines(String unlistedMedicines) {
         this.unlistedMedicines = unlistedMedicines;
     }
 }

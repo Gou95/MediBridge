@@ -39,7 +39,7 @@ public class OrderDetailsResponse {
     private String orderStatus;
     @SerializedName("unlisted_medicines")
     @Expose
-    private Object unlistedMedicines;
+    private String unlistedMedicines;
     @SerializedName("product_id")
     @Expose
     private String productId;
@@ -52,6 +52,9 @@ public class OrderDetailsResponse {
     @SerializedName("batch_no")
     @Expose
     private String batchNo;
+    @SerializedName("source")
+    @Expose
+    private String source;
     boolean isPed;
     boolean isNotPed;
 
@@ -159,11 +162,11 @@ public class OrderDetailsResponse {
         this.orderStatus = orderStatus;
     }
 
-    public CharSequence getUnlistedMedicines() {
-        return (CharSequence) unlistedMedicines;
+    public String getUnlistedMedicines() {
+        return unlistedMedicines;
     }
 
-    public void setUnlistedMedicines(Object unlistedMedicines) {
+    public void setUnlistedMedicines(String unlistedMedicines) {
         this.unlistedMedicines = unlistedMedicines;
     }
 
@@ -182,6 +185,7 @@ public class OrderDetailsResponse {
     public void setOrderItemsId(String orderItemsId) {
         this.orderItemsId = orderItemsId;
     }
+
     public String getExpiryMonth() {
         return expiryMonth;
     }
@@ -189,6 +193,7 @@ public class OrderDetailsResponse {
     public void setExpiryMonth(String expiryMonth) {
         this.expiryMonth = expiryMonth;
     }
+
     public String getBatchNo() {
         return batchNo;
     }
@@ -196,5 +201,209 @@ public class OrderDetailsResponse {
     public void setBatchNo(String batchNo) {
         this.batchNo = batchNo;
     }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+
+
+
+//    @SerializedName("order_no")
+//    @Expose
+//    private String orderNo;
+//    @SerializedName("addtime")
+//    @Expose
+//    private String addtime;
+//    @SerializedName("delivery_day")
+//    @Expose
+//    private String deliveryDay;
+//    @SerializedName("product_name")
+//    @Expose
+//    private String productName;
+//    @SerializedName("order_qty")
+//    @Expose
+//    private String orderQty;
+//    @SerializedName("unit_name")
+//    @Expose
+//    private String unitName;
+//    @SerializedName("dealer_name")
+//    @Expose
+//    private String dealerName;
+//    @SerializedName("dealer_phone")
+//    @Expose
+//    private String dealerPhone;
+//    @SerializedName("dealer_id")
+//    @Expose
+//    private String dealerId;
+//    @SerializedName("retailer_id")
+//    @Expose
+//    private String retailerId;
+//    @SerializedName("order_status")
+//    @Expose
+//    private String orderStatus;
+//    @SerializedName("unlisted_medicines")
+//    @Expose
+//    private Object unlistedMedicines;
+//    @SerializedName("product_id")
+//    @Expose
+//    private String productId;
+//    @SerializedName("order_items_id")
+//    @Expose
+//    private String orderItemsId;
+//    @SerializedName("expiry_month")
+//    @Expose
+//    private String expiryMonth;
+//    @SerializedName("batch_no")
+//    @Expose
+//    private String batchNo;
+//    boolean isPed;
+//    boolean isNotPed;
+//
+//    public boolean isPed() {
+//        return isPed;
+//    }
+//
+//    public void setPed(boolean ped) {
+//        isPed = ped;
+//    }
+//
+//    public boolean isNotPed() {
+//        return isNotPed;
+//    }
+//
+//    public void setNotPed(boolean notPed) {
+//        isNotPed = notPed;
+//    }
+//
+//    public String getOrderNo() {
+//        return orderNo;
+//    }
+//
+//    public void setOrderNo(String orderNo) {
+//        this.orderNo = orderNo;
+//    }
+//
+//    public String getAddtime() {
+//        return addtime;
+//    }
+//
+//    public void setAddtime(String addtime) {
+//        this.addtime = addtime;
+//    }
+//
+//    public String getDeliveryDay() {
+//        return deliveryDay;
+//    }
+//
+//    public void setDeliveryDay(String deliveryDay) {
+//        this.deliveryDay = deliveryDay;
+//    }
+//
+//    public String getProductName() {
+//        return productName;
+//    }
+//
+//    public void setProductName(String productName) {
+//        this.productName = productName;
+//    }
+//
+//    public String getOrderQty() {
+//        return orderQty;
+//    }
+//
+//    public void setOrderQty(String orderQty) {
+//        this.orderQty = orderQty;
+//    }
+//
+//    public String getUnitName() {
+//        return unitName;
+//    }
+//
+//    public void setUnitName(String unitName) {
+//        this.unitName = unitName;
+//    }
+//
+//    public String getDealerName() {
+//        return dealerName;
+//    }
+//
+//    public void setDealerName(String dealerName) {
+//        this.dealerName = dealerName;
+//    }
+//
+//    public String getDealerPhone() {
+//        return dealerPhone;
+//    }
+//
+//    public void setDealerPhone(String dealerPhone) {
+//        this.dealerPhone = dealerPhone;
+//    }
+//
+//    public String getDealerId() {
+//        return dealerId;
+//    }
+//
+//    public void setDealerId(String dealerId) {
+//        this.dealerId = dealerId;
+//    }
+//
+//    public String getRetailerId() {
+//        return retailerId;
+//    }
+//
+//    public void setRetailerId(String retailerId) {
+//        this.retailerId = retailerId;
+//    }
+//
+//    public String getOrderStatus() {
+//        return orderStatus;
+//    }
+//
+//    public void setOrderStatus(String orderStatus) {
+//        this.orderStatus = orderStatus;
+//    }
+//
+//    public CharSequence getUnlistedMedicines() {
+//        return (CharSequence) unlistedMedicines;
+//    }
+//
+//    public void setUnlistedMedicines(Object unlistedMedicines) {
+//        this.unlistedMedicines = unlistedMedicines;
+//    }
+//
+//    public String getProductId() {
+//        return productId;
+//    }
+//
+//    public void setProductId(String productId) {
+//        this.productId = productId;
+//    }
+//
+//    public String getOrderItemsId() {
+//        return orderItemsId;
+//    }
+//
+//    public void setOrderItemsId(String orderItemsId) {
+//        this.orderItemsId = orderItemsId;
+//    }
+//    public String getExpiryMonth() {
+//        return expiryMonth;
+//    }
+//
+//    public void setExpiryMonth(String expiryMonth) {
+//        this.expiryMonth = expiryMonth;
+//    }
+//    public String getBatchNo() {
+//        return batchNo;
+//    }
+//
+//    public void setBatchNo(String batchNo) {
+//        this.batchNo = batchNo;
+//    }
 
 }

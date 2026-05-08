@@ -48,7 +48,17 @@ public class AllOrderDetailAdapter extends RecyclerView.Adapter<AllOrderDetailAd
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OrderDetailsResponse response = list.get(position);
-        holder.productName.setText(response.getProductName());
+        String name;
+
+        if (response.getProductName() != null && !response.getProductName().isEmpty()) {
+            name = response.getProductName();
+        } else if (response.getUnlistedMedicines() != null && !response.getUnlistedMedicines().isEmpty()) {
+            name = response.getUnlistedMedicines();
+        } else {
+            name = "N/A";
+        }
+        holder.productName.setText(name);
+
         holder.unitNM.setText(response.getUnitName()+":");
         holder.unitNUmber.setText(response.getOrderQty() );
         holder.deliveryDay.setText(response.getDeliveryDay());
@@ -56,13 +66,13 @@ public class AllOrderDetailAdapter extends RecyclerView.Adapter<AllOrderDetailAd
         holder.unListed.setText(response.getUnlistedMedicines());
         holder.serialNumber.setText(String.valueOf(position+1)+".");
 
-        if ("UNLISTED MEDICINES".equals(response.getProductName())){
-            holder.layout.setVisibility(View.GONE);
-            holder.unListed.setVisibility(View.VISIBLE);
-        }else {
-            holder.layout.setVisibility(View.VISIBLE);
-            holder.unListed.setVisibility(View.GONE);
-        }
+//        if ("unlisted".equals(response.getProductName())){
+//            holder.layout.setVisibility(View.GONE);
+//            holder.unListed.setVisibility(View.VISIBLE);
+//        }else {
+//            holder.layout.setVisibility(View.VISIBLE);
+//            holder.unListed.setVisibility(View.GONE);
+//        }
 
         boolean isPed = response.isPed();
         boolean isNotPed = response.isNotPed();
@@ -120,6 +130,7 @@ public class AllOrderDetailAdapter extends RecyclerView.Adapter<AllOrderDetailAd
         String stockist = response.getDealerName();
         String productId = response.getProductId();
         String stockistId = response.getDealerId();
+        String unlisted = response.getUnlistedMedicines();
         holder.expiry.setOnClickListener(v -> {
             Intent intent = new Intent(context, ExpireActivity.class);
             intent.putExtra("productName",productName);
@@ -127,6 +138,7 @@ public class AllOrderDetailAdapter extends RecyclerView.Adapter<AllOrderDetailAd
             intent.putExtra("stockist",stockist);
             intent.putExtra("productId",productId);
             intent.putExtra("stockistId",stockistId);
+            intent.putExtra("unlisted",unlisted);
 
             context.startActivity(intent);
         });

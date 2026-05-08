@@ -73,6 +73,7 @@ import com.indosoft.medibridge.Activities.PosActivity;
 import com.indosoft.medibridge.Activities.PosDetailActivity;
 import com.indosoft.medibridge.Activities.StockistActivity;
 import com.indosoft.medibridge.Activities.SubscribeActivity;
+import com.indosoft.medibridge.Activities.UnlistedItemsActivity;
 import com.indosoft.medibridge.Activities.UnlistedStockistActivity;
 import com.indosoft.medibridge.Activities.ViewAllStockistActivity;
 import com.indosoft.medibridge.Adapter.RecentStockitsAdapter;
@@ -135,6 +136,7 @@ public class HomeFragment extends Fragment {
     private HashMap<String, String> unitNameToIdMap = new HashMap<>();
     int notificationCount;
     private String currentQuery = "";
+        
     private boolean isMedicineLoaded = false;
     private boolean isReceiverRegistered = false;
     @Override
@@ -185,10 +187,10 @@ public class HomeFragment extends Fragment {
                     .setValue(Constants.UNIT_ID, String.valueOf(item.getUnitId()));
 
             AppSession.getInstance(requireContext())
-                    .setValue(Constants.UNIT_NAME, item.getUnitName());
+                    .setValue(Constants.UNIT_NAME, item.getUnit());
 
-            showPopup(item.getProductName(), item.getSupplierName());
-        });
+            showPopup(item.getProductName(), item.getCompanyName());
+        }); 
 
 
         binding.rvSearch.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -237,7 +239,7 @@ public class HomeFragment extends Fragment {
         });
         cartViewModel.getLiveData().observe(getViewLifecycleOwner(), response -> {
             if (response != null) {
-                Toast.makeText(getContext(), response.getMessage(), Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(getContext(), response.getMessage(), Toast.LENGTH_SHORT).show();
                 String cartCountStr = AppSession.getInstance(getContext()).getValue(Constants.CART_COUNT);
                 int cartCount = (cartCountStr == null || cartCountStr.isEmpty()) ? 0 : Integer.parseInt(cartCountStr);
                 cartCount++;
@@ -364,7 +366,7 @@ public class HomeFragment extends Fragment {
         });
 
         binding.cardExpiryRegister.setOnClickListener(v -> launchActivity(ExpiryRegisterActivity.class));
-        // binding.cardUnlistedStockist.setOnClickListener(v -> launchActivity(UnlistedStockistActivity.class));
+         binding.txtAddUnlisted.setOnClickListener(v -> launchActivity(UnlistedItemsActivity.class));
         binding.cardExpiryList.setOnClickListener(v -> launchActivity(ExpiryListActivity.class));
         binding.cardStockistList.setOnClickListener(v -> launchActivity(StockistActivity.class));
         binding.cardAllOrders.setOnClickListener(v -> launchActivity(AllOrdersActivity.class));

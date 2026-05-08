@@ -7,6 +7,9 @@ import java.util.List;
 
 public class MedicineListResponse {
 
+    @SerializedName("status")
+    @Expose
+    private String status;
     @SerializedName("page")
     @Expose
     private Integer page;
@@ -22,6 +25,14 @@ public class MedicineListResponse {
     @SerializedName("data")
     @Expose
     private List<Datum> data;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Integer getPage() {
         return page;
@@ -66,28 +77,31 @@ public class MedicineListResponse {
 
         @SerializedName("product_id")
         @Expose
-        private Integer productId;
+        private String productId;
         @SerializedName("product_name")
         @Expose
         private String productName;
         @SerializedName("company_id")
         @Expose
         private Integer companyId;
-        @SerializedName("supplier_name")
+        @SerializedName("company_name")
         @Expose
-        private String supplierName;
+        private String companyName;
         @SerializedName("unit_id")
         @Expose
         private Integer unitId;
-        @SerializedName("unit_name")
+        @SerializedName("unit")
         @Expose
-        private String unitName;
+        private String unit;
+        @SerializedName("source")
+        @Expose
+        private String source;
 
-        public Integer getProductId() {
+        public String getProductId() {
             return productId;
         }
 
-        public void setProductId(Integer productId) {
+        public void setProductId(String productId) {
             this.productId = productId;
         }
 
@@ -107,12 +121,12 @@ public class MedicineListResponse {
             this.companyId = companyId;
         }
 
-        public String getSupplierName() {
-            return supplierName;
+        public String getCompanyName() {
+            return companyName;
         }
 
-        public void setSupplierName(String supplierName) {
-            this.supplierName = supplierName;
+        public void setCompanyName(String companyName) {
+            this.companyName = companyName;
         }
 
         public Integer getUnitId() {
@@ -123,12 +137,20 @@ public class MedicineListResponse {
             this.unitId = unitId;
         }
 
-        public String getUnitName() {
-            return unitName;
+        public String getUnit() {
+            return unit;
         }
 
-        public void setUnitName(String unitName) {
-            this.unitName = unitName;
+        public void setUnit(String unit) {
+            this.unit = unit;
+        }
+
+        public String getSource() {
+            return source;
+        }
+
+        public void setSource(String source) {
+            this.source = source;
         }
 
     }

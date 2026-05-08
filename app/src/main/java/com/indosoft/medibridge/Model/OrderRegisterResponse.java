@@ -39,7 +39,7 @@ public class OrderRegisterResponse {
     private String orderStatus;
     @SerializedName("unlisted_medicines")
     @Expose
-    private Object unlistedMedicines;
+    private String unlistedMedicines;
 
     boolean isPed;
     boolean isNotPed;
@@ -148,11 +148,11 @@ public class OrderRegisterResponse {
         this.orderStatus = orderStatus;
     }
 
-    public CharSequence getUnlistedMedicines() {
-        return (CharSequence) unlistedMedicines;
+    public String getUnlistedMedicines() {
+        return (String) unlistedMedicines;
     }
 
-    public void setUnlistedMedicines(Object unlistedMedicines) {
+    public void setUnlistedMedicines(String unlistedMedicines) {
         this.unlistedMedicines = unlistedMedicines;
     }
 

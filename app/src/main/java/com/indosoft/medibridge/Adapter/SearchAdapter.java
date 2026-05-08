@@ -51,7 +51,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.VH> {
 
     @Override
     public int getItemCount() {
-        return Math.min(list.size(), 50); // 🔥 ONLY SHOW FIRST 50
+        return Math.min(list.size(), 100); // 🔥 ONLY SHOW FIRST 50
     }
 
     static class VH extends RecyclerView.ViewHolder {

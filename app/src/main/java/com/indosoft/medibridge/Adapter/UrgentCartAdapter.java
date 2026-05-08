@@ -41,7 +41,18 @@ public class UrgentCartAdapter extends RecyclerView.Adapter<UrgentCartAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GetUrgentCartResponse response = list.get(position);
-         holder.medicineName.setText(response.getProductName());
+
+        String name;
+
+        if (response.getProductName() != null && !response.getProductName().isEmpty()) {
+            name = response.getProductName();
+        } else if (response.getUnlistedMedicines() != null && !response.getUnlistedMedicines().isEmpty()) {
+            name = response.getUnlistedMedicines();
+        } else {
+            name = "N/A";
+        }
+        holder.medicineName.setText(name);
+
          holder.stockitsName.setText(response.getDealerName());
          holder.unitName.setText(response.getUnitName());
          holder.quantity.setText(response.getQty());

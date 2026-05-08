@@ -73,6 +73,7 @@ public class CashMemoAdapter extends RecyclerView.Adapter<CashMemoAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull CashMemoAdapter.ViewHolder holder, int position) {
         CashMemoListResponse response = list.get(position);
+
         holder.product.setText(response.getProductName());
         holder.unit.setText(response.getUnitName());
         holder.batch.setText(response.getBatchNo());
@@ -81,6 +82,23 @@ public class CashMemoAdapter extends RecyclerView.Adapter<CashMemoAdapter.ViewHo
         holder.amount.setText(response.getAmount());
         holder.rate.setText("Rate"+" "+response.getRate());
 
+        holder.delete.setOnClickListener(v -> new AlertDialog.Builder(context)
+                .setTitle("Delete Item")
+                .setMessage("Do you want to delete this item?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    sign.deleteItem(response.getId());
+                    sign.getLiveData().observe((LifecycleOwner) context, signUpResponse -> {
+                        if (signUpResponse != null) {
+                            holder.delete.setVisibility(View.GONE);
+                            if (listener != null) listener.onMedicineUpdated();
+
+                        }
+
+                    });
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show());
 
         holder.layout.setOnClickListener(v -> {
             View popupView = LayoutInflater.from(context).inflate(R.layout.cash_memo_details, null);
@@ -325,6 +343,7 @@ public class CashMemoAdapter extends RecyclerView.Adapter<CashMemoAdapter.ViewHo
     }
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView product,unit,expiry,qty,batch,amount,rate;
+        ImageView delete;
         LinearLayout layout;
 
         public ViewHolder(@NonNull View itemView) {
@@ -337,6 +356,7 @@ public class CashMemoAdapter extends RecyclerView.Adapter<CashMemoAdapter.ViewHo
             amount = itemView.findViewById(R.id.txt_cashMemoAmount);
             layout = itemView.findViewById(R.id.cash_linear);
             rate = itemView.findViewById(R.id.txt_cashMemoRate);
+            delete = itemView.findViewById(R.id.img_delete);
         }
     }
     public interface OnMedicineUpdatedListener {

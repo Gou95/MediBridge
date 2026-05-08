@@ -13,6 +13,7 @@ import com.indosoft.medibridge.Body.SendEmailBody;
 import com.indosoft.medibridge.Body.SignUpBody;
 import com.indosoft.medibridge.Body.StockistBody;
 import com.indosoft.medibridge.Body.UnlistedBody;
+import com.indosoft.medibridge.Body.UnlistedItemBody;
 import com.indosoft.medibridge.Body.UpdateStatusBody;
 import com.indosoft.medibridge.Body.UserUpdateBody;
 import com.indosoft.medibridge.Model.AddressUpdateResponse;
@@ -58,6 +59,7 @@ import com.indosoft.medibridge.Model.StockistListResponse;
 import com.indosoft.medibridge.Model.StockitsResponse;
 import com.indosoft.medibridge.Model.TotalSalesResponse;
 import com.indosoft.medibridge.Model.UnitResponse;
+import com.indosoft.medibridge.Model.UnlistedItemResponse;
 import com.indosoft.medibridge.Model.UrgentCartResponse;
 import com.indosoft.medibridge.Model.UrgentDeleteResponse;
 import com.indosoft.medibridge.Model.UrgentProceedResponse;
@@ -99,12 +101,15 @@ public interface ApiInterface {
     @GET("users.php")
     Call<List<GetSignUpUserResponse>> getUserList();
     @GET("showcart.php")
-    Call<List<ShowCartResponse>> showGetCartList();
+    Call<List<ShowCartResponse>> showGetCartList(); 
     @FormUrlEncoded
     @POST("city.php")
     Call<List<StateCityResponse>> cityList(@Field("state_id") String state_id);
-    @POST("showcart.php")
+    @GET("cart.php")
     Call<List<ShowCartResponse>> showCartList(@Query("retailer_id") String retailer_id);
+//    @POST("showcart.php")
+//    Call<List<ShowCartResponse>> showCartList(@Query("retailer_id") String retailer_id);
+
     @POST("login_verify.php")
     Call<LoginResponse> loginRes(@Query("retailer_phone") String retailer_phone, @Query("retailer_password") String retailer_password);
     @POST("users.php")
@@ -144,7 +149,7 @@ public interface ApiInterface {
     @POST("proceedorder.php")
     Call<ProceedOrderResponse> proceedOrder(@Query("retailer_id") String retailer_id);
 
-    @POST("orders.php")
+    @POST("orders.php") 
     Call<OrderResponse> orderRes(@Query("retailer_id") String retailer_id, @Query("order_no") String order_no);
 
     @POST("orderdetails_stockist.php")
@@ -271,5 +276,7 @@ public interface ApiInterface {
     Call<SignUpResponse>deleteAllCart(@Query("retailer_id") String retailer_id);
     @GET("dailysalesamount.php")
     Call<List<TotalSalesResponse>> getTotal(@Query("retailer_id") String dealer_id);
+    @POST("addUnlistedProducts.php")
+    Call<UnlistedItemResponse> addUnlistedItem(@Body UnlistedItemBody body);
 }
 

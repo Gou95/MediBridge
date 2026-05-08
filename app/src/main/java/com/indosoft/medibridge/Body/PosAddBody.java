@@ -20,6 +20,8 @@ public class PosAddBody {
     @Expose
     private String addtime;
 
+
+
     public String getProductId() {
         return productId;
     }
@@ -59,4 +61,6 @@ public class PosAddBody {
     public void setAddtime(String addtime) {
         this.addtime = addtime;
     }
+
+
 }

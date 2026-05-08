@@ -57,25 +57,35 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ShowCartResponse output = list.get(position);
-        holder.medicinename.setText(output.getProductName());
+        if ("unlisted".equalsIgnoreCase(output.getSource())) {
+            holder.medicinename.setText(output.getUnlistedMedicines());
+        } else {
+            holder.medicinename.setText(output.getProductName());
+        }
         holder.dealerName.setText(output.getDealerName());
         holder.unit.setText(output.getUnitName());
         holder.number.setText(output.getQty());
         holder.unlisted.setText(output.getUnlistedMedicines());
         Log.d("AdapterDebug", "Position: " + position + " | Product ID: " + output.getProductId() + " | Product Name: " + output.getProductName());
 
-        if ("1680".equals(output.getProductId())) {
+
+        if ("1680".equalsIgnoreCase(output.getSource())) {
             holder.linearLayout.setVisibility(View.GONE);
             holder.unlisted.setVisibility(View.VISIBLE);
-            holder.unlisted.setText(output.getUnlistedMedicines() != null ? output.getUnlistedMedicines() : "N/A");
+            holder.unlisted.setText(output.getUnlistedMedicines());
         } else {
             holder.linearLayout.setVisibility(View.VISIBLE);
             holder.unlisted.setVisibility(View.GONE);
-            holder.unit.setText(output.getUnitName() != null ? output.getUnitName() : "N/A");
         }
         AtomicInteger number = new AtomicInteger(tryParseFloat(output.getQty(), 1));
         String cartId = output.getCartId();
-        String productId = output.getProductId();
+        String productId;
+
+        if ("unlisted".equalsIgnoreCase(output.getSource())) {
+            productId = output.getUnlistedId();   // 🔥 IMPORTANT FIX
+        } else {
+            productId = output.getProductId();
+        }
         updateVisibility(holder, number.get());
         holder.add.setOnClickListener(v -> {
             int newQty = number.incrementAndGet();

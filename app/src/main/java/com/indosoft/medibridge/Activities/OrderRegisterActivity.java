@@ -457,7 +457,15 @@ ActivityOrderRegisterBinding binding;
             while (itemIndex < list.size() && y + rowHeight < pageHeight - 50) {
                 OrderRegisterResponse item = list.get(itemIndex);
 
-                String productName = safe(item.getProductName());
+                String productName;
+
+                if (item.getProductName() != null && !item.getProductName().isEmpty()) {
+                    productName = item.getProductName();
+                } else if (item.getUnlistedMedicines() != null && !item.getUnlistedMedicines().isEmpty()) {
+                    productName = item.getUnlistedMedicines();
+                } else {
+                    productName = "-";
+                }
                 String quantity = safe(item.getOrderQty());
                 String unitName = safe(item.getUnitName());
                 String deliveryDay = safe(item.getDeliveryDay(), "-");

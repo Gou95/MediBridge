@@ -53,7 +53,14 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
     @Override
     public void onBindViewHolder(@NonNull AllOrdersListAdapter.ViewHolder holder, int position) {
         OrderDetailsResponse response = list.get(position);
-        holder.medicine.setText(response.getProductName());
+        String name;
+
+        if (response.getProductName() != null && !response.getProductName().isEmpty()) {
+            name = response.getProductName();
+        } else {
+            name = response.getUnlistedMedicines();
+        }
+        holder.medicine.setText(name);
         holder.unitName.setText(response.getUnitName());
         holder.unitQty.setText(response.getOrderQty());
         holder.stockist.setText(response.getDealerName());
@@ -66,13 +73,13 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
         holder.expiryMonth.setText("Expiry: "+ response.getExpiryMonth());
         holder.batchNo.setText(response.getBatchNo());
 
-        if ("UNLISTED MEDICINES".equals(response.getProductName())){
-            holder.unlisted.setVisibility(View.VISIBLE);
-            holder.linearLayout.setVisibility(View.GONE);
-        }else {
-            holder.unlisted.setVisibility(View.GONE);
-            holder.linearLayout.setVisibility(View.VISIBLE);
-        }
+//        if ("unlisted".equals(response.getProductName())){
+//            holder.unlisted.setVisibility(View.VISIBLE);
+//            holder.linearLayout.setVisibility(View.GONE);
+//        }else {
+//            holder.unlisted.setVisibility(View.GONE);
+//            holder.linearLayout.setVisibility(View.VISIBLE);
+//        }
 
         String orderStatus = response.getOrderStatus();
         if ("Received".equalsIgnoreCase(orderStatus)) {
@@ -117,14 +124,19 @@ public class AllOrdersListAdapter extends RecyclerView.Adapter<AllOrdersListAdap
                 }
             });
         });
-//
+        String productId;
 
+        if ("unlisted".equalsIgnoreCase(response.getSource())) {
+            productId = response.getProductId();   // 🔥 FIX
+        } else {
+            productId = response.getProductId();
+        }
         holder.expiry.setOnClickListener(v -> {
             Intent intent = new Intent(context, ExpireActivity.class);
-            intent.putExtra("productName", response.getProductName());
-            intent.putExtra("qty", response.getOrderQty());
+            intent.putExtra("productId", productId);
+            intent.putExtra("productName", name);
+            intent.putExtra("qty", response.getOrderQty() != null ? response.getOrderQty() : "0");
             intent.putExtra("stockist", response.getDealerName());
-            intent.putExtra("productId", response.getProductId());
             intent.putExtra("stockistId", response.getDealerId());
             intent.putExtra("orderItemsId", response.getOrderItemsId());
             intent.putExtra("expiry", response.getExpiryMonth());

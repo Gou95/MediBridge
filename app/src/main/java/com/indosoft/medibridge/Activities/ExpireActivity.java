@@ -139,13 +139,15 @@ public class ExpireActivity extends AppCompatActivity {
                 binding.autoStockist.setText("");
                 binding.edtBatchNo.setText("");
 
-                String expiryMonth = binding.edtExpiryMonth.getText().toString();
-                String batch = binding.edtExpiryMonth.getText().toString();
+                String expiryMonth = binding.edtExpiryMonth.getText().toString().trim();
+                String batch = binding.edtBatchNo.getText().toString().trim();
+                String qty = binding.edtStockQty.getText().toString().trim();
 
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("productId", selectedProductId);
                 resultIntent.putExtra("expiryMonth", expiryMonth);
                 resultIntent.putExtra("batch", batch);
+                resultIntent.putExtra("qty", qty);
                 setResult(RESULT_OK, resultIntent);
                 finish();
             }
