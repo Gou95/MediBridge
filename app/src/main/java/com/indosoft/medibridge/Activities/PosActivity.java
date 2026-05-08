@@ -128,9 +128,9 @@ public class PosActivity extends AppCompatActivity {
                     .setValue(Constants.UNIT_ID, String.valueOf(item.getUnitId()));
 
             AppSession.getInstance(this)
-                    .setValue(Constants.UNIT_NAME, item.getUnitName());
+                    .setValue(Constants.UNIT_NAME, item.getUnit());
 
-            showPopup(item.getProductName(), item.getSupplierName());
+            showPopup(item.getProductName(), item.getCompanyName());
         });
 
 

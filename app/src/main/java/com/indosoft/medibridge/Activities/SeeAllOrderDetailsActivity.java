@@ -92,6 +92,7 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
         String dateTime = getIntent().getStringExtra("dot");
         String orderStatus = getIntent().getStringExtra("orderStatus");
         String dealer = getIntent().getStringExtra("name");
+        String unlisted = getIntent().getStringExtra("unlisted");
 
 
         binding.txtOrderNo.setText("#"+orderNo);
@@ -270,7 +271,15 @@ public class SeeAllOrderDetailsActivity extends AppCompatActivity {
             while (itemIndex < list.size() && y + rowHeight < pageHeight - 50) {
                 OrderDetailsResponse item = list.get(itemIndex);
 
-                String productName = safe(item.getProductName());
+                String productName;
+
+                if (item.getProductName() != null && !item.getProductName().isEmpty()) {
+                    productName = item.getProductName();
+                } else if (item.getUnlistedMedicines() != null && !item.getUnlistedMedicines().isEmpty()) {
+                    productName = item.getUnlistedMedicines();
+                } else {
+                    productName = "-";
+                }
                 String quantity = safe(item.getOrderQty());
                 String unitName = safe(item.getUnitName());
                 String deliveryDay = safe(item.getDeliveryDay(), "-");

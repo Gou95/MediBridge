@@ -42,8 +42,20 @@
     <FrameLayout
         android:id="@+id/webViewContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"/>
+
+
+    <ImageView
+        android:id="@+id/img_whatsapp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/whatsapp"
+        android:layout_gravity="end"
+        android:layout_margin="20dp"
+        />
 
 
 </LinearLayout>

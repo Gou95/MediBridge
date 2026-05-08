@@ -20,17 +20,21 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:hardwareAccelerated="true"
         android:icon="@drawable/logomedi"
         android:installLocation="auto"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@drawable/logomedi"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:largeHeap="true"
-        android:hardwareAccelerated="true"
         android:usesCleartextTraffic="true"
-
         tools:targetApi="31">
+        <activity
+            android:name=".Activities.UnlistedItemsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            />
         <activity
             android:name=".Activities.CashMemoListActivity"
             android:exported="false" />
@@ -90,8 +94,7 @@
         <activity
             android:name=".Activities.UnlistedStockistActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-            />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".Activities.ExpiryRegisterActivity"
             android:exported="false"
@@ -124,23 +127,22 @@
         <activity
             android:name=".Activities.EditProfileActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".Activities.DashBoardActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"
-            />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".Activities.ForgetPasswordActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.SignUpActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".Activities.LoginActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".Activities.SplashActivity"
             android:exported="true">

@@ -73,6 +73,25 @@ public class HelpActivity extends AppCompatActivity {
         spannable.setSpan(new ForegroundColorSpan(blue), 0, 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannable.setSpan(new ForegroundColorSpan(red), 8, spannable.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         title.setText(spannable);
+
+        binding.imgWhatsapp.setOnClickListener(v -> {
+            try {
+                String phoneNumber = "917389891240"; // 🔥 Country code +91 zaroori
+                String message = "Hello MediBro Support"; // optional message
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(
+                        android.net.Uri.parse(
+                                "https://wa.me/" + phoneNumber + "?text=" + android.net.Uri.encode(message)
+                        )
+                );
+                startActivity(intent);
+
+            } catch (Exception e) {
+                Toast.makeText(this, "WhatsApp is not installed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     @Override

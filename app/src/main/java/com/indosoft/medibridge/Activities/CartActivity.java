@@ -201,7 +201,7 @@ public class CartActivity extends AppCompatActivity implements CardListAdapter.O
 
             if (signUpResponse != null) {
 
-                Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
+               // Toast.makeText(this, signUpResponse.getMessage(), Toast.LENGTH_SHORT).show();
 
                 // ✅ Cart UI clear
                 list.clear();

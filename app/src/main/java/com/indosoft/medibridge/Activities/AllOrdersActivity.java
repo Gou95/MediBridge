@@ -90,10 +90,22 @@ public class AllOrdersActivity extends AppCompatActivity {
                         String productId = result.getData().getStringExtra("productId");
                         String expiryMonth = result.getData().getStringExtra("expiryMonth");
                         String batch = result.getData().getStringExtra("batch");
+                        String qty = result.getData().getStringExtra("qty");
 
                         for (OrderDetailsResponse item : list) {
-                            if (item.getProductId().equals(productId)) {
+
+                            String id;
+
+                            if ("unlisted".equalsIgnoreCase(item.getSource())) {
+                                id = item.getProductId();   // 🔥 correct id
+                            } else {
+                                id = item.getProductId();
+                            }
+
+                            if (id != null && id.equals(productId)) {
                                 item.setExpiryMonth(expiryMonth);
+                                item.setBatchNo(batch);
+                                item.setOrderQty(qty);
                                 break;
                             }
                         }

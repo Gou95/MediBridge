@@ -21,6 +21,7 @@ import com.indosoft.medibridge.R;
 import com.indosoft.medibridge.ViewModel.CompanyViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class StockistListAdapter extends RecyclerView.Adapter<StockistListAdapter.ViewHolder> {
     Context context;
@@ -34,7 +35,6 @@ public class StockistListAdapter extends RecyclerView.Adapter<StockistListAdapte
         this.list = list;
         this.companyViewModel = companyViewModel;
     }
-
 
     @NonNull
     @Override
@@ -72,17 +72,47 @@ public class StockistListAdapter extends RecyclerView.Adapter<StockistListAdapte
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); // Add this line
             dialog.show();
 
-
             close.setOnClickListener(v1 -> dialog.dismiss());
 
-            // Observe result once
             companyViewModel.getLiveData().observe((LifecycleOwner) context, companyResponses -> {
                 if (companyResponses != null) {
                     companyResponseArrayList.clear();
-                    companyResponseArrayList.addAll(companyResponses);
+
+                    ArrayList<CompanyResponse> uniqueList = new ArrayList<>();
+
+                    for (CompanyResponse response1 : companyResponses) {
+                        boolean exists = false;
+
+                        for (CompanyResponse added : uniqueList) {
+                            if (response1.getCompanyName() != null &&
+                                    added.getCompanyName() != null &&
+                                    response1.getCompanyName().trim()
+                                            .equalsIgnoreCase(added.getCompanyName().trim())) {
+                                exists = true;
+                                break;
+                            }
+                        }
+
+                        if (!exists) {
+                            uniqueList.add(response1);
+                        }
+                    }
+
+                    // 🔹 STEP 2: SORT A → Z
+                    Collections.sort(uniqueList, (c1, c2) -> {
+                        if (c1.getCompanyName() == null) return 1;
+                        if (c2.getCompanyName() == null) return -1;
+                        return c1.getCompanyName().trim()
+                                .compareToIgnoreCase(c2.getCompanyName().trim());
+                    });
+
+                    // 🔹 STEP 3: UPDATE ADAPTER LIST
+                    companyResponseArrayList.addAll(uniqueList);
                     adapter.notifyDataSetChanged();
                 }
             });
+
+
         });
 
     }

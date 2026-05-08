@@ -129,6 +129,8 @@ public class CashMemoActivity extends AppCompatActivity {
         binding.swipeRefreshLayout.setOnRefreshListener(this::onAttachObservers);
         binding.swipeRefreshLayout.setRefreshing(false);
         adapter = new CashMemoAdapter(this,list,sign,()->{
+//            calculateRawTotalAmount();
+//            refreshList();
             cashMemoListViewModel.getMedicine(retailerId);
         });
         binding.recyclerView.setAdapter(adapter);
@@ -136,6 +138,7 @@ public class CashMemoActivity extends AppCompatActivity {
         initClicks();
         onAttachObservers();
         startNetworkService();
+
 
         binding.edtDocterNm.setText("Dr. ");
         binding.edtDocterNm.setSelection(binding.edtDocterNm.getText().length());
@@ -154,9 +157,9 @@ public class CashMemoActivity extends AppCompatActivity {
                     .setValue(Constants.UNIT_ID, String.valueOf(item.getUnitId()));
 
             AppSession.getInstance(this)
-                    .setValue(Constants.UNIT_NAME, item.getUnitName());
+                    .setValue(Constants.UNIT_NAME, item.getUnit());
 
-            showPopup(item.getProductName(), item.getSupplierName());
+            showPopup(item.getProductName(), item.getCompanyName());
         });
 
 
@@ -164,6 +167,9 @@ public class CashMemoActivity extends AppCompatActivity {
         binding.rvSearch.setAdapter(searchAdapter);
 
     }
+
+
+
     private void onAttachObservers() {
         binding.swipeRefreshLayout.setRefreshing(true);
         medicineViewModel.getLiveData().observe(this, list -> {
@@ -181,6 +187,7 @@ public class CashMemoActivity extends AppCompatActivity {
             searchAdapter.submitList(list);
             binding.rvSearch.setVisibility(View.VISIBLE);
         });
+
         cashMemoListViewModel.getLiveData().observe(this, responses -> {
             binding.swipeRefreshLayout.setRefreshing(false);
             list.clear();
@@ -200,7 +207,7 @@ public class CashMemoActivity extends AppCompatActivity {
                             }
                             else {
                             }
-                            }
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -211,6 +218,7 @@ public class CashMemoActivity extends AppCompatActivity {
             }else {
             }
         });
+
         cashMemoPdfViewModel.getLiveData().observe(this, responses -> {
             if (responses != null && !responses.isEmpty()) {
                 pdfList.clear();
@@ -767,7 +775,15 @@ public class CashMemoActivity extends AppCompatActivity {
             CashMemoPdfResponse item = pdfList.get(i);
 
             String sno = String.valueOf(i + 1);
-            String name = item.getProductName();
+            String name;
+
+            if (item.getProductName() != null && !item.getProductName().isEmpty()) {
+                name = item.getProductName();
+            } else if (item.getProductName() != null && !item.getProductName().isEmpty()) {
+                name = item.getProductName();
+            } else {
+                name = "-";
+            }
             String batch = item.getBatchNo();
             String expiry = item.getExpiryDate();
             String qty = item.getQty();

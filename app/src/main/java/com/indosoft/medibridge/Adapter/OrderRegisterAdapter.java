@@ -37,7 +37,18 @@ public class OrderRegisterAdapter extends RecyclerView.Adapter<OrderRegisterAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OrderRegisterResponse response = list.get(position);
-        holder.medicine.setText(response.getProductName());
+
+        String name;
+
+        if (response.getProductName() != null && !response.getProductName().isEmpty()) {
+            name = response.getProductName();
+        } else if (response.getUnlistedMedicines() != null && !response.getUnlistedMedicines().isEmpty()) {
+            name = response.getUnlistedMedicines();
+        } else {
+            name = "N/A";
+        }
+        holder.medicine.setText(name);
+
         holder.unitName.setText(response.getUnitName());
         holder.unitQty.setText(response.getOrderQty());
         holder.stockist.setText(response.getDealerName());
@@ -45,15 +56,13 @@ public class OrderRegisterAdapter extends RecyclerView.Adapter<OrderRegisterAdap
         holder.status.setText(response.getOrderStatus());
         holder.time.setText(response.getAddtime());
         holder.serial.setText(String.valueOf(position+1)+".");
-        holder.unlisted.setText(response.getUnlistedMedicines());
+     //   holder.unlisted.setText(response.getUnlistedMedicines());
 
         if ("UNLISTED MEDICINES".equals(response.getProductName())){
             holder.unlisted.setVisibility(View.VISIBLE);
-            holder.linearLayout.setVisibility(View.GONE);
-        }else {
-            holder.unlisted.setVisibility(View.GONE);
-            holder.linearLayout.setVisibility(View.VISIBLE);
-        }
+            holder.linearLayout.setVisibility(View.GONE); }
+        else { holder.unlisted.setVisibility(View.GONE);
+            holder.linearLayout.setVisibility(View.VISIBLE); }
 
         int textColor;
         switch (response.getOrderStatus()) {

@@ -39,7 +39,7 @@ public class RetrofitService {
     public static <S> S userService(Class<S> serviceClass) {
         Retrofit retrofit = loginBuilder.client(client).
                 addConverterFactory(GsonConverterFactory.create(gson)).
-                build();
+                build();   
         return retrofit.create(serviceClass);
     }
 

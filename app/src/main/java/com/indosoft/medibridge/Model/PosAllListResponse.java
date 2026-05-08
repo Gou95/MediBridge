@@ -26,6 +26,10 @@ public class PosAllListResponse {
     @Expose
     private String amount;
 
+    @SerializedName("source")
+    @Expose
+    private String source;
+
     public String getRetailerId() {
         return retailerId;
     }
@@ -80,6 +84,14 @@ public class PosAllListResponse {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
 }
